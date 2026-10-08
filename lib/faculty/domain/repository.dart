@@ -11,4 +11,7 @@ abstract interface class IFacultyRepository {
 
   /// Watch for [Faculty] data changes
   Stream<AppResult<List<Faculty>>> watch();
+
+  /// Update [Faculty] with [id] base on [name]
+  Future<AppResult<Faculty>> update(String id, {String? name});
 }
