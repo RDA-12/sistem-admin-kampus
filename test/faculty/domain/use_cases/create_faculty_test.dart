@@ -78,6 +78,13 @@ void main() {
       final result = await useCase(params);
 
       expect(result, AppResult.success(faculty));
+      verify(
+        () => accessControlMock.permissionCheck(
+          action: .create,
+          resource: .faculty,
+        ),
+      ).called(1);
+      verify(() => facultyRepositoryMock.save(name: params.name)).called(1);
     });
   });
 }
