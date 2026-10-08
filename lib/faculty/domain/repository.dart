@@ -5,4 +5,7 @@ import 'package:sistem_admin/faculty/domain/entities.dart';
 abstract interface class IFacultyRepository {
   /// Save new [Faculty] with [name]
   Future<AppResult<Faculty>> save({required String name});
+
+  /// Delete [Faculty] with [id]
+  Future<AppResult<Null>> delete(String id);
 }

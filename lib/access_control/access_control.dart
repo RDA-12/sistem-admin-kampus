@@ -8,6 +8,9 @@ enum ResourceType {
 enum ActionType {
   /// Creating new resource action
   create,
+
+  /// Deleting resource(s) action
+  delete,
 }
 
 /// Manage access control within this app
