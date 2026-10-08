@@ -22,7 +22,7 @@ void main() {
         const testObj = AppFailure<int>(exception: exc);
         const a = AppFailure<int>(exception: exc);
         const b = AppFailure<int>(
-          exception: AppException('message 2', code: .accessControlCheckFail),
+          exception: AppException('message 2', code: .server),
         );
 
         expect(testObj, equals(a));

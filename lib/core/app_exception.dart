@@ -8,12 +8,6 @@ enum AppExceptionCode {
 
   /// Code caused by server error
   server,
-
-  /// Code caused by access control check fail
-  ///
-  /// It means current user doesn't have enough permission
-  /// to do some action on some resource.
-  accessControlCheckFail,
 }
 
 /// Exception class for this app
