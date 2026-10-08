@@ -10,7 +10,7 @@ class DeleteFacultyUseCase implements FutureBaseUseCase<Faculty, Null> {
   final IFacultyRepository _facultyRepository;
 
   @override
-  Future<AppResult<Null>> call(Faculty params) async {
-    return await _facultyRepository.delete(params.id);
+  Future<AppResult<Null>> call(Faculty params) {
+    return _facultyRepository.delete(params.id);
   }
 }
