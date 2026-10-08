@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:sistem_admin/common/common.dart';
 
 void main() {
   runApp(const MainApp());
 }
 
+/// Main widget for the app
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  /// Creates new [MainApp]
+  const new({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(body: Center(child: Text('Hello World!'))),
+    return MaterialApp.router(
+      routerConfig: AppRouter.config,
     );
   }
 }
