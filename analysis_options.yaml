@@ -7,3 +7,6 @@ analyzer:
     - build/**
     - web/**
     - windows/**
+
+formatter:
+  trailing_commas: preserve
