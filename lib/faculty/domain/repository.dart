@@ -8,4 +8,7 @@ abstract interface class IFacultyRepository {
 
   /// Delete [Faculty] with [id]
   Future<AppResult<Null>> delete(String id);
+
+  /// Watch for [Faculty] data changes
+  Stream<AppResult<List<Faculty>>> watch();
 }
