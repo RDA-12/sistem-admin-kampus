@@ -1,14 +1,40 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/core/core.dart';
 
 extension WidgetTesterX on WidgetTester {
-  Future<void> pumpWidgetForTest(Widget Function(BuildContext) builder) {
+  /// Pump [MaterialApp] to test [Widget] returned by [builder]
+  ///
+  /// [providerBuilder] will be placed as parent of [builder]. It useful to
+  /// use it as [BlocProvider] or [MultiBlocProvider] to provide
+  /// necessary bloc(s) for testing.
+  ///
+  /// [providerBuilder] will have [BuildContext] and [Widget] from [builder].
+  Future<void> pumpWidgetForTest(
+    Widget Function(BuildContext) builder, {
+    Widget Function(BuildContext, Widget)? providerBuilder,
+  }) {
+    late final Widget body;
+    if (providerBuilder != null) {
+      body = Builder(
+        builder: (context) {
+          return providerBuilder(
+            context,
+            // Ensure have fresh context than provider
+            Builder(builder: builder),
+          );
+        },
+      );
+    } else {
+      body = Builder(builder: builder);
+    }
+
     return pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Builder(builder: builder),
+          body: body,
         ),
       ),
     );

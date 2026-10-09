@@ -1,24 +1,43 @@
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
+import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
 
 void main() {
   const faculty = Faculty(id: 'id', name: 'name');
+  late FacultyMutationBloc facultyMutationBlocMock;
 
   group('FacultyForm', () {
+    setUpAll(initializeMockDependencies);
+
+    setUp(() {
+      facultyMutationBlocMock = getItMock<FacultyMutationBloc>();
+      whenListen(
+        facultyMutationBlocMock,
+        Stream.value(const FacultyMutationState()),
+      );
+    });
+
     Future<void> pumpWidget(
       WidgetTester tester, {
       Faculty? initial,
-      void Function(String)? onSaved,
     }) {
       return tester.pumpWidgetForTest(
         (context) => FacultyForm(
           initial: initial,
-          onSaved: onSaved,
         ),
+        providerBuilder: (context, child) {
+          return BlocProvider.value(
+            value: facultyMutationBlocMock,
+            child: child,
+          );
+        },
       );
     }
 
@@ -26,10 +45,7 @@ void main() {
       of: find.text('Nama Fakultas *'),
       matching: find.byType(TextFormField),
     );
-    final saveButtonFinder = find.ancestor(
-      of: find.text('Simpan'),
-      matching: find.byType(AppButton),
-    );
+    final saveButtonFinder = find.byType(AppButton);
 
     group('Render', () {
       testWidgets('shows name field', (tester) async {
@@ -48,7 +64,10 @@ void main() {
           await pumpWidget(tester);
 
           expect(
-            saveButtonFinder,
+            find.ancestor(
+              of: find.text('Simpan'),
+              matching: find.byType(AppButton),
+            ),
             findsOneWidget,
           );
         },
@@ -79,19 +98,41 @@ void main() {
 
     group('Interactions', () {
       testWidgets(
-        'calls onSaved when save button pressed with valid fields',
+        'add FacultyMutationCreateRequested when initial is null '
+        'and save valid fields',
         (tester) async {
-          String? name;
-          await pumpWidget(
-            tester,
-            onSaved: (val) => name = val,
-          );
+          await pumpWidget(tester);
 
           await tester.enterText(nameFieldFinder, 'text');
           await tester.tap(saveButtonFinder);
           await tester.pumpAndSettle();
 
-          expect(name, 'text');
+          verify(
+            () => facultyMutationBlocMock.add(
+              const FacultyMutationCreateRequested(name: 'text'),
+            ),
+          ).called(1);
+        },
+      );
+
+      testWidgets(
+        'add FacultyMutationUpdateRequested when initial is provided '
+        'and save valid fields',
+        (tester) async {
+          await pumpWidget(tester, initial: faculty);
+
+          await tester.enterText(nameFieldFinder, 'text');
+          await tester.tap(saveButtonFinder);
+          await tester.pumpAndSettle();
+
+          verify(
+            () => facultyMutationBlocMock.add(
+              const FacultyMutationUpdateRequested(
+                faculty: faculty,
+                name: 'text',
+              ),
+            ),
+          ).called(1);
         },
       );
     });

@@ -1,20 +1,25 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/domain/domain.dart';
+import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 
 /// Form to create/update a [Faculty]
 class FacultyForm extends StatefulWidget {
   /// Creates new [FacultyForm]
   ///
   /// Save button's label default to "Perbarui" when [initial] is provided.
-  /// Otherwise, it shows "Simpan"
-  const new({this.initial, this.onSaved, super.key});
+  /// Otherwise, it shows "Simpan".
+  ///
+  /// It reacts to [FacultyMutationBloc]'s state changes.
+  /// So, make sure to provide that bloc in the widget tree.
+  const new({
+    this.initial,
+    super.key,
+  });
 
   /// Initial faculty data that will be showed
   final Faculty? initial;
-
-  /// Invoked when user pressed save button and the form is valid
-  final void Function(String)? onSaved;
 
   @override
   State<FacultyForm> createState() => _FacultyFormState();
@@ -54,7 +59,18 @@ class _FacultyFormState extends State<FacultyForm> {
             onPressed: () {
               if (!_formKey.currentState!.validate()) return;
               final name = _nameController.text.trim();
-              widget.onSaved?.call(name);
+              if (widget.initial == null) {
+                context.read<FacultyMutationBloc>().add(
+                  FacultyMutationCreateRequested(name: name),
+                );
+              } else {
+                context.read<FacultyMutationBloc>().add(
+                  FacultyMutationUpdateRequested(
+                    faculty: widget.initial!,
+                    name: name,
+                  ),
+                );
+              }
             },
           ),
         ],
