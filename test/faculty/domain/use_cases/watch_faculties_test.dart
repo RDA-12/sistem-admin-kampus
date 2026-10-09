@@ -3,7 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
-import '../mocks.dart';
+import '../../../common/di_mocks.dart';
 
 void main() {
   final faculties = List.generate(
@@ -13,8 +13,10 @@ void main() {
   late IFacultyRepository facultyRepositoryMock;
   late WatchFacultiesUseCase useCase;
 
+  setUpAll(initializeMockDependencies);
+
   setUp(() {
-    facultyRepositoryMock = MockFacultyRepository();
+    facultyRepositoryMock = getItMock<IFacultyRepository>();
     when(() => facultyRepositoryMock.watch())
         .thenAnswer((_) => Stream.value(AppResult.success(faculties)));
 

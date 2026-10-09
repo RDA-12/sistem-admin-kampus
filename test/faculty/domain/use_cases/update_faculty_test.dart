@@ -3,7 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
-import '../mocks.dart';
+import '../../../common/di_mocks.dart';
 
 void main() {
   const faculty = Faculty(id: 'id', name: 'name');
@@ -11,8 +11,10 @@ void main() {
   late IFacultyRepository facultyRepositoryMock;
   late UpdateFacultyUseCase useCase;
 
+  setUpAll(initializeMockDependencies);
+
   setUp(() {
-    facultyRepositoryMock = MockFacultyRepository();
+    facultyRepositoryMock = getItMock<IFacultyRepository>();
     when(() => facultyRepositoryMock.update(faculty.id, args: params))
         .thenAnswer((_) async => AppResult.success(faculty));
 
