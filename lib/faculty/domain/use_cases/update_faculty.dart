@@ -28,6 +28,6 @@ class UpdateFacultyUseCase
 
   @override
   Future<AppResult<Faculty>> call(UpdateFacultyParams params) {
-    return _facultyRepository.update(params.faculty.id, name: params.name);
+    return _facultyRepository.update(params.faculty.id, args: params);
   }
 }

@@ -1,17 +1,8 @@
-import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/domain/entities.dart';
+import 'package:sistem_admin/faculty/domain/use_cases/update_faculty.dart';
+import 'package:sistem_admin/faculty/domain/use_cases/use_cases.dart';
 
 /// Manage data on [Faculty]
-abstract interface class IFacultyRepository {
-  /// Save new [Faculty] with [name]
-  Future<AppResult<Faculty>> save({required String name});
-
-  /// Delete [Faculty] with [id]
-  Future<AppResult<Null>> delete(String id);
-
-  /// Watch for [Faculty] data changes
-  Stream<AppResult<List<Faculty>>> watch();
-
-  /// Update [Faculty] with [id] base on [name]
-  Future<AppResult<Faculty>> update(String id, {String? name});
-}
+abstract interface class IFacultyRepository
+    extends BaseRepository<Faculty, CreateFacultyParams, UpdateFacultyParams>;

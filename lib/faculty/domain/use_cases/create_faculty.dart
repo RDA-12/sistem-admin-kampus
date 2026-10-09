@@ -26,7 +26,7 @@ class CreateFacultyUseCase
   /// Run creating new [Faculty]
   @override
   Future<AppResult<Faculty>> call(CreateFacultyParams params) async {
-    final result = await _facultyRepository.save(name: params.name);
+    final result = await _facultyRepository.save(params);
     switch (result) {
       case AppSuccess(:final data):
         return AppResult.success(data);

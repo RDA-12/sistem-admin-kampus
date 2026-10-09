@@ -13,7 +13,7 @@ void main() {
 
   setUp(() {
     facultyRepositoryMock = MockFacultyRepository();
-    when(() => facultyRepositoryMock.save(name: params.name))
+    when(() => facultyRepositoryMock.save(params))
         .thenAnswer((_) async => AppResult.success(faculty));
 
     useCase = CreateFacultyUseCase(
@@ -23,7 +23,7 @@ void main() {
 
   group('CreateFacultyUseCase', () {
     test('returns failure when FacultyRepository.save fails', () async {
-      when(() => facultyRepositoryMock.save(name: params.name)).thenAnswer(
+      when(() => facultyRepositoryMock.save(params)).thenAnswer(
         (_) async => AppResult<Faculty>.failure(
           AppException.test(),
         ),
@@ -45,7 +45,7 @@ void main() {
       final result = await useCase(params);
 
       expect(result, AppResult.success(faculty));
-      verify(() => facultyRepositoryMock.save(name: params.name)).called(1);
+      verify(() => facultyRepositoryMock.save(params)).called(1);
     });
   });
 }

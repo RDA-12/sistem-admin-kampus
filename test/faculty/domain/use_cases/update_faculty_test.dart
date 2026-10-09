@@ -14,7 +14,7 @@ void main() {
 
   setUp(() {
     facultyRepositoryMock = MockFacultyRepository();
-    when(() => facultyRepositoryMock.update(faculty.id, name: params.name))
+    when(() => facultyRepositoryMock.update(faculty.id, args: params))
         .thenAnswer((_) async => AppResult.success(faculty));
 
     useCase = UpdateFacultyUseCase(
@@ -24,7 +24,7 @@ void main() {
 
   group('UpdateFacultyUseCase', () {
     test('returns failure when FacultyRepository.save fails', () async {
-      when(() => facultyRepositoryMock.update(faculty.id, name: params.name))
+      when(() => facultyRepositoryMock.update(faculty.id, args: params))
           .thenAnswer(
             (_) async => AppResult<Faculty>.failure(
               AppException.test(),
@@ -47,7 +47,7 @@ void main() {
       final result = await useCase(params);
 
       expect(result, AppResult.success(faculty));
-      verify(() => facultyRepositoryMock.update(faculty.id, name: params.name))
+      verify(() => facultyRepositoryMock.update(faculty.id, args: params))
           .called(1);
     });
   });
