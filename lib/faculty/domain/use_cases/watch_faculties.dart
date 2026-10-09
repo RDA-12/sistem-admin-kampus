@@ -1,8 +1,10 @@
+import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/domain/entities.dart';
 import 'package:sistem_admin/faculty/domain/repository.dart';
 
 /// Use case to watch for [Faculty] data changes
+@LazySingleton(env: [Environment.prod])
 class WatchFacultiesUseCase implements StreamBaseUseCase<Null, List<Faculty>> {
   /// Creates new [WatchFacultiesUseCase]
   new({required this._facultyRepository});

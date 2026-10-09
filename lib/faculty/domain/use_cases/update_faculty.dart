@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/domain/entities.dart';
 import 'package:sistem_admin/faculty/domain/repository.dart';
@@ -19,6 +20,7 @@ final class UpdateFacultyParams extends Equatable {
 }
 
 /// Use case for updating a [Faculty]
+@LazySingleton(env: [Environment.prod])
 class UpdateFacultyUseCase
     implements FutureBaseUseCase<UpdateFacultyParams, Faculty> {
   /// Creates new [UpdateFacultyUseCase]
