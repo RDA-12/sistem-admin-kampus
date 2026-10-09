@@ -21,6 +21,7 @@ void main() {
       whenListen(
         facultyMutationBlocMock,
         Stream.value(const FacultyMutationState()),
+        initialState: const FacultyMutationState(),
       );
     });
 
@@ -94,6 +95,40 @@ void main() {
 
         expect(find.text(faculty.name), findsOneWidget);
       });
+
+      testWidgets(
+        'shows LoadingIndicator and disable save button '
+        'when FacultyMutationState isCreating true',
+        (tester) async {
+          whenListen(
+            facultyMutationBlocMock,
+            Stream.value(const FacultyMutationState(isCreating: true)),
+          );
+
+          await pumpWidget(tester);
+          await tester.pump();
+
+          expect(find.byType(LoadingIndicator), findsOneWidget);
+          expect(tester.widget<AppButton>(saveButtonFinder).onPressed, isNull);
+        },
+      );
+
+      testWidgets(
+        'shows LoadingIndicator and disable save button '
+        'when FacultyMutationState updatingIds contains initial faculty',
+        (tester) async {
+          whenListen(
+            facultyMutationBlocMock,
+            Stream.value(FacultyMutationState(updatingIds: {faculty.id})),
+          );
+
+          await pumpWidget(tester, initial: faculty);
+          await tester.pump();
+
+          expect(find.byType(LoadingIndicator), findsOneWidget);
+          expect(tester.widget<AppButton>(saveButtonFinder).onPressed, isNull);
+        },
+      );
     });
 
     group('Interactions', () {

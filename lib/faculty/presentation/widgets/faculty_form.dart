@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/domain/domain.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
@@ -54,23 +54,36 @@ class _FacultyFormState extends State<FacultyForm> {
             controller: _nameController,
             label: 'Nama Fakultas',
           ),
-          AppButton(
-            label: widget.initial == null ? 'Simpan' : 'Perbarui',
-            onPressed: () {
-              if (!_formKey.currentState!.validate()) return;
-              final name = _nameController.text.trim();
-              if (widget.initial == null) {
-                context.read<FacultyMutationBloc>().add(
-                  FacultyMutationCreateRequested(name: name),
-                );
-              } else {
-                context.read<FacultyMutationBloc>().add(
-                  FacultyMutationUpdateRequested(
-                    faculty: widget.initial!,
-                    name: name,
-                  ),
-                );
-              }
+          BlocSelector<FacultyMutationBloc, FacultyMutationState, bool>(
+            selector: (state) {
+              return state.isCreating ||
+                  state.updatingIds.contains(widget.initial?.id);
+            },
+            builder: (context, isProcessing) {
+              return AppButton(
+                leadingIcon: isProcessing
+                    ? const LoadingIndicator()
+                    : const Icon(Icons.save_rounded),
+                label: widget.initial == null ? 'Simpan' : 'Perbarui',
+                onPressed: isProcessing
+                    ? null
+                    : () {
+                        if (!_formKey.currentState!.validate()) return;
+                        final name = _nameController.text.trim();
+                        if (widget.initial == null) {
+                          context.read<FacultyMutationBloc>().add(
+                            FacultyMutationCreateRequested(name: name),
+                          );
+                        } else {
+                          context.read<FacultyMutationBloc>().add(
+                            FacultyMutationUpdateRequested(
+                              faculty: widget.initial!,
+                              name: name,
+                            ),
+                          );
+                        }
+                      },
+              );
             },
           ),
         ],

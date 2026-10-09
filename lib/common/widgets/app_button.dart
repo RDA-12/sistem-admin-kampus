@@ -7,6 +7,7 @@ class AppButton extends StatelessWidget {
   const new({
     required this.label,
     this.onPressed,
+    this.leadingIcon,
     super.key,
   });
 
@@ -16,21 +17,36 @@ class AppButton extends StatelessWidget {
   /// Label for this button
   final String label;
 
+  /// Icon to be placed before [label]
+  final Widget? leadingIcon;
+
   @override
   Widget build(BuildContext context) {
+    final child = Text(label);
+    final style = FilledButton.styleFrom(
+      fixedSize: const Size.fromHeight(56),
+      textStyle: context.text.titleMedium?.copyWith(
+        color: context.color.onPrimary,
+      ),
+      padding: const EdgeInsets.all(24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(16),
+      ),
+    );
+
+    if (leadingIcon != null) {
+      return FilledButton.icon(
+        onPressed: onPressed,
+        label: child,
+        icon: leadingIcon,
+        iconAlignment: IconAlignment.start,
+      );
+    }
+
     return FilledButton(
       onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        fixedSize: const Size.fromHeight(56),
-        textStyle: context.text.titleMedium?.copyWith(
-          color: context.color.onPrimary,
-        ),
-        padding: const EdgeInsets.all(24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16),
-        ),
-      ),
-      child: Text(label),
+      style: style,
+      child: child,
     );
   }
 }

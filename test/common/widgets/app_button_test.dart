@@ -10,11 +10,13 @@ void main() {
       WidgetTester tester, {
       String label = 'Label',
       VoidCallback? onPressed,
+      Widget? leadingIcon,
     }) {
       return tester.pumpWidgetForTest(
         (context) => AppButton(
           label: label,
           onPressed: onPressed,
+          leadingIcon: leadingIcon,
         ),
       );
     }
@@ -30,6 +32,14 @@ void main() {
         await pumpWidget(tester);
 
         expect(find.byType(FilledButton), findsOneWidget);
+      });
+
+      testWidgets('shows leadingIcon when provided', (tester) async {
+        const leadingIcon = Icon(Icons.abc);
+
+        await pumpWidget(tester, leadingIcon: leadingIcon);
+
+        expect(find.byWidget(leadingIcon), findsOneWidget);
       });
     });
 
