@@ -39,9 +39,12 @@ class AppFormField extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         label: Text(effectiveLabel),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        fillColor: context.color.surfaceContainer,
+        filled: true,
         border: WidgetStateInputBorder.resolveWith((states) {
           final basicBorder = UnderlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
           );
           if (states.contains(WidgetState.error)) {
             return basicBorder.copyWith(
