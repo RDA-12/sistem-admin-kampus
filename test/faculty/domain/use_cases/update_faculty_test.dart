@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/core/core.dart';
-import 'package:sistem_admin/faculty/domain/use_cases/update_faculty.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
 import '../mocks.dart';
