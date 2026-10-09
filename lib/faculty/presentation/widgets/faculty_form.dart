@@ -43,6 +43,7 @@ class _FacultyFormState extends State<FacultyForm> {
       key: _formKey,
       child: Column(
         spacing: 16,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppFormField(
             controller: _nameController,
