@@ -52,3 +52,5 @@ app.*.map.json
 
 # Generated code
 *.g.dart
+di.config.dart
+di_mocks.config.dart

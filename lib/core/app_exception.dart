@@ -8,6 +8,12 @@ enum AppExceptionCode {
 
   /// Code caused by server error
   server,
+
+  /// Code caused by requested faculty not found in db
+  facultyNotFound,
+
+  /// Code caused by new faculty have existing name
+  facultyAlreadyExists,
 }
 
 /// Exception class for this app

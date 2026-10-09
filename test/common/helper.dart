@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sistem_admin/core/core.dart';
 
 extension WidgetTesterX on WidgetTester {
   Future<void> pumpWidgetForTest(Widget Function(BuildContext) builder) {
@@ -43,4 +44,16 @@ extension WidgetTesterX on WidgetTester {
       ),
     );
   }
+}
+
+/// Helper for [AppResult] expectation
+extension AppResultX<T> on AppResult<T> {
+  void expectFailureWithCode(AppExceptionCode code) => expect(
+    this,
+    isA<AppFailure<T>>().having(
+      (e) => e.exception.code,
+      'exception.code',
+      code,
+    ),
+  );
 }
