@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:drift/native.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mock_exceptions/mock_exceptions.dart';
 import 'package:rxdart/rxdart.dart';
@@ -35,6 +34,17 @@ class FacultyRepository implements IFacultyRepository {
   Future<AppResult<Faculty>> save(CreateFacultyParams args) async {
     try {
       maybeThrowException(this, Invocation.method(#save, [args]));
+      final query = _db.select(_db.facultiesDrift)
+        ..where((tbl) => tbl.name.equals(args.name));
+      final exists = await query.getSingleOrNull();
+      if (exists != null) {
+        return AppResult.failure(
+          AppException(
+            'faculty with name ${args.name} already exists',
+            code: .facultyAlreadyExists,
+          ),
+        );
+      }
       final id = _uidGenerator.generate();
       final facultyInsert = FacultiesDriftCompanion.insert(
         id: id,
@@ -44,17 +54,6 @@ class FacultyRepository implements IFacultyRepository {
           .into(_db.facultiesDrift)
           .insertReturning(facultyInsert);
       return AppResult.success(facultyDb.toDomain());
-    } on SqliteException catch (e) {
-      final code = e.resultCode;
-      if (code == 19) {
-        return AppResult.failure(
-          AppException(
-            'faculty with name ${args.name} already exists',
-            code: .facultyAlreadyExists,
-          ),
-        );
-      }
-      return AppResult.failure(AppException('$e', code: .internal));
     } on Exception catch (e) {
       return AppResult.failure(AppException('$e', code: .internal));
     }
