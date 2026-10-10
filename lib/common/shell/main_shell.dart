@@ -47,7 +47,7 @@ class MainShell extends StatelessWidget {
           onDestinationSelected: onDestinationChanged,
           indicatorColor: context.color.primaryContainer,
           backgroundColor: breakpoint > BreakPoint.compact
-              ? context.color.surfaceContainerLow
+              ? context.mainShellSurface
               : null,
           destinations: _destinations.indexed.map((value) {
             final (index, it) = value;
@@ -92,10 +92,10 @@ class MainShell extends StatelessWidget {
             );
         }
         return Scaffold(
-          backgroundColor: context.color.surfaceContainerLow,
+          backgroundColor: context.mainShellSurface,
           appBar: AppBar(
             backgroundColor: breakpoint > BreakPoint.compact
-                ? context.color.surfaceContainerLow
+                ? context.mainShellSurface
                 : null,
             title: const Text('Sistem Administrasi'),
           ),
