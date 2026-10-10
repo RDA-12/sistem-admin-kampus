@@ -54,3 +54,6 @@ app.*.map.json
 *.g.dart
 di.config.dart
 di_mocks.config.dart
+
+# VSCode config
+.vscode/

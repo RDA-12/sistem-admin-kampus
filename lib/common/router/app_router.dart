@@ -9,7 +9,7 @@ part 'app_router.g.dart';
 class AppRouter {
   /// Router config for this app
   static GoRouter config = GoRouter(
-    initialLocation: '/create',
+    initialLocation: '/faculties',
     routes: $appRoutes,
   );
 }

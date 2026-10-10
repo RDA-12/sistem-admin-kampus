@@ -4,3 +4,6 @@ import 'package:sistem_admin/faculty/faculty.dart';
 
 @LazySingleton(as: FacultyMutationBloc, env: [Environment.test])
 class MockFacultyMutationBloc extends Mock implements FacultyMutationBloc;
+
+@LazySingleton(as: FacultiesBloc, env: [Environment.test])
+class MockFacultiesBloc extends Mock implements FacultiesBloc;
