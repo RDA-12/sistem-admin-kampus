@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 
 void main() {
+  initializeDependencies();
   runApp(const MainApp());
 }
 
