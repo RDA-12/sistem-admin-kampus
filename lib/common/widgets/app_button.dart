@@ -40,6 +40,7 @@ class AppButton extends StatelessWidget {
         label: child,
         icon: leadingIcon,
         iconAlignment: IconAlignment.start,
+        style: style,
       );
     }
 
