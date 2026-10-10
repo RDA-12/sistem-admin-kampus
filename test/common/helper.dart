@@ -12,10 +12,25 @@ extension WidgetTesterX on WidgetTester {
   /// necessary bloc(s) for testing.
   ///
   /// [providerBuilder] will have [BuildContext] and [Widget] from [builder].
+  /// 
+  /// [phoneSize] is useful to set physical device size that will be used
+  /// to test the widget. It automatically add a tearDown to reset the size.
   Future<void> pumpWidgetForTest(
     Widget Function(BuildContext) builder, {
     Widget Function(BuildContext, Widget)? providerBuilder,
+    Size? phoneSize,
   }) {
+    if (phoneSize != null) {
+      view.physicalSize = phoneSize;
+      view.devicePixelRatio = 1;
+
+      addTearDown(() {
+        view
+          ..resetDevicePixelRatio()
+          ..resetPhysicalSize();
+      });
+    }
+
     late final Widget body;
     if (providerBuilder != null) {
       body = Builder(

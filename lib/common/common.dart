@@ -3,6 +3,7 @@ export 'data/data.dart';
 export 'di.dart';
 export 'exception_message.dart';
 export 'router/router.dart';
+export 'shell/shell.dart';
 export 'theme/theme.dart';
 export 'uid_generator.dart';
 export 'widgets/widgets.dart';
