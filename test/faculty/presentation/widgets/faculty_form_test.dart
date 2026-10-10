@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
 import '../../../common/di_mocks.dart';
@@ -211,6 +212,111 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('text'), findsNothing);
+      });
+
+      testWidgets('shows success dialog with correct title and message '
+          'when create success', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          const FacultyMutationState(
+            notice: FacultyCreatedNotice(faculty),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Fakultas berhasil disimpan'), findsOneWidget);
+        expect(
+          find.text('Fakulas dengan nama "${faculty.name}" berhasil disimpan'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('shows success dialog with correct title and message '
+          'when update success', (tester) async {
+        const updated = Faculty(id: 'id', name: 'updated');
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          const FacultyMutationState(
+            notice: FacultyUpdatedNotice(before: faculty, after: updated),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Fakultas "${faculty.name}" berhasil diperbarui'),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            'Fakulas "${faculty.name}" berhasil diperbarui '
+            'dengan nama "${updated.name}"',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('shows failed dialog with correct title and message '
+          'when create failed', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          FacultyMutationState(
+            notice: FacultyMutationFailedNotice(
+              type: .create,
+              exception: AppException.test(),
+              faculty: null,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Gagal menyimpan fakultas baru'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Terjadi kesalahan internal. Harap coba lagi nanti'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('shows failed dialog with correct title and message '
+          'when update failed', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          FacultyMutationState(
+            notice: FacultyMutationFailedNotice(
+              type: .update,
+              exception: AppException.test(),
+              faculty: faculty,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Gagal memperbarui fakultas'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Terjadi kesalahan internal. Harap coba lagi nanti'),
+          findsOneWidget,
+        );
       });
     });
   });

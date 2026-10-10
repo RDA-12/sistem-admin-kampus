@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
@@ -48,10 +50,43 @@ class _FacultyFormState extends State<FacultyForm> {
       listenWhen: (p, c) => p.notice != c.notice,
       listener: (context, state) {
         switch (state.notice) {
-          case FacultyMutationFailedNotice():
-          case FacultyUpdatedNotice():
+          case FacultyMutationFailedNotice(
+            :final type,
+            :final exception,
+          ):
+            late final String title;
+            switch (type) {
+              case FacultyMutationType.create:
+                title = 'Gagal menyimpan fakultas baru';
+              case FacultyMutationType.update:
+                title = 'Gagal memperbarui fakultas';
+              case _:
+                break;
+            }
+            unawaited(
+              context.showFailedDialog(
+                title: title,
+                message: exception.code.message,
+              ),
+            );
+          case FacultyUpdatedNotice(:final before, :final after):
+            unawaited(
+              context.showSuccessDialog(
+                title: 'Fakultas "${before.name}" berhasil diperbarui',
+                message:
+                    'Fakulas "${before.name}" berhasil diperbarui '
+                    'dengan nama "${after.name}"',
+              ),
+            );
             _nameController.clear();
-          case FacultyCreatedNotice():
+          case FacultyCreatedNotice(:final created):
+            unawaited(
+              context.showSuccessDialog(
+                title: 'Fakultas berhasil disimpan',
+                message:
+                    'Fakulas dengan nama "${created.name}" berhasil disimpan',
+              ),
+            );
             _nameController.clear();
           default:
         }
