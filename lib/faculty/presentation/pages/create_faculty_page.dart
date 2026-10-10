@@ -14,10 +14,10 @@ class CreateFacultyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<FacultyMutationBloc>(),
-      child: Scaffold(
+      child: const Scaffold(
         body: Padding(
-          padding: context.pagePadding,
-          child: const FacultyForm(),
+          padding: AppSpacing.pagePadding,
+          child: FacultyForm(),
         ),
       ),
     );

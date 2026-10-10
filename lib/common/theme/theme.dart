@@ -143,7 +143,10 @@ extension ThemeX on BuildContext {
 
   /// Returns active [TextTheme]
   TextTheme get text => TextTheme.of(this);
+}
 
-  /// Returns insets [Padding] for page
-  EdgeInsets get pagePadding => const EdgeInsets.all(16);
+/// Global spacing configuration for this app
+abstract class AppSpacing {
+  /// Returns padding for a page
+  static const EdgeInsets pagePadding = EdgeInsets.all(16);
 }
