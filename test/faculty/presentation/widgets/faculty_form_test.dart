@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -170,6 +172,46 @@ void main() {
           ).called(1);
         },
       );
+    });
+
+    group('Side Effects', () {
+      testWidgets('clear all fields when create success', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+
+        await tester.enterText(nameFieldFinder, 'text');
+        expect(find.text('text'), findsOneWidget);
+
+        controller.add(
+          const FacultyMutationState(notice: FacultyCreatedNotice(faculty)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('text'), findsNothing);
+      });
+
+      testWidgets('clear all fields when update success', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+
+        await tester.enterText(nameFieldFinder, 'text');
+        expect(find.text('text'), findsOneWidget);
+
+        controller.add(
+          const FacultyMutationState(
+            notice: FacultyUpdatedNotice(before: faculty, after: faculty),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('text'), findsNothing);
+      });
     });
   });
 }

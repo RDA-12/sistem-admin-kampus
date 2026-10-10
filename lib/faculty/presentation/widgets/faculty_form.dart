@@ -44,49 +44,62 @@ class _FacultyFormState extends State<FacultyForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        spacing: 16,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppFormField(
-            controller: _nameController,
-            label: 'Nama Fakultas',
-          ),
-          BlocSelector<FacultyMutationBloc, FacultyMutationState, bool>(
-            selector: (state) {
-              return state.isCreating ||
-                  state.updatingIds.contains(widget.initial?.id);
-            },
-            builder: (context, isProcessing) {
-              return AppButton(
-                leadingIcon: isProcessing
-                    ? const LoadingIndicator()
-                    : const Icon(Icons.save_rounded),
-                label: widget.initial == null ? 'Simpan' : 'Perbarui',
-                onPressed: isProcessing
-                    ? null
-                    : () {
-                        if (!_formKey.currentState!.validate()) return;
-                        final name = _nameController.text.trim();
-                        if (widget.initial == null) {
-                          context.read<FacultyMutationBloc>().add(
-                            FacultyMutationCreateRequested(name: name),
-                          );
-                        } else {
-                          context.read<FacultyMutationBloc>().add(
-                            FacultyMutationUpdateRequested(
-                              faculty: widget.initial!,
-                              name: name,
-                            ),
-                          );
-                        }
-                      },
-              );
-            },
-          ),
-        ],
+    return BlocListener<FacultyMutationBloc, FacultyMutationState>(
+      listenWhen: (p, c) => p.notice != c.notice,
+      listener: (context, state) {
+        switch (state.notice) {
+          case FacultyMutationFailedNotice():
+          case FacultyUpdatedNotice():
+            _nameController.clear();
+          case FacultyCreatedNotice():
+            _nameController.clear();
+          default:
+        }
+      },
+      child: Form(
+        key: _formKey,
+        child: Column(
+          spacing: 16,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppFormField(
+              controller: _nameController,
+              label: 'Nama Fakultas',
+            ),
+            BlocSelector<FacultyMutationBloc, FacultyMutationState, bool>(
+              selector: (state) {
+                return state.isCreating ||
+                    state.updatingIds.contains(widget.initial?.id);
+              },
+              builder: (context, isProcessing) {
+                return AppButton(
+                  leadingIcon: isProcessing
+                      ? const LoadingIndicator()
+                      : const Icon(Icons.save_rounded),
+                  label: widget.initial == null ? 'Simpan' : 'Perbarui',
+                  onPressed: isProcessing
+                      ? null
+                      : () {
+                          if (!_formKey.currentState!.validate()) return;
+                          final name = _nameController.text.trim();
+                          if (widget.initial == null) {
+                            context.read<FacultyMutationBloc>().add(
+                              FacultyMutationCreateRequested(name: name),
+                            );
+                          } else {
+                            context.read<FacultyMutationBloc>().add(
+                              FacultyMutationUpdateRequested(
+                                faculty: widget.initial!,
+                                name: name,
+                              ),
+                            );
+                          }
+                        },
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
