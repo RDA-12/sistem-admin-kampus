@@ -3,6 +3,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
@@ -18,9 +19,9 @@ void main() {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      createFacultyMock = getItMock<CreateFacultyUseCase>();
-      updateFacultyMock = getItMock<UpdateFacultyUseCase>();
-      deleteFacultyMock = getItMock<DeleteFacultyUseCase>();
+      createFacultyMock = getIt<CreateFacultyUseCase>();
+      updateFacultyMock = getIt<UpdateFacultyUseCase>();
+      deleteFacultyMock = getIt<DeleteFacultyUseCase>();
     });
 
     FacultyMutationBloc buildBloc() {

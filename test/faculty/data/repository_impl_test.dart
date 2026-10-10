@@ -22,14 +22,14 @@ void main() {
   setUpAll(initializeMockDependencies);
 
   setUp(() async {
-    database = getItMock<AppDriftDatabase>();
+    database = getIt<AppDriftDatabase>();
     for (final f in seededFaculty) {
       await database
           .into(database.facultiesDrift)
           .insert(FacultiesDriftCompanion.insert(id: f.id, name: f.name));
     }
 
-    uidGeneratorMock = getItMock<UidGenerator>();
+    uidGeneratorMock = getIt<UidGenerator>();
     when(uidGeneratorMock.generate).thenReturn(createdFaculty.id);
 
     repository = FacultyRepository(

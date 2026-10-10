@@ -20,7 +20,7 @@ void main() {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      facultyMutationBlocMock = getItMock<FacultyMutationBloc>();
+      facultyMutationBlocMock = getIt<FacultyMutationBloc>();
       whenListen(
         facultyMutationBlocMock,
         Stream.value(const FacultyMutationState()),

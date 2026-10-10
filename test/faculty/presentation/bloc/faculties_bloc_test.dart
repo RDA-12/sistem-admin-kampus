@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
@@ -18,7 +19,7 @@ void main() {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      watchFacultiesMock = getItMock<WatchFacultiesUseCase>();
+      watchFacultiesMock = getIt<WatchFacultiesUseCase>();
       when(() => watchFacultiesMock(null))
           .thenAnswer((_) => Stream.value(AppResult.success(faculties)));
     });

@@ -1,12 +1,9 @@
-import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sistem_admin/common/common.dart';
 
 import 'di_mocks.config.dart';
 
-/// Global getIt instance to get service for testing
-final GetIt getItMock = GetIt.instance;
-
-/// Initialize dependencies with [getItMock] for testing
+/// Initialize dependencies with [getIt] for testing
 ///
 /// It should be run once
 @InjectableInit(
@@ -14,5 +11,4 @@ final GetIt getItMock = GetIt.instance;
   generateForDir: ['test'],
   preferRelativeImports: true,
 )
-void initializeMockDependencies() =>
-    getItMock.init(environment: Environment.test);
+void initializeMockDependencies() => getIt.init(environment: Environment.test);

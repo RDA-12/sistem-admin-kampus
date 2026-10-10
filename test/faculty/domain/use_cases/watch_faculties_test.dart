@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
@@ -16,7 +17,7 @@ void main() {
   setUpAll(initializeMockDependencies);
 
   setUp(() {
-    facultyRepositoryMock = getItMock<IFacultyRepository>();
+    facultyRepositoryMock = getIt<IFacultyRepository>();
     when(() => facultyRepositoryMock.watch())
         .thenAnswer((_) => Stream.value(AppResult.success(faculties)));
 
