@@ -24,6 +24,10 @@ void main() {
     );
   });
 
+  tearDown(() {
+    reset(facultyRepositoryMock);
+  });
+
   group('DeleteFacultyUseCase', () {
     test('returns failure when FacultyRepository.delete fails', () async {
       when(() => facultyRepositoryMock.delete(facultyId)).thenAnswer(

@@ -24,6 +24,10 @@ void main() {
     );
   });
 
+  tearDown(() {
+    reset(facultyRepositoryMock);
+  });
+
   group('CreateFacultyUseCase', () {
     test('returns failure when FacultyRepository.save fails', () async {
       when(() => facultyRepositoryMock.save(params)).thenAnswer(
