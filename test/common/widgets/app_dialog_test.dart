@@ -37,14 +37,6 @@ void main() {
       });
     }
 
-    testWidgets('shows correct icon', (tester) async {
-      await pumpWidget(tester);
-
-      await openDialog(tester);
-
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
-    });
-
     testWidgets('shows provided title and message', (tester) async {
       await pumpWidget(tester, title: 'test', message: 'message test');
 
@@ -96,14 +88,6 @@ void main() {
         );
       });
     }
-
-    testWidgets('shows correct icon', (tester) async {
-      await pumpWidget(tester);
-
-      await openDialog(tester);
-
-      expect(find.byIcon(Icons.cancel_rounded), findsOneWidget);
-    });
 
     testWidgets('shows provided title and message', (tester) async {
       await pumpWidget(tester, title: 'test', message: 'message test');

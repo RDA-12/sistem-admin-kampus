@@ -12,14 +12,9 @@ extension AppDialogX on BuildContext {
     return showDialog(
       context: this,
       builder: (context) {
-        return AlertDialog(
-          icon: Icon(
-            Icons.check_circle_rounded,
-            color: context.color.primary,
-          ),
-          title: Text(title),
+        return _AppDialog(
+          title: title,
           content: Text(message),
-          actionsAlignment: MainAxisAlignment.end,
           actions: [
             AppButton(
               label: 'OK',
@@ -42,12 +37,8 @@ extension AppDialogX on BuildContext {
     return showDialog(
       context: this,
       builder: (context) {
-        return AlertDialog(
-          icon: Icon(
-            Icons.cancel_rounded,
-            color: context.color.error,
-          ),
-          title: Text(title),
+        return _AppDialog(
+          title: title,
           content: Text(message),
           actions: [
             AppButton(
@@ -59,6 +50,29 @@ extension AppDialogX on BuildContext {
           ],
         );
       },
+    );
+  }
+}
+
+class _AppDialog extends StatelessWidget {
+  const new({
+    required this.title,
+    required this.content,
+    this.actions,
+  });
+
+  final String title;
+  final Widget content;
+  final List<Widget>? actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      constraints: const BoxConstraints(minWidth: 280, maxWidth: 560),
+      title: Text(title),
+      content: content,
+      actionsAlignment: MainAxisAlignment.end,
+      actions: actions,
     );
   }
 }
