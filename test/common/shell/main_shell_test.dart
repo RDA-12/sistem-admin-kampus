@@ -35,6 +35,12 @@ void main() {
         expect(find.text('Sistem Administrasi'), findsOneWidget);
       });
 
+      testWidgets('hides title on compact screen', (tester) async {
+        await pumpWidget(tester, phoneSize: const Size(450, 800));
+
+        expect(find.text('Sistem Administrasi'), findsNothing);
+      });
+
       testWidgets('shows child', (tester) async {
         await pumpWidget(tester);
 

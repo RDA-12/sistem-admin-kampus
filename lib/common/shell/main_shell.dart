@@ -97,7 +97,9 @@ class MainShell extends StatelessWidget {
             backgroundColor: breakpoint > BreakPoint.compact
                 ? context.mainShellSurface
                 : null,
-            title: const Text('Sistem Administrasi'),
+            title: breakpoint == BreakPoint.compact
+                ? null
+                : const Text('Sistem Administrasi'),
           ),
           drawer: breakpoint < BreakPoint.medium
               ? Drawer(child: navRail)
