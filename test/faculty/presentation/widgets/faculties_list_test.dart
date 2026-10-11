@@ -16,6 +16,11 @@ void main() {
   late FacultiesBloc facultiesBlocMock;
 
   group('FacultyList', () {
+    final createButtonFinder = find.ancestor(
+      of: find.text('Buat baru'),
+      matching: find.byType(AppButton),
+    );
+
     setUpAll(initializeMockDependencies);
 
     setUp(() {
@@ -30,11 +35,13 @@ void main() {
     Future<void> pumpWidget(
       WidgetTester tester, {
       void Function(Faculty)? onPressed,
+      void Function()? onCreatePressed,
     }) {
       return tester.pumpWidgetForTest(
         (context) {
           return FacultiesList(
             onPressed: onPressed,
+            onCreatePressed: onCreatePressed,
           );
         },
         providerBuilder: (context, child) {
@@ -102,6 +109,12 @@ void main() {
           expect(widget.title, 'Gagal mengambil data fakultas');
         },
       );
+
+      testWidgets('shows create button', (tester) async {
+        await pumpWidget(tester);
+
+        expect(createButtonFinder, findsOneWidget);
+      });
     });
 
     group('Interactions', () {
@@ -123,6 +136,23 @@ void main() {
           await tester.tap(facultyFinder);
 
           expect(pressedFaculty, facultiesMock.first);
+        },
+      );
+
+      testWidgets(
+        'calls onCreatePressed when create button is pressed',
+        (tester) async {
+          var pressed = false;
+          await pumpWidget(
+            tester,
+            onCreatePressed: () {
+              pressed = true;
+            },
+          );
+
+          await tester.tap(createButtonFinder);
+
+          expect(pressed, isTrue);
         },
       );
     });

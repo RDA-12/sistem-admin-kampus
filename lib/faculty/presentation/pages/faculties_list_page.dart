@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
@@ -16,8 +18,12 @@ class FacultiesListPage extends StatelessWidget {
         ..add(
           const SubscriptionRequested(),
         ),
-      child: const Scaffold(
-        body: FacultiesList(),
+      child: Scaffold(
+        body: FacultiesList(
+          onCreatePressed: () {
+            unawaited(const CreateFacultyRoute().push<void>(context));
+          },
+        ),
       ),
     );
   }

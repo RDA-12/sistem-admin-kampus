@@ -13,52 +13,71 @@ class FacultiesList extends StatelessWidget {
   /// So, make sure to provide it with that bloc.
   const new({
     this.onPressed,
+    this.onCreatePressed,
     super.key,
   });
 
   /// Invoked when one of faculties is pressed
   final void Function(Faculty)? onPressed;
 
+  /// Invoked when user press create button
+  final void Function()? onCreatePressed;
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FacultiesBloc, FacultiesState>(
-      builder: (context, state) {
-        switch (state) {
-          case LoadingFaculties():
-          case FacultiesInitial():
-            return const Center(
-              child: LoadingIndicator(size: 32),
-            );
-          case FacultiesLoaded(:final data):
-            return ListView.separated(
-              itemCount: data.length,
-              separatorBuilder: (_, _) => const Divider(height: 4),
-              itemBuilder: (context, index) {
-                final faculty = data[index];
-                return FacultyListTile(
-                  faculty: faculty,
-                  onPressed: onPressed == null
-                      ? null
-                      : () {
-                          onPressed!(faculty);
-                        },
-                );
-              },
-            );
-          case FacultiesFailure(:final exception):
-            return Center(
-              child: AppExceptionBox(
-                title: 'Gagal mengambil data fakultas',
-                exception: exception,
-                onRetryPressed: () {
-                  context.read<FacultiesBloc>().add(
-                    const SubscriptionRequested(),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: .end,
+          children: [
+            AppButton(
+              label: 'Buat baru',
+              onPressed: onCreatePressed,
+            ),
+          ],
+        ),
+        Expanded(
+          child: BlocBuilder<FacultiesBloc, FacultiesState>(
+            builder: (context, state) {
+              switch (state) {
+                case LoadingFaculties():
+                case FacultiesInitial():
+                  return const Center(
+                    child: LoadingIndicator(size: 32),
                   );
-                },
-              ),
-            );
-        }
-      },
+                case FacultiesLoaded(:final data):
+                  return ListView.separated(
+                    itemCount: data.length,
+                    separatorBuilder: (_, _) => const Divider(height: 4),
+                    itemBuilder: (context, index) {
+                      final faculty = data[index];
+                      return FacultyListTile(
+                        faculty: faculty,
+                        onPressed: onPressed == null
+                            ? null
+                            : () {
+                                onPressed!(faculty);
+                              },
+                      );
+                    },
+                  );
+                case FacultiesFailure(:final exception):
+                  return Center(
+                    child: AppExceptionBox(
+                      title: 'Gagal mengambil data fakultas',
+                      exception: exception,
+                      onRetryPressed: () {
+                        context.read<FacultiesBloc>().add(
+                          const SubscriptionRequested(),
+                        );
+                      },
+                    ),
+                  );
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }
