@@ -12,7 +12,7 @@ extension WidgetTesterX on WidgetTester {
   /// necessary bloc(s) for testing.
   ///
   /// [providerBuilder] will have [BuildContext] and [Widget] from [builder].
-  /// 
+  ///
   /// [phoneSize] is useful to set physical device size that will be used
   /// to test the widget. It automatically add a tearDown to reset the size.
   Future<void> pumpWidgetForTest(
@@ -63,15 +63,19 @@ extension WidgetTesterX on WidgetTester {
   ///
   /// [additionalRoutes] typically used to test moving from [page] to others.
   /// Ensure the `others` are within [additionalRoutes].
+  ///
+  /// [childRoutes] will be included in routes of [page] route.
   Future<void> pumpPageForTest({
     required Widget page,
     List<GoRoute> additionalRoutes = const [],
     String path = '/',
+    List<GoRoute> childRoutes = const [],
   }) {
     final routes = [
       GoRoute(
         path: path,
         builder: (context, state) => page,
+        routes: childRoutes,
       ),
       ...additionalRoutes,
     ];
