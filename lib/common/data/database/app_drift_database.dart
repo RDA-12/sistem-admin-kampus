@@ -28,7 +28,7 @@ class AppDriftDatabase extends _$AppDriftDatabase {
       name: 'sistem_admin_db',
       web: DriftWebOptions(
         sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-        driftWorker: Uri.parse('drift_worker.dart.js'),
+        driftWorker: Uri.parse('drift_worker.js'),
       ),
     );
   }
