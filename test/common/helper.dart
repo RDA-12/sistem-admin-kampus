@@ -65,12 +65,27 @@ extension WidgetTesterX on WidgetTester {
   /// Ensure the `others` are within [additionalRoutes].
   ///
   /// [childRoutes] will be included in routes of [page] route.
+  ///
+  /// [phoneSize] is useful to set physical device size that will be used
+  /// to test the widget. It automatically add a tearDown to reset the size.
   Future<void> pumpPageForTest({
     required Widget page,
     List<GoRoute> additionalRoutes = const [],
     String path = '/',
     List<GoRoute> childRoutes = const [],
+    Size? phoneSize,
   }) {
+    if (phoneSize != null) {
+      view.physicalSize = phoneSize;
+      view.devicePixelRatio = 1;
+
+      addTearDown(() {
+        view
+          ..resetDevicePixelRatio()
+          ..resetPhysicalSize();
+      });
+    }
+
     final routes = [
       GoRoute(
         path: path,

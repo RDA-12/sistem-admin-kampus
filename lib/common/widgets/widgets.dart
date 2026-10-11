@@ -4,3 +4,4 @@ export 'app_exception_box.dart';
 export 'app_form_field.dart';
 export 'loading_indicator.dart';
 export 'responsive_builder.dart';
+export 'two_pane_layout_builder.dart';

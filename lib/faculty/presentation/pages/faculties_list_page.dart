@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
+import 'package:sistem_admin/faculty/presentation/pages/create_faculty_page.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/widgets.dart';
 
 /// Page to shows faculties data
@@ -18,12 +19,28 @@ class FacultiesListPage extends StatelessWidget {
         ..add(
           const SubscriptionRequested(),
         ),
-      child: Scaffold(
-        body: FacultiesList(
-          onCreatePressed: () {
-            unawaited(const CreateFacultyRoute().push<void>(context));
-          },
-        ),
+      child: TwoPaneLayoutBuilder<String?>(
+        initialAdditionalData: null,
+        leftBuilder: (context, controller, breakPoint, constraints) {
+          return Scaffold(
+            body: Padding(
+              padding: AppSpacing.pagePadding,
+              child: FacultiesList(
+                onCreatePressed: () {
+                  if (breakPoint < BreakPoint.expanded) {
+                    unawaited(const CreateFacultyRoute().push<void>(context));
+                  } else {
+                    controller.data = 'create';
+                  }
+                },
+              ),
+            ),
+          );
+        },
+        rightBuilder: (context, controller, breakPoint, constraints) {
+          if (controller.data == null) return const SizedBox.shrink();
+          return const CreateFacultyPage();
+        },
       ),
     );
   }
