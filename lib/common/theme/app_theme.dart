@@ -147,5 +147,5 @@ extension ThemeX on BuildContext {
   /// Returns main shell color
   ///
   /// It slighty darker than surface color
-  Color get mainShellSurface => color.surfaceContainerLow;
+  Color get mainShellSurface => color.surfaceContainer;
 }
