@@ -23,6 +23,9 @@ class FacultiesListPage extends StatelessWidget {
         initialAdditionalData: null,
         leftBuilder: (context, controller, breakPoint, constraints) {
           return Scaffold(
+            appBar: AppBar(
+              title: const Text('Daftar Fakultas'),
+            ),
             body: Padding(
               padding: AppSpacing.pagePadding,
               child: FacultiesList(

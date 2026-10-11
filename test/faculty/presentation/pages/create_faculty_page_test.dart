@@ -29,6 +29,12 @@ void main() {
     }
 
     group('Render', () {
+      testWidgets('shows correct title', (tester) async {
+        await pumpWidget(tester);
+
+        expect(find.text('Buat Fakultas Baru'), findsOneWidget);
+      });
+
       testWidgets('shows FacultyForm', (tester) async {
         await pumpWidget(tester);
 

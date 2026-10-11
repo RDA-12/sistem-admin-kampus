@@ -64,6 +64,12 @@ void main() {
     }
 
     group('Render', () {
+      testWidgets('shows correct title', (tester) async {
+        await pumpWidget(tester);
+
+        expect(find.text('Daftar Fakultas'), findsOneWidget);
+      });
+
       testWidgets('provides FacultiesBloc', (tester) async {
         await pumpWidget(tester);
 
