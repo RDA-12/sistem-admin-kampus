@@ -50,6 +50,12 @@ void main() {
             return const CreateFacultyPage();
           },
         ),
+        GoRoute(
+          path: 'create-compact',
+          builder: (_, _) {
+            return const CreateFacultyPage();
+          },
+        ),
       ],
     );
   }

@@ -10,6 +10,20 @@ class CreateFacultyRoute extends GoRouteData with $CreateFacultyRoute {
       const CreateFacultyPage();
 }
 
+/// Route for [CreateFacultyPage] in compact screen
+class CreateFacultyCompactRoute extends GoRouteData
+    with $CreateFacultyCompactRoute {
+  /// Creates new [CreateFacultyRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateFacultyPage();
+}
+
 /// Route for [FacultiesListPage]
 class FacultiesListRoute extends GoRouteData with $FacultiesListRoute {
   /// Creates new [FacultiesListRoute]
@@ -32,6 +46,7 @@ class FacultyMainShellData extends StatefulShellBranchData;
           path: '/faculties',
           routes: [
             TypedGoRoute<CreateFacultyRoute>(path: 'create'),
+            TypedGoRoute<CreateFacultyCompactRoute>(path: 'create-compact'),
           ],
         ),
       ],

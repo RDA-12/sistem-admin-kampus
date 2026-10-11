@@ -31,7 +31,13 @@ class FacultiesListPage extends StatelessWidget {
               child: FacultiesList(
                 onCreatePressed: () {
                   if (breakPoint < BreakPoint.expanded) {
-                    unawaited(const CreateFacultyRoute().push<void>(context));
+                    if (breakPoint == BreakPoint.compact) {
+                      unawaited(
+                        const CreateFacultyCompactRoute().push<void>(context),
+                      );
+                    } else {
+                      unawaited(const CreateFacultyRoute().push<void>(context));
+                    }
                   } else {
                     controller.data = 'create';
                   }

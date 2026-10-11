@@ -6,10 +6,14 @@ import 'package:sistem_admin/faculty/faculty.dart';
 part 'app_routes.dart';
 part 'app_router.g.dart';
 
+/// Navigator key for root app
+final rootNavKey = GlobalKey<NavigatorState>();
+
 /// Holds router for this app
 class AppRouter {
   /// Router config for this app
   static GoRouter config = GoRouter(
+    navigatorKey: rootNavKey,
     initialLocation: '/faculties',
     routes: $appRoutes,
   );
