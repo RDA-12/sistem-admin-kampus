@@ -24,13 +24,13 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final child = Text(label);
     final style = FilledButton.styleFrom(
-      fixedSize: const Size.fromHeight(56),
-      textStyle: context.text.titleMedium?.copyWith(
+      fixedSize: const Size.fromHeight(40),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      textStyle: context.text.titleSmall?.copyWith(
         color: context.color.onPrimary,
       ),
-      padding: const EdgeInsets.all(24),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(16),
+        borderRadius: BorderRadiusGeometry.circular(100),
       ),
     );
 
