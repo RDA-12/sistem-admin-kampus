@@ -8,6 +8,9 @@ void main() {
     .server: 'Terjadi kesalahan di server. Harap coba lagi nanti',
     .facultyAlreadyExists: 'Fakultas dengan nama tersebut sudah ada',
     .facultyNotFound: 'Fakultas tidak dapat ditemukan',
+    .programNotFound: 'Program studi tidak dapat ditemukan',
+    .programAlreadyExists:
+        'Program studi dengan nama tersebut sudah ada pada fakultas ini',
   };
 
   group('AppExceptionCode.message', () {

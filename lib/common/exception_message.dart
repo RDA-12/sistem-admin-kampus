@@ -11,5 +11,8 @@ extension ExceptionMessageX on AppExceptionCode {
     AppExceptionCode.facultyNotFound => 'Fakultas tidak dapat ditemukan',
     AppExceptionCode.facultyAlreadyExists =>
       'Fakultas dengan nama tersebut sudah ada',
+    AppExceptionCode.programNotFound => 'Program studi tidak dapat ditemukan',
+    AppExceptionCode.programAlreadyExists =>
+      'Program studi dengan nama tersebut sudah ada pada fakultas ini',
   };
 }
