@@ -67,7 +67,10 @@ class FacultiesListPage extends StatelessWidget {
         rightBuilder: (context, controller, breakPoint, constraints) {
           if (controller.data == null) return const SizedBox.shrink();
           if (controller.data == 'create') return const CreateFacultyPage();
-          return FacultyDetailPage(id: controller.data!);
+          return FacultyDetailPage(
+            key: ValueKey(controller.data!),
+            id: controller.data!,
+          );
         },
       ),
     );
