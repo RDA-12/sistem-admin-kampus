@@ -17,6 +17,10 @@ class MockUpdateFacultyUseCase extends Mock implements UpdateFacultyUseCase;
 @LazySingleton(as: DeleteFacultyUseCase, env: [Environment.test])
 class MockDeleteFacultyUseCase extends Mock implements DeleteFacultyUseCase;
 
+@LazySingleton(as: WatchSingleFacultyUseCase, env: [Environment.test])
+class MockWatchSingleFacultyUseCase extends Mock
+    implements WatchSingleFacultyUseCase;
+
 final facultiesMock = List<Faculty>.generate(
   5,
   (index) => Faculty(id: '$index', name: 'name $index'),
