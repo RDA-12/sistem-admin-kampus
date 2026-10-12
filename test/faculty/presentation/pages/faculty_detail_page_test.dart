@@ -31,9 +31,15 @@ void main() {
     when(getIt<FacultyMutationBloc>().close).thenAnswer((_) async {});
   });
 
-  Future<void> pumpWidget(WidgetTester tester) {
+  Future<void> pumpWidget(
+    WidgetTester tester, {
+    void Function(Faculty)? onFacultyDeleted,
+  }) {
     return tester.pumpPageForTest(
-      page: FacultyDetailPage(id: facultyMock.id),
+      page: FacultyDetailPage(
+        id: facultyMock.id,
+        onFacultyDeleted: onFacultyDeleted,
+      ),
     );
   }
 
@@ -100,6 +106,29 @@ void main() {
               FacultyDetailSubscriptionRequested(id: facultyMock.id),
             ),
           ).called(2); // Expect called 2, one on init
+        },
+      );
+    });
+
+    group('Side Effects', () {
+      testWidgets(
+        'calls onFacultyDeleted when FacultyDetail fires onFacultyDeleted',
+        (tester) async {
+          Faculty? faculty;
+
+          await pumpWidget(
+            tester,
+            onFacultyDeleted: (v) {
+              faculty = v;
+            },
+          );
+
+          final widget = tester.widget<FacultyDetail>(
+            find.byType(FacultyDetail),
+          );
+          widget.onFacultyDeleted!(facultyMock);
+
+          expect(faculty, facultyMock);
         },
       );
     });

@@ -52,6 +52,41 @@ extension AppDialogX on BuildContext {
       },
     );
   }
+
+  /// Shows confirmation dialog with [title] and [message]
+  ///
+  /// Returns true when the user confirmed. Otherwise, false.
+  Future<bool> showConfirmationDialog({
+    required String title,
+    required String message,
+  }) async {
+    final result = await showDialog<bool?>(
+      context: this,
+      builder: (context) {
+        return _AppDialog(
+          title: title,
+          content: Text(message),
+          actions: [
+            AppButton(
+              type: .text,
+              label: 'Batal',
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            AppButton(
+              type: .text,
+              label: 'OK',
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    return result ?? false;
+  }
 }
 
 class _AppDialog extends StatelessWidget {

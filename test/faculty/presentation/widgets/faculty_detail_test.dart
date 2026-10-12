@@ -32,11 +32,13 @@ void main() {
   Future<void> pumpWidget(
     WidgetTester tester, {
     void Function()? onRetryPressed,
+    void Function(Faculty)? onFacultyDeleted,
   }) {
     return tester.pumpWidgetForTest(
       (context) {
         return FacultyDetail(
           onRetryPressed: onRetryPressed,
+          onFacultyDeleted: onFacultyDeleted,
         );
       },
       providerBuilder: (context, child) {
@@ -139,6 +141,30 @@ void main() {
           );
 
           expect(pressed, isTrue);
+        },
+      );
+    });
+
+    group('Side Effects', () {
+      testWidgets(
+        'calls onFacultyDeleted '
+        'when FacultyDetail fires onFacultyDeleted callback',
+        (tester) async {
+          Faculty? deleted;
+
+          await pumpWidget(
+            tester,
+            onFacultyDeleted: (v) {
+              deleted = v;
+            },
+          );
+
+          final finder = find.byType(FacultyForm);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<FacultyForm>(finder);
+          widget.onFacultyDeleted!(facultyMock);
+
+          expect(deleted, facultyMock);
         },
       );
     });

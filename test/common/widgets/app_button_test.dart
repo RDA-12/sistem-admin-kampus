@@ -11,12 +11,14 @@ void main() {
       String label = 'Label',
       VoidCallback? onPressed,
       Widget? leadingIcon,
+      AppButtonType type = AppButtonType.filled,
     }) {
       return tester.pumpWidgetForTest(
         (context) => AppButton(
           label: label,
           onPressed: onPressed,
           leadingIcon: leadingIcon,
+          type: type,
         ),
       );
     }
@@ -28,36 +30,49 @@ void main() {
         expect(find.text('Label'), findsOneWidget);
       });
 
-      testWidgets('shows FilledButton', (tester) async {
-        await pumpWidget(tester);
+      testWidgets('shows FilledButton when type is filled', (tester) async {
+        // ignore: avoid_redundant_argument_values need verbosity
+        await pumpWidget(tester, type: AppButtonType.filled);
 
         expect(find.byType(FilledButton), findsOneWidget);
       });
 
-      testWidgets('shows leadingIcon when provided', (tester) async {
-        const leadingIcon = Icon(Icons.abc);
+      testWidgets('shows TextButton when type is text', (tester) async {
+        await pumpWidget(tester, type: AppButtonType.text);
 
-        await pumpWidget(tester, leadingIcon: leadingIcon);
-
-        expect(find.byWidget(leadingIcon), findsOneWidget);
+        expect(find.byType(TextButton), findsOneWidget);
       });
+
+      for (final type in AppButtonType.values) {
+        testWidgets('shows leadingIcon in $type '
+            'when provided', (tester) async {
+          const leadingIcon = Icon(Icons.abc);
+
+          await pumpWidget(tester, leadingIcon: leadingIcon, type: type);
+
+          expect(find.byWidget(leadingIcon), findsOneWidget);
+        });
+      }
     });
 
     group('Interactions', () {
-      testWidgets('calls onPressed when pressed', (tester) async {
-        var pressed = false;
+      for (final type in AppButtonType.values) {
+        testWidgets('calls onPressed in $type '
+            'when pressed', (tester) async {
+          var pressed = false;
 
-        await pumpWidget(
-          tester,
-          onPressed: () {
-            pressed = true;
-          },
-        );
+          await pumpWidget(
+            tester,
+            onPressed: () {
+              pressed = true;
+            },
+          );
 
-        await tester.tap(find.byType(FilledButton));
+          await tester.tap(find.byType(FilledButton));
 
-        expect(pressed, isTrue);
-      });
+          expect(pressed, isTrue);
+        });
+      }
     });
   });
 }

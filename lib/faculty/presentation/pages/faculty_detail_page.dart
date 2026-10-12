@@ -10,11 +10,15 @@ class FacultyDetailPage extends StatelessWidget {
   /// Creates new [FacultyDetailPage]
   const new({
     required this.id,
+    this.onFacultyDeleted,
     super.key,
   });
 
   /// ID of the [Faculty] that will be showed
   final String id;
+
+  /// Invoked when a [Faculty] has been deleted
+  final void Function(Faculty)? onFacultyDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,7 @@ class FacultyDetailPage extends StatelessWidget {
           child: Builder(
             builder: (context) {
               return FacultyDetail(
+                onFacultyDeleted: onFacultyDeleted,
                 onRetryPressed: () {
                   context.read<FacultyDetailBloc>().add(
                     FacultyDetailSubscriptionRequested(id: id),

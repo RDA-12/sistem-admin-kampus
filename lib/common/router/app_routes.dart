@@ -43,8 +43,12 @@ class FacultyDetailRoute extends GoRouteData with $FacultyDetailRoute {
   final String id;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      FacultyDetailPage(id: id);
+  Widget build(BuildContext context, GoRouterState state) => FacultyDetailPage(
+    id: id,
+    onFacultyDeleted: (_) {
+      context.pop();
+    },
+  );
 }
 
 /// Route for [FacultyDetailPage] in compact screen
@@ -60,8 +64,12 @@ class FacultyDetailCompactRoute extends GoRouteData
   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      FacultyDetailPage(id: id);
+  Widget build(BuildContext context, GoRouterState state) => FacultyDetailPage(
+    id: id,
+    onFacultyDeleted: (_) {
+      context.pop();
+    },
+  );
 }
 
 /// Branch for [Faculty] in [MainShell]

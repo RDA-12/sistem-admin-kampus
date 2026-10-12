@@ -123,4 +123,105 @@ void main() {
       });
     });
   });
+
+  group('showConfirmationDialog', () {
+    Future<void> pumpWidget(
+      WidgetTester tester, {
+      String title = 'title',
+      String message = 'message',
+      // ignore: avoid_positional_boolean_parameters no need
+      void Function(bool)? onResult,
+    }) {
+      return tester.pumpWidgetForTest((context) {
+        return FilledButton(
+          onPressed: () async {
+            final result = await context.showConfirmationDialog(
+              title: title,
+              message: message,
+            );
+            onResult?.call(result);
+          },
+          child: const Text('show'),
+        );
+      });
+    }
+
+    final confirmButtonFinder = find.ancestor(
+      of: find.text('OK'),
+      matching: find.byType(AppButton),
+    );
+    final cancelButtonFinder = find.ancestor(
+      of: find.text('Batal'),
+      matching: find.byType(AppButton),
+    );
+
+    group('Render', () {
+      testWidgets('shows provided title and message', (tester) async {
+        await pumpWidget(tester, title: 'test', message: 'message test');
+
+        await openDialog(tester);
+
+        expect(find.text('test'), findsOneWidget);
+        expect(find.text('message test'), findsOneWidget);
+      });
+
+      testWidgets('shows confirmed button', (tester) async {
+        await pumpWidget(tester);
+
+        await openDialog(tester);
+
+        expect(confirmButtonFinder, findsOneWidget);
+      });
+
+      testWidgets('shows cancel button', (tester) async {
+        await pumpWidget(tester);
+
+        await openDialog(tester);
+
+        expect(cancelButtonFinder, findsOneWidget);
+      });
+    });
+
+    group('Interactions', () {
+      testWidgets(
+        'return true when confirmed button pressed',
+        (tester) async {
+          bool? result;
+          await pumpWidget(
+            tester,
+            onResult: (v) {
+              result = v;
+            },
+          );
+
+          await openDialog(tester);
+
+          await tester.tap(confirmButtonFinder);
+          await tester.pumpAndSettle();
+
+          expect(result, isTrue);
+        },
+      );
+
+      testWidgets(
+        'return false when cancel button pressed',
+        (tester) async {
+          bool? result;
+          await pumpWidget(
+            tester,
+            onResult: (v) {
+              result = v;
+            },
+          );
+
+          await openDialog(tester);
+
+          await tester.tap(cancelButtonFinder);
+          await tester.pumpAndSettle();
+
+          expect(result, isFalse);
+        },
+      );
+    });
+  });
 }

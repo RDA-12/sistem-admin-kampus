@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/faculty/domain/domain.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/faculty_form.dart';
 
@@ -12,11 +13,15 @@ class FacultyDetail extends StatelessWidget {
   /// So, ensure to provide it with those blocs.
   const new({
     this.onRetryPressed,
+    this.onFacultyDeleted,
     super.key,
   });
 
   /// Invoked when user press retry button
   final void Function()? onRetryPressed;
+
+  /// Invoked when a faculty has been deleted
+  final void Function(Faculty)? onFacultyDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +36,7 @@ class FacultyDetail extends StatelessWidget {
           case FacultyDetailLoaded(:final faculty):
             return FacultyForm(
               initial: faculty,
+              onFacultyDeleted: onFacultyDeleted,
             );
           case FacultyDetailLoadFailed(:final exception):
             return Center(

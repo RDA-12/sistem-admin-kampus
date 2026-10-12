@@ -292,5 +292,49 @@ void main() {
         },
       );
     });
+
+    group('Side Effects', () {
+      testWidgets(
+        'hides FacultyDetail page when it fires onFacultyDeleted '
+        'in expanded screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(850, 800));
+
+          await facultyPressed(tester);
+
+          final facultyDetailPageFinder = find.byType(FacultyDetailPage);
+          expect(facultyDetailPageFinder, findsOneWidget);
+
+          final widget = tester.widget<FacultyDetailPage>(
+            facultyDetailPageFinder,
+          );
+          widget.onFacultyDeleted!(facultyMock);
+          await tester.pumpAndSettle();
+
+          expect(facultyDetailPageFinder, findsNothing);
+        },
+      );
+
+      testWidgets(
+        'hides FacultyDetail page when it fires onFacultyDeleted '
+        'in large screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+          await facultyPressed(tester);
+
+          final facultyDetailPageFinder = find.byType(FacultyDetailPage);
+          expect(facultyDetailPageFinder, findsOneWidget);
+
+          final widget = tester.widget<FacultyDetailPage>(
+            facultyDetailPageFinder,
+          );
+          widget.onFacultyDeleted!(facultyMock);
+          await tester.pumpAndSettle();
+
+          expect(facultyDetailPageFinder, findsNothing);
+        },
+      );
+    });
   });
 }

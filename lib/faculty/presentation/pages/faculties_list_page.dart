@@ -73,6 +73,9 @@ class FacultiesListPage extends StatelessWidget {
           return FacultyDetailPage(
             key: ValueKey(controller.data!),
             id: controller.data!,
+            onFacultyDeleted: (_) {
+              controller.data = null;
+            },
           );
         },
       ),

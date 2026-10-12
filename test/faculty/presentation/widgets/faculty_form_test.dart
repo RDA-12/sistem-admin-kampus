@@ -31,10 +31,12 @@ void main() {
     Future<void> pumpWidget(
       WidgetTester tester, {
       Faculty? initial,
+      void Function(Faculty)? onFacultyDeleted,
     }) {
       return tester.pumpWidgetForTest(
         (context) => FacultyForm(
           initial: initial,
+          onFacultyDeleted: onFacultyDeleted,
         ),
         providerBuilder: (context, child) {
           return BlocProvider.value(
@@ -51,6 +53,10 @@ void main() {
     );
     final saveButtonFinder = find.ancestor(
       of: find.text('Simpan'),
+      matching: find.byType(AppButton),
+    );
+    final deleteButtonFinder = find.ancestor(
+      of: find.text('Hapus'),
       matching: find.byType(AppButton),
     );
 
@@ -70,6 +76,24 @@ void main() {
           await pumpWidget(tester);
 
           expect(saveButtonFinder, findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows delete button when initial is provided',
+        (tester) async {
+          await pumpWidget(tester, initial: faculty);
+
+          expect(deleteButtonFinder, findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'hide delete button when initial is null',
+        (tester) async {
+          await pumpWidget(tester);
+
+          expect(deleteButtonFinder, findsNothing);
         },
       );
 
@@ -97,7 +121,7 @@ void main() {
       );
 
       testWidgets(
-        'shows LoadingIndicator and disable save button '
+        'shows LoadingIndicator on save button and disable it '
         'when FacultyMutationState updatingIds contains initial faculty',
         (tester) async {
           whenListen(
@@ -108,8 +132,78 @@ void main() {
           await pumpWidget(tester, initial: faculty);
           await tester.pump();
 
-          expect(find.byType(LoadingIndicator), findsOneWidget);
+          expect(
+            find.descendant(
+              of: saveButtonFinder,
+              matching: find.byType(LoadingIndicator),
+            ),
+            findsOneWidget,
+          );
           expect(tester.widget<AppButton>(saveButtonFinder).onPressed, isNull);
+        },
+      );
+
+      testWidgets(
+        'disable delete button '
+        'when FacultyMutationState updateingIds contains initial faculty',
+        (tester) async {
+          whenListen(
+            facultyMutationBlocMock,
+            Stream.value(FacultyMutationState(deletingIds: {faculty.id})),
+          );
+
+          await pumpWidget(tester, initial: faculty);
+          await tester.pump();
+
+          expect(
+            tester.widget<AppButton>(deleteButtonFinder).onPressed,
+            isNull,
+          );
+        },
+      );
+
+      testWidgets(
+        'disable save button '
+        'when FacultyMutationState deletingIds contains initial faculty',
+        (tester) async {
+          whenListen(
+            facultyMutationBlocMock,
+            Stream.value(FacultyMutationState(deletingIds: {faculty.id})),
+          );
+
+          await pumpWidget(tester, initial: faculty);
+          await tester.pump();
+
+          expect(
+            tester.widget<AppButton>(saveButtonFinder).onPressed,
+            isNull,
+          );
+        },
+      );
+
+      testWidgets(
+        'shows LoadingIndicator on delete button and disable it '
+        'when FacultyMutationState deletingIds contains initial faculty',
+        (tester) async {
+          whenListen(
+            facultyMutationBlocMock,
+            Stream.value(FacultyMutationState(deletingIds: {faculty.id})),
+          );
+
+          await pumpWidget(tester, initial: faculty);
+          await tester.pump();
+
+          expect(
+            find.descendant(
+              of: deleteButtonFinder,
+              matching: find.byType(LoadingIndicator),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            tester.widget<AppButton>(deleteButtonFinder).onPressed,
+            isNull,
+          );
         },
       );
     });
@@ -148,6 +242,27 @@ void main() {
               const FacultyMutationUpdateRequested(
                 faculty: faculty,
                 name: 'text',
+              ),
+            ),
+          ).called(1);
+        },
+      );
+
+      testWidgets(
+        'add FacultyMutationDeleteRequested when delete button pressed',
+        (tester) async {
+          await pumpWidget(tester, initial: faculty);
+
+          await tester.tap(deleteButtonFinder);
+          await tester.pumpAndSettle();
+          // Confirm on dialog
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
+
+          verify(
+            () => facultyMutationBlocMock.add(
+              const FacultyMutationDeleteRequested(
+                faculty: faculty,
               ),
             ),
           ).called(1);
@@ -243,6 +358,32 @@ void main() {
         );
       });
 
+      testWidgets('shows success dialog with correct title and message '
+          'when delete success', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          const FacultyMutationState(
+            notice: FacultyDeletedNotice(faculty),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Fakultas berhasil dihapus'),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            'Fakulas dengan nama "${faculty.name}" berhasil dihapus',
+          ),
+          findsOneWidget,
+        );
+      });
+
       testWidgets('shows failed dialog with correct title and message '
           'when create failed', (tester) async {
         final controller = StreamController<FacultyMutationState>.broadcast();
@@ -297,6 +438,64 @@ void main() {
           find.text('Terjadi kesalahan internal. Harap coba lagi nanti'),
           findsOneWidget,
         );
+      });
+
+      testWidgets('shows failed dialog with correct title and message '
+          'when delete failed', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          FacultyMutationState(
+            notice: FacultyMutationFailedNotice(
+              type: .delete,
+              exception: AppException.test(),
+              faculty: faculty,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Gagal menghapus fakultas'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Terjadi kesalahan internal. Harap coba lagi nanti'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('calls onFacultyDeleted after dialog close '
+          'when delete success', (tester) async {
+        final controller = StreamController<FacultyMutationState>.broadcast();
+        when(() => facultyMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+        Faculty? deleted;
+
+        await pumpWidget(
+          tester,
+          onFacultyDeleted: (v) {
+            deleted = v;
+          },
+        );
+        controller.add(
+          const FacultyMutationState(
+            notice: FacultyDeletedNotice(faculty),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(AppButton),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(deleted, faculty);
       });
     });
   });
