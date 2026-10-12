@@ -10,7 +10,7 @@ sealed class FacultiesEvent extends Equatable {
 }
 
 /// Event to subscribe to faculties data changes
-final class SubscriptionRequested extends FacultiesEvent {
-  /// Creates new [SubscriptionRequested]
+final class FacultiesSubscriptionRequested extends FacultiesEvent {
+  /// Creates new [FacultiesSubscriptionRequested]
   const new();
 }

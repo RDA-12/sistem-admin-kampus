@@ -36,13 +36,13 @@ void main() {
       expect(bloc.state, const FacultiesInitial());
     });
 
-    group('SubscriptionRequested', () {
+    group('FacultiesSubscriptionRequested', () {
       blocTest<FacultiesBloc, FacultiesState>(
         'emits [LoadingFaculties, FacultiesLoaded] '
-        'when SubscriptionRequested is added '
+        'when FacultiesSubscriptionRequested is added '
         'and WatchFacultiesUseCase emits success',
         build: buildBloc,
-        act: (bloc) => bloc.add(const SubscriptionRequested()),
+        act: (bloc) => bloc.add(const FacultiesSubscriptionRequested()),
         expect: () => <FacultiesState>[
           const LoadingFaculties(),
           FacultiesLoaded(faculties),
@@ -54,7 +54,7 @@ void main() {
 
       blocTest<FacultiesBloc, FacultiesState>(
         'emits [LoadingFaculties, FacultiesFailure] '
-        'when SubscriptionRequested is added '
+        'when FacultiesSubscriptionRequested is added '
         'and WatchFacultiesUseCase emits failure',
         setUp: () {
           when(() => watchFacultiesMock(null)).thenAnswer(
@@ -62,7 +62,7 @@ void main() {
           );
         },
         build: buildBloc,
-        act: (bloc) => bloc.add(const SubscriptionRequested()),
+        act: (bloc) => bloc.add(const FacultiesSubscriptionRequested()),
         expect: () => <FacultiesState>[
           const LoadingFaculties(),
           FacultiesFailure(AppException.test()),

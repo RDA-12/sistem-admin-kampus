@@ -17,7 +17,7 @@ class FacultiesListPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<FacultiesBloc>()
         ..add(
-          const SubscriptionRequested(),
+          const FacultiesSubscriptionRequested(),
         ),
       child: TwoPaneLayoutBuilder<String?>(
         initialAdditionalData: null,

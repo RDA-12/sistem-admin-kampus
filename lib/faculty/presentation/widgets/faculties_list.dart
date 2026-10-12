@@ -68,7 +68,7 @@ class FacultiesList extends StatelessWidget {
                       exception: exception,
                       onRetryPressed: () {
                         context.read<FacultiesBloc>().add(
-                          const SubscriptionRequested(),
+                          const FacultiesSubscriptionRequested(),
                         );
                       },
                     ),

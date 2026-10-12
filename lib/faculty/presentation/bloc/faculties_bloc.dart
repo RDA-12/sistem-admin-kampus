@@ -13,16 +13,16 @@ part 'faculties_state.dart';
 class FacultiesBloc extends Bloc<FacultiesEvent, FacultiesState> {
   /// Creates new [FacultiesBloc]
   new({required this._watchFaculties}) : super(const FacultiesInitial()) {
-    on<SubscriptionRequested>(
-      _onSubscriptionRequested,
+    on<FacultiesSubscriptionRequested>(
+      _onFacultiesSubscriptionRequested,
       transformer: droppable(),
     );
   }
 
   final WatchFacultiesUseCase _watchFaculties;
 
-  Future<void> _onSubscriptionRequested(
-    SubscriptionRequested event,
+  Future<void> _onFacultiesSubscriptionRequested(
+    FacultiesSubscriptionRequested event,
     Emitter<FacultiesState> emit,
   ) async {
     emit(const LoadingFaculties());
