@@ -78,7 +78,6 @@ class _FacultyFormState extends State<FacultyForm> {
                     'dengan nama "${after.name}"',
               ),
             );
-            _nameController.clear();
           case FacultyCreatedNotice(:final created):
             unawaited(
               context.showSuccessDialog(

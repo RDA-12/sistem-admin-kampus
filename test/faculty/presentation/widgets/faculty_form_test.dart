@@ -194,7 +194,7 @@ void main() {
         expect(find.text('text'), findsNothing);
       });
 
-      testWidgets('clear all fields when update success', (tester) async {
+      testWidgets('not clear all fields when update success', (tester) async {
         final controller = StreamController<FacultyMutationState>.broadcast();
         when(() => facultyMutationBlocMock.stream)
             .thenAnswer((_) => controller.stream);
@@ -211,7 +211,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('text'), findsNothing);
+        expect(find.text('text'), findsOneWidget);
       });
 
       testWidgets('shows success dialog with correct title and message '
