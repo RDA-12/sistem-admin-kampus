@@ -11,6 +11,9 @@ abstract class BaseRepository<T, SaveArgs, UpdateArgs> {
   /// Watch for [T] data changes
   Stream<AppResult<List<T>>> watch();
 
+  /// Watch single [T] with [id] data changes
+  Stream<AppResult<T>> watchSingle(String id);
+
   /// Update [T] with [id] based on [args]
   Future<AppResult<T>> update(String id, {required UpdateArgs args});
 }

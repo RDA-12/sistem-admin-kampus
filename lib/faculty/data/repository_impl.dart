@@ -104,4 +104,10 @@ class FacultyRepository implements IFacultyRepository {
           );
         });
   }
+
+  @override
+  Stream<AppResult<Faculty>> watchSingle(String id) {
+    // TODO: implement watchSingle
+    throw UnimplementedError();
+  }
 }
