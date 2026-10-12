@@ -106,8 +106,20 @@ class FacultyRepository implements IFacultyRepository {
   }
 
   @override
-  Stream<AppResult<Faculty>> watchSingle(String id) {
-    // TODO: implement watchSingle
-    throw UnimplementedError();
+  Stream<AppResult<Faculty>> watchSingle(String id) async* {
+    final query = _db.select(_db.facultiesDrift)
+      ..where((tbl) => tbl.id.equals(id));
+    final exists = await query.getSingleOrNull();
+    if (exists == null) {
+      yield AppResult.failure(
+        AppException('faculty with ID $id not found', code: .facultyNotFound),
+      );
+    }
+    yield* query
+        .watchSingle()
+        .map((it) => AppResult.success(it.toDomain()))
+        .onErrorReturnWith((error, _) {
+          return AppResult.failure(AppException('$error', code: .internal));
+        });
   }
 }

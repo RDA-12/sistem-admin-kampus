@@ -202,5 +202,29 @@ void main() {
         result.expectFailureWithCode(.internal);
       });
     });
+
+    group('watchSingle', () {
+      test('emits correct faculty when faculty exists', () {
+        final result = repository.watchSingle(seededFaculty.first.id);
+
+        expect(result, emits(AppResult.success(seededFaculty.first)));
+      });
+
+      test('emits failure with facultyNotFound code '
+          'when faculty not exists', () {
+        final result = repository.watchSingle('not-exists');
+
+        expect(
+          result,
+          emits(
+            isA<AppFailure<Faculty>>().having(
+              (e) => e.exception.code,
+              'exception.code',
+              AppExceptionCode.facultyNotFound,
+            ),
+          ),
+        );
+      });
+    });
   });
 }
