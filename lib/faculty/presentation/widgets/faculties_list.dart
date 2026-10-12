@@ -14,8 +14,12 @@ class FacultiesList extends StatelessWidget {
   const new({
     this.onPressed,
     this.onCreatePressed,
+    this.selectedId,
     super.key,
   });
+
+  /// ID of selected faculty
+  final String? selectedId;
 
   /// Invoked when one of faculties is pressed
   final void Function(Faculty)? onPressed;
@@ -54,6 +58,7 @@ class FacultiesList extends StatelessWidget {
                       final faculty = data[index];
                       return FacultyListTile(
                         faculty: faculty,
+                        selected: faculty.id == selectedId,
                         onPressed: onPressed == null
                             ? null
                             : () {

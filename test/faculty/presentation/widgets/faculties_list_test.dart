@@ -36,10 +36,12 @@ void main() {
       WidgetTester tester, {
       void Function(Faculty)? onPressed,
       void Function()? onCreatePressed,
+      String? selectedId,
     }) {
       return tester.pumpWidgetForTest(
         (context) {
           return FacultiesList(
+            selectedId: selectedId,
             onPressed: onPressed,
             onCreatePressed: onCreatePressed,
           );
@@ -114,6 +116,20 @@ void main() {
         await pumpWidget(tester);
 
         expect(createButtonFinder, findsOneWidget);
+      });
+
+      testWidgets('shows selected FacultyListTile', (tester) async {
+        await pumpWidget(tester, selectedId: facultiesMock.first.id);
+
+        for (final faculty in facultiesMock) {
+          final finder = find.ancestor(
+            of: find.text(faculty.name),
+            matching: find.byType(FacultyListTile),
+          );
+          await tester.ensureVisible(finder);
+          final widget = tester.widget<FacultyListTile>(finder);
+          expect(widget.selected, faculty.id == facultiesMock.first.id);
+        }
       });
     });
 

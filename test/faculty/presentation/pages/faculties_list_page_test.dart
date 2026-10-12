@@ -143,6 +143,7 @@ void main() {
         expect(find.byType(FacultiesList), findsOneWidget);
         expect(find.byType(CreateFacultyPage), findsOneWidget);
       });
+
       testWidgets('shows FacultiesList and FacultyDetailPage '
           'in expanded screen when a faculty is pressed', (tester) async {
         await pumpWidget(tester, phoneSize: const Size(850, 800));
@@ -162,6 +163,36 @@ void main() {
         expect(find.byType(FacultiesList), findsOneWidget);
         expect(find.byType(FacultyDetailPage), findsOneWidget);
       });
+
+      testWidgets(
+        'set selectedId on FacultiesList '
+        'when a faculty is pressed in expanded screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(850, 800));
+
+          await facultyPressed(tester);
+
+          final widget = tester.widget<FacultiesList>(
+            find.byType(FacultiesList),
+          );
+          expect(widget.selectedId, facultyMock.id);
+        },
+      );
+
+      testWidgets(
+        'set selectedId on FacultiesList '
+        'when a faculty is pressed in large screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+          await facultyPressed(tester);
+
+          final widget = tester.widget<FacultiesList>(
+            find.byType(FacultiesList),
+          );
+          expect(widget.selectedId, facultyMock.id);
+        },
+      );
     });
 
     group('Interactions', () {

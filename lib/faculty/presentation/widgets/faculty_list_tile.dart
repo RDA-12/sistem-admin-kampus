@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
 /// Shows a [ListTile] with [Faculty] data
@@ -7,6 +8,7 @@ class FacultyListTile extends StatelessWidget {
   const new({
     required this.faculty,
     this.onPressed,
+    this.selected = false,
     super.key,
   });
 
@@ -16,9 +18,20 @@ class FacultyListTile extends StatelessWidget {
   /// Invoked when this faculty tile is pressed
   final VoidCallback? onPressed;
 
+  /// Whether this tile is selected or not
+  final bool selected;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      selected: selected,
+      selectedTileColor: context.color.primaryContainer,
+      selectedColor: context.color.onPrimaryContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: selected
+            ? BorderRadiusGeometry.circular(16)
+            : BorderRadius.zero,
+      ),
       title: Text(faculty.name),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onPressed,

@@ -30,6 +30,9 @@ class FacultiesListPage extends StatelessWidget {
             body: Padding(
               padding: AppSpacing.pagePadding,
               child: FacultiesList(
+                selectedId: controller.data == 'create'
+                    ? null
+                    : controller.data,
                 onPressed: (faculty) {
                   final facultyId = faculty.id;
                   if (breakPoint < BreakPoint.expanded) {
