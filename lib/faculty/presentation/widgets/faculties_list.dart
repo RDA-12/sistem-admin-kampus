@@ -26,6 +26,7 @@ class FacultiesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 16,
       children: [
         Row(
           mainAxisAlignment: .end,
