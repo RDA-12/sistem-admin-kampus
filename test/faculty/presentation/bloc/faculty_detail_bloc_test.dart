@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
-import 'package:sistem_admin/faculty/presentation/bloc/faculty_detail_bloc.dart';
 
 import '../../../common/di_mocks.dart';
 
