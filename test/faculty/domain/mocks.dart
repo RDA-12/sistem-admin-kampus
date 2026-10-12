@@ -25,3 +25,4 @@ final facultiesMock = List<Faculty>.generate(
   5,
   (index) => Faculty(id: '$index', name: 'name $index'),
 );
+const facultyMock = Faculty(id: 'id', name: 'name');

@@ -7,3 +7,6 @@ class MockFacultyMutationBloc extends Mock implements FacultyMutationBloc;
 
 @LazySingleton(as: FacultiesBloc, env: [Environment.test])
 class MockFacultiesBloc extends Mock implements FacultiesBloc;
+
+@LazySingleton(as: FacultyDetailBloc, env: [Environment.test])
+class MockFacultyDetailBloc extends Mock implements FacultyDetailBloc;
