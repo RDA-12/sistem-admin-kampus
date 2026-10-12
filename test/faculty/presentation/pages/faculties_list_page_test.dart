@@ -31,11 +31,19 @@ void main() {
       initialState: const FacultyMutationState(),
     );
     when(getIt<FacultyMutationBloc>().close).thenAnswer((_) async {});
+
+    whenListen(
+      getIt<FacultyDetailBloc>(),
+      Stream.value(const FacultyDetailLoaded(faculty: facultyMock)),
+      initialState: const FacultyDetailLoaded(faculty: facultyMock),
+    );
+    when(getIt<FacultyDetailBloc>().close).thenAnswer((_) async {});
   });
 
   tearDown(() {
     reset(facultiesBlocMock);
     reset(getIt<FacultyMutationBloc>());
+    reset(getIt<FacultyDetailBloc>());
   });
 
   Future<void> pumpWidget(WidgetTester tester, {Size? phoneSize}) {
@@ -56,6 +64,20 @@ void main() {
             return const CreateFacultyPage();
           },
         ),
+        GoRoute(
+          path: ':id',
+          builder: (_, state) {
+            final id = state.pathParameters['id']!;
+            return FacultyDetailPage(id: id);
+          },
+        ),
+        GoRoute(
+          path: 'compact/:id',
+          builder: (_, state) {
+            final id = state.pathParameters['id']!;
+            return FacultyDetailPage(id: id);
+          },
+        ),
       ],
     );
   }
@@ -66,6 +88,14 @@ void main() {
         find.byType(FacultiesList),
       );
       widget.onCreatePressed!();
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> facultyPressed(WidgetTester tester) async {
+      final widget = tester.widget<FacultiesList>(
+        find.byType(FacultiesList),
+      );
+      widget.onPressed!(facultyMock);
       await tester.pumpAndSettle();
     }
 
@@ -95,7 +125,7 @@ void main() {
       });
 
       testWidgets('shows FacultiesList and CreateFacultyPage '
-          'in expanded screen', (tester) async {
+          'in expanded screen when create button is pressed', (tester) async {
         await pumpWidget(tester, phoneSize: const Size(850, 800));
 
         await createButtonPressed(tester);
@@ -105,7 +135,7 @@ void main() {
       });
 
       testWidgets('shows FacultiesList and CreateFacultyPage '
-          'in large screen', (tester) async {
+          'in large screen when create button is pressed', (tester) async {
         await pumpWidget(tester, phoneSize: const Size(1250, 800));
 
         await createButtonPressed(tester);
@@ -113,11 +143,30 @@ void main() {
         expect(find.byType(FacultiesList), findsOneWidget);
         expect(find.byType(CreateFacultyPage), findsOneWidget);
       });
+      testWidgets('shows FacultiesList and FacultyDetailPage '
+          'in expanded screen when a faculty is pressed', (tester) async {
+        await pumpWidget(tester, phoneSize: const Size(850, 800));
+
+        await facultyPressed(tester);
+
+        expect(find.byType(FacultiesList), findsOneWidget);
+        expect(find.byType(FacultyDetailPage), findsOneWidget);
+      });
+
+      testWidgets('shows FacultiesList and FacultyDetailPage '
+          'in large screen when a faculty is pressed', (tester) async {
+        await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+        await facultyPressed(tester);
+
+        expect(find.byType(FacultiesList), findsOneWidget);
+        expect(find.byType(FacultyDetailPage), findsOneWidget);
+      });
     });
 
     group('Interactions', () {
       testWidgets(
-        'go to create page when create button pressed when compact screen',
+        'go to create page when create button is pressed in compact screen',
         (tester) async {
           await pumpWidget(tester, phoneSize: const Size(450, 800));
 
@@ -129,7 +178,7 @@ void main() {
       );
 
       testWidgets(
-        'go to create page when create button pressed in medium screen',
+        'go to create page when create button is pressed in medium screen',
         (tester) async {
           await pumpWidget(tester, phoneSize: const Size(650, 800));
 
@@ -141,7 +190,7 @@ void main() {
       );
 
       testWidgets(
-        'shows create page when create button pressed in expanded screen',
+        'shows create page when create button is pressed in expanded screen',
         (tester) async {
           await pumpWidget(tester, phoneSize: const Size(900, 800));
 
@@ -153,7 +202,7 @@ void main() {
       );
 
       testWidgets(
-        'shows create page when create button pressed in large screen',
+        'shows create page when create button is pressed in large screen',
         (tester) async {
           await pumpWidget(tester, phoneSize: const Size(1250, 800));
 
@@ -161,6 +210,54 @@ void main() {
 
           expect(find.byType(FacultiesList), findsOneWidget);
           expect(find.byType(CreateFacultyPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'go to detail page when a faculty is pressed in compact screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(450, 800));
+
+          await facultyPressed(tester);
+
+          expect(find.byType(FacultiesList), findsNothing);
+          expect(find.byType(FacultyDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'go to detail page when a faculty is pressed in medium screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(650, 800));
+
+          await facultyPressed(tester);
+
+          expect(find.byType(FacultiesList), findsNothing);
+          expect(find.byType(FacultyDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows detail page when a faculty is pressed in expanded screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(900, 800));
+
+          await facultyPressed(tester);
+
+          expect(find.byType(FacultiesList), findsOneWidget);
+          expect(find.byType(FacultyDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows detail page when a faculty is pressed in large screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+          await facultyPressed(tester);
+
+          expect(find.byType(FacultiesList), findsOneWidget);
+          expect(find.byType(FacultyDetailPage), findsOneWidget);
         },
       );
     });

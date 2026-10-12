@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/faculty/presentation/pages/create_faculty_page.dart';
+import 'package:sistem_admin/faculty/presentation/pages/faculty_detail_page.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/widgets.dart';
 
 /// Page to shows faculties data
@@ -29,6 +30,23 @@ class FacultiesListPage extends StatelessWidget {
             body: Padding(
               padding: AppSpacing.pagePadding,
               child: FacultiesList(
+                onPressed: (faculty) {
+                  final facultyId = faculty.id;
+                  if (breakPoint < BreakPoint.expanded) {
+                    if (breakPoint == BreakPoint.compact) {
+                      unawaited(
+                        FacultyDetailCompactRoute(facultyId)
+                            .push<void>(context),
+                      );
+                    } else {
+                      unawaited(
+                        FacultyDetailRoute(facultyId).push<void>(context),
+                      );
+                    }
+                  } else {
+                    controller.data = facultyId;
+                  }
+                },
                 onCreatePressed: () {
                   if (breakPoint < BreakPoint.expanded) {
                     if (breakPoint == BreakPoint.compact) {
@@ -48,7 +66,8 @@ class FacultiesListPage extends StatelessWidget {
         },
         rightBuilder: (context, controller, breakPoint, constraints) {
           if (controller.data == null) return const SizedBox.shrink();
-          return const CreateFacultyPage();
+          if (controller.data == 'create') return const CreateFacultyPage();
+          return FacultyDetailPage(id: controller.data!);
         },
       ),
     );
