@@ -33,16 +33,19 @@ class FacultyDetailPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Detail Fakultas'),
         ),
-        body: Builder(
-          builder: (context) {
-            return FacultyDetail(
-              onRetryPressed: () {
-                context.read<FacultyDetailBloc>().add(
-                  FacultyDetailSubscriptionRequested(id: id),
-                );
-              },
-            );
-          },
+        body: Padding(
+          padding: AppSpacing.pagePadding,
+          child: Builder(
+            builder: (context) {
+              return FacultyDetail(
+                onRetryPressed: () {
+                  context.read<FacultyDetailBloc>().add(
+                    FacultyDetailSubscriptionRequested(id: id),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
