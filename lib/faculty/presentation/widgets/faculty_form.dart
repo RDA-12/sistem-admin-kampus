@@ -10,9 +10,6 @@ import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 class FacultyForm extends StatefulWidget {
   /// Creates new [FacultyForm]
   ///
-  /// Save button's label default to "Perbarui" when [initial] is provided.
-  /// Otherwise, it shows "Simpan".
-  ///
   /// It reacts to [FacultyMutationBloc]'s state changes.
   /// So, make sure to provide that bloc in the widget tree.
   const new({
@@ -110,7 +107,7 @@ class _FacultyFormState extends State<FacultyForm> {
                   leadingIcon: isProcessing
                       ? const LoadingIndicator()
                       : const Icon(Icons.save_rounded),
-                  label: widget.initial == null ? 'Simpan' : 'Perbarui',
+                  label: 'Simpan',
                   onPressed: isProcessing
                       ? null
                       : () {

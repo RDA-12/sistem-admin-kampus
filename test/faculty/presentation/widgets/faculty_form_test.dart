@@ -49,7 +49,10 @@ void main() {
       of: find.text('Nama Fakultas *'),
       matching: find.byType(TextFormField),
     );
-    final saveButtonFinder = find.byType(AppButton);
+    final saveButtonFinder = find.ancestor(
+      of: find.text('Simpan'),
+      matching: find.byType(AppButton),
+    );
 
     group('Render', () {
       testWidgets('shows name field', (tester) async {
@@ -62,34 +65,11 @@ void main() {
       });
 
       testWidgets(
-        'shows correct save button '
-        'when initial is not provided',
+        'shows save button',
         (tester) async {
           await pumpWidget(tester);
 
-          expect(
-            find.ancestor(
-              of: find.text('Simpan'),
-              matching: find.byType(AppButton),
-            ),
-            findsOneWidget,
-          );
-        },
-      );
-
-      testWidgets(
-        'shows correct save button '
-        'when initial is provided',
-        (tester) async {
-          await pumpWidget(tester, initial: faculty);
-
-          expect(
-            find.ancestor(
-              of: find.text('Perbarui'),
-              matching: find.byType(AppButton),
-            ),
-            findsOneWidget,
-          );
+          expect(saveButtonFinder, findsOneWidget);
         },
       );
 
