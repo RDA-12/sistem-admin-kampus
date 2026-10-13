@@ -16,6 +16,7 @@ class ProgramMutationBloc
   new({
     required this._createProgram,
     required this._updateProgram,
+    required this._deleteProgram,
   }) : super(const ProgramMutationState()) {
     on<ProgramMutationCreateRequested>(
       _onProgramMutationCreateRequested,
@@ -24,10 +25,14 @@ class ProgramMutationBloc
     on<ProgramMutationUpdateRequested>(
       _onProgramMutationUpdateRequested,
     );
+    on<ProgramMutationDeleteRequested>(
+      _onProgramMutationDeleteRequested,
+    );
   }
 
   final CreateProgramUseCase _createProgram;
   final UpdateProgramUseCase _updateProgram;
+  final DeleteProgramUseCase _deleteProgram;
 
   Future<void> _onProgramMutationCreateRequested(
     ProgramMutationCreateRequested event,
@@ -79,6 +84,30 @@ class ProgramMutationBloc
       state.copyWith(
         notice: notice,
         updatingIds: {...state.updatingIds}..remove(event.program.id),
+      ),
+    );
+  }
+
+  Future<void> _onProgramMutationDeleteRequested(
+    ProgramMutationDeleteRequested event,
+    Emitter<ProgramMutationState> emit,
+  ) async {
+    emit(state.copyWith(deletingIds: {...state.deletingIds, event.program.id}));
+
+    final result = await _deleteProgram(event.program);
+
+    final notice = switch (result) {
+      AppSuccess() => ProgramDeletedNotice(event.program),
+      AppFailure(:final exception) => ProgramMutationFailedNotice(
+        type: ProgramMutationType.delete,
+        exception: exception,
+        program: event.program,
+      ),
+    };
+    emit(
+      state.copyWith(
+        notice: notice,
+        deletingIds: {...state.deletingIds}..remove(event.program.id),
       ),
     );
   }

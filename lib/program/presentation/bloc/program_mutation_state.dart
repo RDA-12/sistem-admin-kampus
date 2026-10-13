@@ -36,6 +36,18 @@ final class ProgramUpdatedNotice extends ProgramMutationNotice {
   List<Object?> get props => [before, after];
 }
 
+/// Notice when a [Program] has been deleted
+final class ProgramDeletedNotice extends ProgramMutationNotice {
+  /// Creates new [ProgramDeletedNotice] for [deleted]
+  const new(this.deleted);
+
+  /// Deleted [Program]
+  final Program deleted;
+
+  @override
+  List<Object?> get props => [deleted];
+}
+
 /// Notice when a [Program] has been created
 final class ProgramCreatedNotice extends ProgramMutationNotice {
   /// Creates new [ProgramCreatedNotice] for [created]

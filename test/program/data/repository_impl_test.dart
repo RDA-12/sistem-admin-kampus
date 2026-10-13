@@ -115,6 +115,45 @@ void main() {
         },
       );
     });
+
+    group('delete', () {
+      test('returns success and delete requested program', () async {
+        final query = database.select(database.programsDrift);
+        final beforeDelete = await query.get();
+        expect(beforeDelete.map((it) => it.toDomain()), seededPrograms);
+
+        final result = await repository.delete(seededPrograms.first.id);
+
+        expect(result, AppResult.success(null));
+
+        final afterDelete = await query.get();
+        expect(
+          afterDelete.map((it) => it.toDomain()),
+          seededPrograms.sublist(1),
+        );
+      });
+
+      test('returns success when deleting non existing program', () async {
+        final result = await repository.delete(createdProgram.id);
+
+        expect(result, AppResult.success(null));
+      });
+
+      test(
+        'returns failure with internal code '
+        'when unintended exception occurred',
+        () async {
+          whenCalling(Invocation.method(#delete, null))
+              .on(repository)
+              .thenThrow(Exception());
+
+          final result = await repository.delete(createdProgram.id);
+
+          result.expectFailureWithCode(AppExceptionCode.internal);
+        },
+      );
+    });
+
     group('watch', () {
       test('emits correct programs', () async {
         final stream = repository.watch();

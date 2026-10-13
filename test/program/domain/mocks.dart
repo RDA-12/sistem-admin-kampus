@@ -18,6 +18,9 @@ class MockCreateProgramUseCase extends Mock implements CreateProgramUseCase;
 @LazySingleton(as: UpdateProgramUseCase, env: [Environment.test])
 class MockUpdateProgramUseCase extends Mock implements UpdateProgramUseCase;
 
+@LazySingleton(as: DeleteProgramUseCase, env: [Environment.test])
+class MockDeleteProgramUseCase extends Mock implements DeleteProgramUseCase;
+
 final programsMock = List<Program>.generate(
   5,
   (index) => Program(id: '$index', facultyId: 'faculty_1', name: 'name $index'),

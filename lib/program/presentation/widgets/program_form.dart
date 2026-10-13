@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
 import 'package:sistem_admin/program/presentation/bloc/bloc.dart';
+import 'package:sistem_admin/program/presentation/widgets/delete_program_button.dart';
 
 enum _FormState {
   idle,
@@ -104,6 +105,14 @@ class _ProgramFormState extends State<ProgramForm> {
             );
             _nameController.clear();
             _facultyIdController.clear();
+          case ProgramDeletedNotice(:final deleted):
+            await context.showSuccessDialog(
+              title: 'Program studi berhasil dihapus',
+              message:
+                  'Program studi dengan nama "${deleted.name}" '
+                  'berhasil dihapus',
+            );
+            widget.onProgramDeleted?.call(deleted);
           case null:
         }
       },
@@ -170,6 +179,19 @@ class _ProgramFormState extends State<ProgramForm> {
                               }
                             },
                     ),
+                    if (widget.initial != null)
+                      DeleteProgramButton(
+                        program: widget.initial!,
+                        isDeleting: formState == _FormState.deleting,
+                        disable: formState.isProcessing,
+                        onConfirmed: () {
+                          context.read<ProgramMutationBloc>().add(
+                            ProgramMutationDeleteRequested(
+                              program: widget.initial!,
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 );
               },

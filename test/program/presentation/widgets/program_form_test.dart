@@ -59,6 +59,10 @@ void main() {
       of: find.text('Simpan'),
       matching: find.byType(AppButton),
     );
+    final deleteButtonFinder = find.ancestor(
+      of: find.text('Hapus'),
+      matching: find.byType(AppButton),
+    );
 
     group('Render', () {
       testWidgets('shows ID Fakultas and name fields', (tester) async {
@@ -121,6 +125,70 @@ void main() {
           expect(tester.widget<AppButton>(saveButtonFinder).onPressed, isNull);
         },
       );
+
+      testWidgets(
+        'disable delete button '
+        'when ProgramMutationState updatingIds contains initial program',
+        (tester) async {
+          whenListen(
+            programMutationBlocMock,
+            Stream.value(ProgramMutationState(deletingIds: {program.id})),
+          );
+
+          await pumpWidget(tester, initial: program);
+          await tester.pump();
+
+          expect(
+            tester.widget<AppButton>(deleteButtonFinder).onPressed,
+            isNull,
+          );
+        },
+      );
+
+      testWidgets(
+        'disable save button '
+        'when ProgramMutationState deletingIds contains initial program',
+        (tester) async {
+          whenListen(
+            programMutationBlocMock,
+            Stream.value(ProgramMutationState(deletingIds: {program.id})),
+          );
+
+          await pumpWidget(tester, initial: program);
+          await tester.pump();
+
+          expect(
+            tester.widget<AppButton>(saveButtonFinder).onPressed,
+            isNull,
+          );
+        },
+      );
+
+      testWidgets(
+        'shows LoadingIndicator on delete button and disable it '
+        'when ProgramMutationState deletingIds contains initial program',
+        (tester) async {
+          whenListen(
+            programMutationBlocMock,
+            Stream.value(ProgramMutationState(deletingIds: {program.id})),
+          );
+
+          await pumpWidget(tester, initial: program);
+          await tester.pump();
+
+          expect(
+            find.descendant(
+              of: deleteButtonFinder,
+              matching: find.byType(LoadingIndicator),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            tester.widget<AppButton>(deleteButtonFinder).onPressed,
+            isNull,
+          );
+        },
+      );
     });
 
     group('Interactions', () {
@@ -166,9 +234,57 @@ void main() {
           ).called(1);
         },
       );
+
+      testWidgets(
+        'add ProgramMutationDeleteRequested when delete button pressed',
+        (tester) async {
+          await pumpWidget(tester, initial: program);
+
+          await tester.tap(deleteButtonFinder);
+          await tester.pumpAndSettle();
+          // Confirm on dialog
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
+
+          verify(
+            () => programMutationBlocMock.add(
+              const ProgramMutationDeleteRequested(
+                program: program,
+              ),
+            ),
+          ).called(1);
+        },
+      );
     });
 
     group('Side Effects', () {
+      testWidgets('not clear name and facultyId field when update success', (
+        tester,
+      ) async {
+        final controller = StreamController<ProgramMutationState>.broadcast();
+        when(() => programMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester, initial: program);
+
+        await tester.enterText(facultyIdFieldFinder, 'faculty_1');
+        await tester.enterText(nameFieldFinder, 'text');
+        await tester.pumpAndSettle();
+
+        expect(find.text('faculty_1'), findsOneWidget);
+        expect(find.text('text'), findsOneWidget);
+
+        controller.add(
+          const ProgramMutationState(
+            notice: ProgramUpdatedNotice(before: program, after: program),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('faculty_1'), findsOneWidget);
+        expect(find.text('text'), findsOneWidget);
+      });
+
       testWidgets('clear all fields when create success', (tester) async {
         final controller = StreamController<ProgramMutationState>.broadcast();
         when(() => programMutationBlocMock.stream)
@@ -307,6 +423,60 @@ void main() {
 
           expect(
             find.text('Gagal memperbarui program studi'),
+            findsOneWidget,
+          );
+          expect(
+            find.text(AppExceptionCode.internal.message),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testWidgets('shows success dialog with correct title and message '
+          'when delete success', (tester) async {
+        final controller = StreamController<ProgramMutationState>.broadcast();
+        when(() => programMutationBlocMock.stream)
+            .thenAnswer((_) => controller.stream);
+
+        await pumpWidget(tester);
+        controller.add(
+          const ProgramMutationState(
+            notice: ProgramDeletedNotice(program),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Program studi berhasil dihapus'), findsOneWidget);
+        expect(
+          find.text(
+            'Program studi dengan nama "${program.name}" berhasil dihapus',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets(
+        'shows failed dialog with correct title and message when delete failed',
+        (tester) async {
+          final controller = StreamController<ProgramMutationState>.broadcast();
+          when(() => programMutationBlocMock.stream)
+              .thenAnswer((_) => controller.stream);
+
+          await pumpWidget(tester);
+
+          controller.add(
+            ProgramMutationState(
+              notice: ProgramMutationFailedNotice(
+                type: ProgramMutationType.delete,
+                exception: AppException.test(),
+                program: program,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(
+            find.text('Gagal menghapus program studi'),
             findsOneWidget,
           );
           expect(

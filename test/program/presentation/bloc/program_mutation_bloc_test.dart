@@ -13,6 +13,7 @@ void main() {
   const program = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
   late CreateProgramUseCase createProgramMock;
   late UpdateProgramUseCase updateProgramMock;
+  late DeleteProgramUseCase deleteProgramMock;
 
   group('ProgramMutationBloc', () {
     setUpAll(initializeMockDependencies);
@@ -20,12 +21,14 @@ void main() {
     setUp(() {
       createProgramMock = getIt<CreateProgramUseCase>();
       updateProgramMock = getIt<UpdateProgramUseCase>();
+      deleteProgramMock = getIt<DeleteProgramUseCase>();
     });
 
     ProgramMutationBloc buildBloc() {
       return ProgramMutationBloc(
         createProgram: createProgramMock,
         updateProgram: updateProgramMock,
+        deleteProgram: deleteProgramMock,
       );
     }
 
@@ -167,6 +170,61 @@ void main() {
         ],
         verify: (_) {
           verify(() => updateProgramMock(params)).called(1);
+        },
+      );
+    });
+
+    group('ProgramMutationDeleteRequested', () {
+      setUp(() {
+        when(() => deleteProgramMock(program))
+            .thenAnswer((_) async => AppResult.success(null));
+      });
+
+      blocTest<ProgramMutationBloc, ProgramMutationState>(
+        'emits [added deletingIds, updated notice and removed deletingIds] '
+        'when ProgramMutationDeleteRequested is added '
+        'and DeleteProgramUseCase success',
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          const ProgramMutationDeleteRequested(program: program),
+        ),
+        expect: () => <ProgramMutationState>[
+          ProgramMutationState(deletingIds: {program.id}),
+          const ProgramMutationState(
+            deletingIds: {},
+            notice: ProgramDeletedNotice(program),
+          ),
+        ],
+        verify: (_) {
+          verify(() => deleteProgramMock(program)).called(1);
+        },
+      );
+
+      blocTest<ProgramMutationBloc, ProgramMutationState>(
+        'emits [added deletingIds, failed notice and removed deletingIds] '
+        'when ProgramMutationDeleteRequested is added '
+        'and DeleteProgramUseCase fail',
+        setUp: () {
+          when(() => deleteProgramMock(program))
+              .thenAnswer((_) async => AppResult.failure(AppException.test()));
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          const ProgramMutationDeleteRequested(program: program),
+        ),
+        expect: () => <ProgramMutationState>[
+          ProgramMutationState(deletingIds: {program.id}),
+          ProgramMutationState(
+            deletingIds: const {},
+            notice: ProgramMutationFailedNotice(
+              program: program,
+              type: ProgramMutationType.delete,
+              exception: AppException.test(),
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => deleteProgramMock(program)).called(1);
         },
       );
     });

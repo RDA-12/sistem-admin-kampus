@@ -35,3 +35,15 @@ final class ProgramMutationCreateRequested extends ProgramMutationEvent {
   @override
   List<Object?> get props => [facultyId, name];
 }
+
+/// Event for deleting a [Program]
+final class ProgramMutationDeleteRequested extends ProgramMutationEvent {
+  /// Creates new [ProgramMutationDeleteRequested]
+  const new({required this.program});
+
+  /// [Program] that will be deleted
+  final Program program;
+
+  @override
+  List<Object?> get props => [program];
+}
