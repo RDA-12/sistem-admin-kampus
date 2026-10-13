@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
@@ -58,6 +59,34 @@ void main() {
         onCreatePressed: onCreatePressed,
       ),
       phoneSize: phoneSize,
+      childRoutes: [
+        GoRoute(
+          path: 'create',
+          builder: (_, _) {
+            return const CreateProgramPage();
+          },
+        ),
+        GoRoute(
+          path: 'create-compact',
+          builder: (_, _) {
+            return const CreateProgramPage();
+          },
+        ),
+        GoRoute(
+          path: ':id',
+          builder: (_, state) {
+            final id = state.pathParameters['id']!;
+            return ProgramDetailPage(id: id);
+          },
+        ),
+        GoRoute(
+          path: 'compact/:id',
+          builder: (_, state) {
+            final id = state.pathParameters['id']!;
+            return ProgramDetailPage(id: id);
+          },
+        ),
+      ],
     );
   }
 
@@ -145,39 +174,101 @@ void main() {
     });
 
     group('Interactions', () {
-      testWidgets('calls onProgramPressed in compact screen', (tester) async {
-        var tappedId = '';
-        await pumpWidget(
-          tester,
-          phoneSize: const Size(450, 800),
-          onProgramPressed: (id) {
-            tappedId = id;
-          },
-        );
+      testWidgets(
+        'go to create page when create button is pressed in compact screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(450, 800));
 
-        final widget = tester.widget<ProgramsList>(find.byType(ProgramsList));
-        widget.onPressed!(programMock);
-        await tester.pumpAndSettle();
+          await createButtonPressed(tester);
 
-        expect(tappedId, programMock.id);
-      });
+          expect(find.byType(ProgramsList), findsNothing);
+          expect(find.byType(CreateProgramPage), findsOneWidget);
+        },
+      );
 
-      testWidgets('calls onCreatePressed in compact screen', (tester) async {
-        var created = false;
-        await pumpWidget(
-          tester,
-          phoneSize: const Size(450, 800),
-          onCreatePressed: () {
-            created = true;
-          },
-        );
+      testWidgets(
+        'go to create page when create button is pressed in medium screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(650, 800));
 
-        final widget = tester.widget<ProgramsList>(find.byType(ProgramsList));
-        widget.onCreatePressed!();
-        await tester.pumpAndSettle();
+          await createButtonPressed(tester);
 
-        expect(created, isTrue);
-      });
+          expect(find.byType(ProgramsList), findsNothing);
+          expect(find.byType(CreateProgramPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows create page when create button is pressed in expanded screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(900, 800));
+
+          await createButtonPressed(tester);
+
+          expect(find.byType(ProgramsList), findsOneWidget);
+          expect(find.byType(CreateProgramPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows create page when create button is pressed in large screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+          await createButtonPressed(tester);
+
+          expect(find.byType(ProgramsList), findsOneWidget);
+          expect(find.byType(CreateProgramPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'go to detail page when a program is pressed in compact screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(450, 800));
+
+          await programPressed(tester);
+
+          expect(find.byType(ProgramsList), findsNothing);
+          expect(find.byType(ProgramDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'go to detail page when a program is pressed in medium screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(650, 800));
+
+          await programPressed(tester);
+
+          expect(find.byType(ProgramsList), findsNothing);
+          expect(find.byType(ProgramDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows detail page when a program is pressed in expanded screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(900, 800));
+
+          await programPressed(tester);
+
+          expect(find.byType(ProgramsList), findsOneWidget);
+          expect(find.byType(ProgramDetailPage), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows detail page when a program is pressed in large screen',
+        (tester) async {
+          await pumpWidget(tester, phoneSize: const Size(1250, 800));
+
+          await programPressed(tester);
+
+          expect(find.byType(ProgramsList), findsOneWidget);
+          expect(find.byType(ProgramDetailPage), findsOneWidget);
+        },
+      );
     });
   });
 }

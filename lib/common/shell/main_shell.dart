@@ -13,6 +13,10 @@ const _destinations = <_MainDestination>[
     icon: Icons.school_rounded,
     label: 'Fakultas',
   ),
+  _MainDestination(
+    icon: Icons.book_rounded,
+    label: 'Program Studi',
+  ),
 ];
 
 /// Main shell which contains nav rail for large screen and

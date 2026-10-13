@@ -72,8 +72,83 @@ class FacultyDetailCompactRoute extends GoRouteData
   );
 }
 
+/// Route for [CreateProgramPage]
+class CreateProgramRoute extends GoRouteData with $CreateProgramRoute {
+  /// Creates new [CreateProgramRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateProgramPage();
+}
+
+/// Route for [CreateProgramPage] in compact screen
+class CreateProgramCompactRoute extends GoRouteData
+    with $CreateProgramCompactRoute {
+  /// Creates new [CreateProgramRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateProgramPage();
+}
+
+/// Route for [ProgramsListPage]
+class ProgramsListRoute extends GoRouteData with $ProgramsListRoute {
+  /// Creates new [ProgramsListRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ProgramsListPage();
+}
+
+/// Route for [ProgramDetailPage]
+class ProgramDetailRoute extends GoRouteData with $ProgramDetailRoute {
+  /// Creates new [ProgramDetailRoute]
+  const new(this.id);
+
+  /// ID of the program that will be loaded
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => ProgramDetailPage(
+    id: id,
+    onProgramDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
+/// Route for [ProgramDetailPage] in compact screen
+class ProgramDetailCompactRoute extends GoRouteData
+    with $ProgramDetailCompactRoute {
+  /// Creates new [ProgramDetailRoute]
+  const new(this.id);
+
+  /// ID of the program that will be loaded
+  final String id;
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => ProgramDetailPage(
+    id: id,
+    onProgramDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
 /// Branch for [Faculty] in [MainShell]
 class FacultyMainShellData extends StatefulShellBranchData;
+
+/// Branch for [Program] in [MainShell]
+class ProgramMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -87,6 +162,19 @@ class FacultyMainShellData extends StatefulShellBranchData;
             TypedGoRoute<CreateFacultyCompactRoute>(path: 'create-compact'),
             TypedGoRoute<FacultyDetailRoute>(path: ':id'),
             TypedGoRoute<FacultyDetailCompactRoute>(path: 'compact/:id'),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<ProgramMainShellData>(
+      routes: [
+        TypedGoRoute<ProgramsListRoute>(
+          path: '/programs',
+          routes: [
+            TypedGoRoute<CreateProgramRoute>(path: 'create'),
+            TypedGoRoute<CreateProgramCompactRoute>(path: 'create-compact'),
+            TypedGoRoute<ProgramDetailRoute>(path: ':id'),
+            TypedGoRoute<ProgramDetailCompactRoute>(path: 'compact/:id'),
           ],
         ),
       ],

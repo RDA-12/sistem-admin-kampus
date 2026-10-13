@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
@@ -42,14 +44,33 @@ class ProgramsListPage extends StatelessWidget {
                 onPressed: (program) {
                   final programId = program.id;
                   if (breakPoint < BreakPoint.expanded) {
-                    onProgramPressed?.call(programId);
+                    if (onProgramPressed != null) {
+                      onProgramPressed?.call(programId);
+                    } else if (breakPoint == BreakPoint.compact) {
+                      unawaited(
+                        ProgramDetailCompactRoute(programId)
+                            .push<void>(context),
+                      );
+                    } else {
+                      unawaited(
+                        ProgramDetailRoute(programId).push<void>(context),
+                      );
+                    }
                   } else {
                     controller.data = programId;
                   }
                 },
                 onCreatePressed: () {
                   if (breakPoint < BreakPoint.expanded) {
-                    onCreatePressed?.call();
+                    if (onCreatePressed != null) {
+                      onCreatePressed?.call();
+                    } else if (breakPoint == BreakPoint.compact) {
+                      unawaited(
+                        const CreateProgramCompactRoute().push<void>(context),
+                      );
+                    } else {
+                      unawaited(const CreateProgramRoute().push<void>(context));
+                    }
                   } else {
                     controller.data = 'create';
                   }
