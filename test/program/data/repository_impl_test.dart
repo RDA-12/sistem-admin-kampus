@@ -175,6 +175,60 @@ void main() {
       );
     });
 
+    group('update', () {
+      test('returns updated program and save changes in database', () async {
+        final query = database.select(database.programsDrift);
+        final before = await query.get();
+        expect(before.map((it) => it.toDomain()), seededPrograms);
+
+        const expectedUpdated = Program(
+          id: 'program_0',
+          facultyId: 'faculty_1',
+          name: 'updated name',
+        );
+
+        final updated = await repository.update(
+          seededPrograms.first.id,
+          args: const UpdateProgramParams(
+            expectedUpdated,
+            name: 'updated name',
+          ),
+        );
+
+        expect(updated, AppResult.success(expectedUpdated));
+
+        final after = await query.get();
+        expect(after.map((it) => it.toDomain()), [
+          expectedUpdated,
+          ...seededPrograms.sublist(1),
+        ]);
+      });
+
+      test('returns failure with programNotFound code '
+          'when update non existing program', () async {
+        final result = await repository.update(
+          createdProgram.id,
+          args: const UpdateProgramParams(createdProgram, name: 'new name'),
+        );
+
+        result.expectFailureWithCode(AppExceptionCode.programNotFound);
+      });
+
+      test('returns failure with internal code '
+          'when unintended exception occurred', () async {
+        whenCalling(Invocation.method(#update, null))
+            .on(repository)
+            .thenThrow(Exception());
+
+        final result = await repository.update(
+          seededPrograms.first.id,
+          args: UpdateProgramParams(seededPrograms.first, name: 'new name'),
+        );
+
+        result.expectFailureWithCode(AppExceptionCode.internal);
+      });
+    });
+
     group('watchSingle', () {
       test('emits correct program when program exists', () {
         final result = repository.watchSingle(seededPrograms.first.id);

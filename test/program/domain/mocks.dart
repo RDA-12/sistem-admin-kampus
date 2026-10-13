@@ -15,6 +15,9 @@ class MockWatchSingleProgramUseCase extends Mock
 @LazySingleton(as: CreateProgramUseCase, env: [Environment.test])
 class MockCreateProgramUseCase extends Mock implements CreateProgramUseCase;
 
+@LazySingleton(as: UpdateProgramUseCase, env: [Environment.test])
+class MockUpdateProgramUseCase extends Mock implements UpdateProgramUseCase;
+
 final programsMock = List<Program>.generate(
   5,
   (index) => Program(id: '$index', facultyId: 'faculty_1', name: 'name $index'),

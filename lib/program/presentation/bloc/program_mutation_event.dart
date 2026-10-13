@@ -6,6 +6,21 @@ sealed class ProgramMutationEvent extends Equatable {
   const new();
 }
 
+/// Event for updating a [Program]
+final class ProgramMutationUpdateRequested extends ProgramMutationEvent {
+  /// Creates new [ProgramMutationUpdateRequested]
+  const new({required this.program, this.name});
+
+  /// [Program] that will be updated
+  final Program program;
+
+  /// New name for [program]
+  final String? name;
+
+  @override
+  List<Object?> get props => [program, name];
+}
+
 /// Event for creating new [Program]
 final class ProgramMutationCreateRequested extends ProgramMutationEvent {
   /// Creates new [ProgramMutationCreateRequested]

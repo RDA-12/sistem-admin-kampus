@@ -99,6 +99,28 @@ void main() {
           );
         },
       );
+      testWidgets(
+        'shows LoadingIndicator on save button and disable it '
+        'when ProgramMutationState updatingIds contains initial program',
+        (tester) async {
+          whenListen(
+            programMutationBlocMock,
+            Stream.value(ProgramMutationState(updatingIds: {program.id})),
+          );
+
+          await pumpWidget(tester, initial: program);
+          await tester.pump();
+
+          expect(
+            find.descendant(
+              of: saveButtonFinder,
+              matching: find.byType(LoadingIndicator),
+            ),
+            findsOneWidget,
+          );
+          expect(tester.widget<AppButton>(saveButtonFinder).onPressed, isNull);
+        },
+      );
     });
 
     group('Interactions', () {
@@ -118,6 +140,27 @@ void main() {
               const ProgramMutationCreateRequested(
                 facultyId: 'faculty_1',
                 name: 'Ilmu Komputer',
+              ),
+            ),
+          ).called(1);
+        },
+      );
+
+      testWidgets(
+        'add ProgramMutationUpdateRequested when initial is provided '
+        'and save valid fields',
+        (tester) async {
+          await pumpWidget(tester, initial: program);
+
+          await tester.enterText(nameFieldFinder, 'Teknik Informatika');
+          await tester.tap(saveButtonFinder);
+          await tester.pumpAndSettle();
+
+          verify(
+            () => programMutationBlocMock.add(
+              const ProgramMutationUpdateRequested(
+                program: program,
+                name: 'Teknik Informatika',
               ),
             ),
           ).called(1);
@@ -177,6 +220,41 @@ void main() {
       );
 
       testWidgets(
+        'shows success dialog with correct title and message when update '
+        'success',
+        (tester) async {
+          const updated = Program(
+            id: 'id',
+            facultyId: 'faculty_1',
+            name: 'updated',
+          );
+          final controller = StreamController<ProgramMutationState>.broadcast();
+          when(() => programMutationBlocMock.stream)
+              .thenAnswer((_) => controller.stream);
+
+          await pumpWidget(tester);
+          controller.add(
+            const ProgramMutationState(
+              notice: ProgramUpdatedNotice(before: program, after: updated),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(
+            find.text('Program studi "${program.name}" berhasil diperbarui'),
+            findsOneWidget,
+          );
+          expect(
+            find.text(
+              'Program studi "${program.name}" berhasil diperbarui '
+              'dengan nama "${updated.name}"',
+            ),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testWidgets(
         'shows failed dialog with correct title and message when create failed',
         (tester) async {
           final controller = StreamController<ProgramMutationState>.broadcast();
@@ -198,6 +276,37 @@ void main() {
 
           expect(
             find.text('Gagal menyimpan program studi baru'),
+            findsOneWidget,
+          );
+          expect(
+            find.text(AppExceptionCode.internal.message),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testWidgets(
+        'shows failed dialog with correct title and message when update failed',
+        (tester) async {
+          final controller = StreamController<ProgramMutationState>.broadcast();
+          when(() => programMutationBlocMock.stream)
+              .thenAnswer((_) => controller.stream);
+
+          await pumpWidget(tester);
+
+          controller.add(
+            ProgramMutationState(
+              notice: ProgramMutationFailedNotice(
+                type: ProgramMutationType.update,
+                exception: AppException.test(),
+                program: program,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(
+            find.text('Gagal memperbarui program studi'),
             findsOneWidget,
           );
           expect(

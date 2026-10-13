@@ -84,6 +84,15 @@ class _ProgramFormState extends State<ProgramForm> {
                 message: exception.code.message,
               ),
             );
+          case ProgramUpdatedNotice(:final before, :final after):
+            unawaited(
+              context.showSuccessDialog(
+                title: 'Program studi "${before.name}" berhasil diperbarui',
+                message:
+                    'Program studi "${before.name}" berhasil diperbarui '
+                    'dengan nama "${after.name}"',
+              ),
+            );
           case ProgramCreatedNotice(:final created):
             unawaited(
               context.showSuccessDialog(
@@ -148,6 +157,13 @@ class _ProgramFormState extends State<ProgramForm> {
                                 context.read<ProgramMutationBloc>().add(
                                   ProgramMutationCreateRequested(
                                     facultyId: facultyId,
+                                    name: name,
+                                  ),
+                                );
+                              } else {
+                                context.read<ProgramMutationBloc>().add(
+                                  ProgramMutationUpdateRequested(
+                                    program: widget.initial!,
                                     name: name,
                                   ),
                                 );

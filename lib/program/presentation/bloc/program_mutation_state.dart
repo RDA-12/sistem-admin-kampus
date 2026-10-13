@@ -19,6 +19,23 @@ sealed class ProgramMutationNotice extends Equatable {
   const new();
 }
 
+/// Notice when a [Program] has been updated from [before] to [after]
+final class ProgramUpdatedNotice extends ProgramMutationNotice {
+  /// Creates new [ProgramUpdatedNotice]
+  ///
+  /// A [Program] has been updated from [before] to [after]
+  const new({required this.before, required this.after});
+
+  /// [Program] data before update
+  final Program before;
+
+  /// [Program] data after update
+  final Program after;
+
+  @override
+  List<Object?> get props => [before, after];
+}
+
 /// Notice when a [Program] has been created
 final class ProgramCreatedNotice extends ProgramMutationNotice {
   /// Creates new [ProgramCreatedNotice] for [created]

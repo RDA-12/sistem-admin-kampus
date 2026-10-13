@@ -12,17 +12,20 @@ import '../../../common/di_mocks.dart';
 void main() {
   const program = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
   late CreateProgramUseCase createProgramMock;
+  late UpdateProgramUseCase updateProgramMock;
 
   group('ProgramMutationBloc', () {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
       createProgramMock = getIt<CreateProgramUseCase>();
+      updateProgramMock = getIt<UpdateProgramUseCase>();
     });
 
     ProgramMutationBloc buildBloc() {
       return ProgramMutationBloc(
         createProgram: createProgramMock,
+        updateProgram: updateProgramMock,
       );
     }
 
@@ -95,6 +98,75 @@ void main() {
         ],
         verify: (_) {
           verify(() => createProgramMock(params)).called(1);
+        },
+      );
+    });
+
+    group('ProgramMutationUpdateRequested', () {
+      const params = UpdateProgramParams(program, name: 'new name');
+      const updated = Program(
+        id: 'id',
+        facultyId: 'faculty_1',
+        name: 'new name',
+      );
+
+      setUpAll(() {
+        registerFallbackValue(params);
+      });
+
+      setUp(() {
+        when(() => updateProgramMock(params))
+            .thenAnswer((_) async => AppResult.success(updated));
+      });
+
+      blocTest<ProgramMutationBloc, ProgramMutationState>(
+        'emits [added updatingIds, updated notice and removed updatingIds] '
+        'when ProgramMutationUpdateRequested is added '
+        'and UpdateProgramUseCase success',
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          ProgramMutationUpdateRequested(program: program, name: params.name),
+        ),
+        expect: () => <ProgramMutationState>[
+          ProgramMutationState(updatingIds: {program.id}),
+          const ProgramMutationState(
+            updatingIds: {},
+            notice: ProgramUpdatedNotice(
+              before: program,
+              after: updated,
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => updateProgramMock(params)).called(1);
+        },
+      );
+
+      blocTest<ProgramMutationBloc, ProgramMutationState>(
+        'emits [added updatingIds, failed notice and removed updatingIds] '
+        'when ProgramMutationUpdateRequested is added '
+        'and UpdateProgramUseCase fail',
+        setUp: () {
+          when(() => updateProgramMock(params))
+              .thenAnswer((_) async => AppResult.failure(AppException.test()));
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          ProgramMutationUpdateRequested(program: program, name: params.name),
+        ),
+        expect: () => <ProgramMutationState>[
+          ProgramMutationState(updatingIds: {program.id}),
+          ProgramMutationState(
+            updatingIds: const {},
+            notice: ProgramMutationFailedNotice(
+              program: program,
+              type: ProgramMutationType.update,
+              exception: AppException.test(),
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => updateProgramMock(params)).called(1);
         },
       );
     });

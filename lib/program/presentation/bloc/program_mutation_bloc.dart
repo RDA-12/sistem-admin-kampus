@@ -15,14 +15,19 @@ class ProgramMutationBloc
   /// Creates new [ProgramMutationBloc]
   new({
     required this._createProgram,
+    required this._updateProgram,
   }) : super(const ProgramMutationState()) {
     on<ProgramMutationCreateRequested>(
       _onProgramMutationCreateRequested,
       transformer: sequential(),
     );
+    on<ProgramMutationUpdateRequested>(
+      _onProgramMutationUpdateRequested,
+    );
   }
 
   final CreateProgramUseCase _createProgram;
+  final UpdateProgramUseCase _updateProgram;
 
   Future<void> _onProgramMutationCreateRequested(
     ProgramMutationCreateRequested event,
@@ -43,5 +48,38 @@ class ProgramMutationBloc
       ),
     };
     emit(state.copyWith(isCreating: false, notice: notice));
+  }
+
+  Future<void> _onProgramMutationUpdateRequested(
+    ProgramMutationUpdateRequested event,
+    Emitter<ProgramMutationState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        updatingIds: {...state.updatingIds, event.program.id},
+      ),
+    );
+
+    final result = await _updateProgram(
+      UpdateProgramParams(event.program, name: event.name),
+    );
+
+    final notice = switch (result) {
+      AppSuccess(:final data) => ProgramUpdatedNotice(
+        before: event.program,
+        after: data,
+      ),
+      AppFailure(:final exception) => ProgramMutationFailedNotice(
+        type: ProgramMutationType.update,
+        exception: exception,
+        program: event.program,
+      ),
+    };
+    emit(
+      state.copyWith(
+        notice: notice,
+        updatingIds: {...state.updatingIds}..remove(event.program.id),
+      ),
+    );
   }
 }
