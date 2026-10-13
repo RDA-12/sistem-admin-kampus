@@ -1,0 +1,159 @@
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/program/program.dart';
+
+import '../../../common/di_mocks.dart';
+import '../../../common/helper.dart';
+import '../../domain/mocks.dart';
+
+void main() {
+  late ProgramDetailBloc programDetailBlocMock;
+
+  setUpAll(initializeMockDependencies);
+
+  setUp(() {
+    programDetailBlocMock = getIt<ProgramDetailBloc>();
+    whenListen(
+      programDetailBlocMock,
+      Stream.value(const ProgramDetailLoaded(program: programMock)),
+      initialState: const ProgramDetailLoaded(program: programMock),
+    );
+  });
+
+  Future<void> pumpWidget(
+    WidgetTester tester, {
+    void Function()? onRetryPressed,
+    void Function(Program)? onProgramDeleted,
+  }) {
+    return tester.pumpWidgetForTest(
+      (context) {
+        return ProgramDetail(
+          onRetryPressed: onRetryPressed,
+          onProgramDeleted: onProgramDeleted,
+        );
+      },
+      providerBuilder: (context, child) {
+        return BlocProvider.value(
+          value: programDetailBlocMock,
+          child: child,
+        );
+      },
+    );
+  }
+
+  group('ProgramDetail', () {
+    group('Render', () {
+      testWidgets(
+        'shows ProgramForm with correct program '
+        'when state is loaded',
+        (tester) async {
+          await pumpWidget(tester);
+
+          final finder = find.byType(ProgramForm);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<ProgramForm>(finder);
+          expect(widget.initial, programMock);
+        },
+      );
+
+      testWidgets(
+        'shows LoadingIndicator when state is loading',
+        (tester) async {
+          whenListen(
+            programDetailBlocMock,
+            Stream.value(const LoadingProgramDetail()),
+            initialState: const LoadingProgramDetail(),
+          );
+
+          await pumpWidget(tester);
+
+          expect(find.byType(LoadingIndicator), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'shows AppExceptionBox when state is failed',
+        (tester) async {
+          whenListen(
+            programDetailBlocMock,
+            Stream.value(
+              ProgramDetailLoadFailed(exception: AppException.test()),
+            ),
+            initialState: ProgramDetailLoadFailed(
+              exception: AppException.test(),
+            ),
+          );
+
+          await pumpWidget(tester);
+
+          final finder = find.byType(AppExceptionBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppExceptionBox>(finder);
+          expect(widget.title, 'Gagal mengambil data program studi');
+          expect(widget.exception, AppException.test());
+        },
+      );
+    });
+
+    group('Interactions', () {
+      testWidgets(
+        'calls onRetryPressed when state is failed '
+        'and retry button is pressed',
+        (tester) async {
+          whenListen(
+            programDetailBlocMock,
+            Stream.value(
+              ProgramDetailLoadFailed(exception: AppException.test()),
+            ),
+            initialState: ProgramDetailLoadFailed(
+              exception: AppException.test(),
+            ),
+          );
+          var pressed = false;
+          await pumpWidget(
+            tester,
+            onRetryPressed: () {
+              pressed = true;
+            },
+          );
+
+          await tester.tap(
+            find.descendant(
+              of: find.byType(AppExceptionBox),
+              matching: find.byType(AppButton),
+            ),
+          );
+
+          expect(pressed, isTrue);
+        },
+      );
+    });
+
+    group('Side Effects', () {
+      testWidgets(
+        'calls onProgramDeleted '
+        'when ProgramDetail fires onProgramDeleted callback',
+        (tester) async {
+          Program? deleted;
+
+          await pumpWidget(
+            tester,
+            onProgramDeleted: (v) {
+              deleted = v;
+            },
+          );
+
+          final finder = find.byType(ProgramForm);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<ProgramForm>(finder);
+          widget.onProgramDeleted!(programMock);
+
+          expect(deleted, programMock);
+        },
+      );
+    });
+  });
+}
