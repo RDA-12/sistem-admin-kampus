@@ -1,5 +1,9 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
+import 'package:sistem_admin/program/presentation/bloc/bloc.dart';
+import 'package:sistem_admin/program/presentation/widgets/widgets.dart';
 
 /// Page for creating new [Program]
 class CreateProgramPage extends StatelessWidget {
@@ -8,6 +12,17 @@ class CreateProgramPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return BlocProvider(
+      create: (context) => getIt<ProgramMutationBloc>(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Buat Program Studi Baru'),
+        ),
+        body: const Padding(
+          padding: AppSpacing.pagePadding,
+          child: ProgramForm(),
+        ),
+      ),
+    );
   }
 }

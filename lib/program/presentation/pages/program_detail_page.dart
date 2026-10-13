@@ -22,10 +22,17 @@ class ProgramDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          getIt<ProgramDetailBloc>()
-            ..add(ProgramDetailSubscriptionRequested(id: id)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              getIt<ProgramDetailBloc>()
+                ..add(ProgramDetailSubscriptionRequested(id: id)),
+        ),
+        BlocProvider(
+          create: (context) => getIt<ProgramMutationBloc>(),
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Detail Program Studi'),

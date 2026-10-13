@@ -22,6 +22,13 @@ void main() {
       initialState: const ProgramDetailLoaded(program: programMock),
     );
     when(programDetailBlocMock.close).thenAnswer((_) async {});
+
+    whenListen(
+      getIt<ProgramMutationBloc>(),
+      Stream.value(const ProgramMutationState()),
+      initialState: const ProgramMutationState(),
+    );
+    when(getIt<ProgramMutationBloc>().close).thenAnswer((_) async {});
   });
 
   Future<void> pumpWidget(
@@ -67,6 +74,12 @@ void main() {
         await pumpWidget(tester);
 
         expect(find.byType(BlocProvider<ProgramDetailBloc>), findsOneWidget);
+      });
+
+      testWidgets('provides ProgramMutationBloc', (tester) async {
+        await pumpWidget(tester);
+
+        expect(find.byType(BlocProvider<ProgramMutationBloc>), findsOneWidget);
       });
 
       testWidgets('shows ProgramDetail', (tester) async {

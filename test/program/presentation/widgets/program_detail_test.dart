@@ -21,6 +21,12 @@ void main() {
       Stream.value(const ProgramDetailLoaded(program: programMock)),
       initialState: const ProgramDetailLoaded(program: programMock),
     );
+
+    whenListen(
+      getIt<ProgramMutationBloc>(),
+      Stream.value(const ProgramMutationState()),
+      initialState: const ProgramMutationState(),
+    );
   });
 
   Future<void> pumpWidget(
@@ -36,8 +42,15 @@ void main() {
         );
       },
       providerBuilder: (context, child) {
-        return BlocProvider.value(
-          value: programDetailBlocMock,
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(
+              value: programDetailBlocMock,
+            ),
+            BlocProvider.value(
+              value: getIt<ProgramMutationBloc>(),
+            ),
+          ],
           child: child,
         );
       },

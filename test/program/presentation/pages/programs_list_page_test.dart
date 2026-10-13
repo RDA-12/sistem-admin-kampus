@@ -30,11 +30,19 @@ void main() {
       initialState: const ProgramDetailLoaded(program: programMock),
     );
     when(getIt<ProgramDetailBloc>().close).thenAnswer((_) async {});
+
+    whenListen(
+      getIt<ProgramMutationBloc>(),
+      Stream.value(const ProgramMutationState()),
+      initialState: const ProgramMutationState(),
+    );
+    when(getIt<ProgramMutationBloc>().close).thenAnswer((_) async {});
   });
 
   tearDown(() {
     reset(programsBlocMock);
     reset(getIt<ProgramDetailBloc>());
+    reset(getIt<ProgramMutationBloc>());
   });
 
   Future<void> pumpWidget(

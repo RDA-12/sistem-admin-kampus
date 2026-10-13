@@ -1,14 +1,22 @@
+import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_exceptions/mock_exceptions.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../common/di_mocks.dart';
+import '../../common/helper.dart';
 
 void main() {
   const faculty = Faculty(id: 'faculty_1', name: 'Faculty 1');
+  const createdProgram = Program(
+    id: 'uid',
+    facultyId: 'faculty_1',
+    name: 'name',
+  );
   final seededPrograms = List.generate(
     5,
     (index) => Program(
@@ -43,6 +51,7 @@ void main() {
     }
 
     uidGeneratorMock = getIt<UidGenerator>();
+    when(uidGeneratorMock.generate).thenReturn(createdProgram.id);
 
     repository = ProgramRepository(
       db: database,
@@ -56,6 +65,56 @@ void main() {
   });
 
   group('ProgramRepository', () {
+    group('save', () {
+      const createArgs = CreateProgramParams(
+        facultyId: 'faculty_1',
+        name: 'name',
+      );
+
+      test('returns correct new program and save it', () async {
+        final now = DateTime.now();
+        await withClock(Clock.fixed(now), () async {
+          final result = await repository.save(createArgs);
+
+          expect(result, AppResult.success(createdProgram));
+
+          final query = database.select(database.programsDrift)
+            ..where((tbl) => tbl.id.equals(createdProgram.id));
+          final exists = await query.getSingleOrNull();
+          expect(exists, isNotNull);
+          expect(exists!.facultyId, createArgs.facultyId);
+          expect(exists.name, createArgs.name);
+          expect(exists.createdAt, now);
+          expect(exists.updatedAt, now);
+        });
+      });
+
+      test(
+        'returns failure with programAlreadyExists code '
+        'when save program with existing name in same faculty',
+        () async {
+          await repository.save(createArgs);
+
+          final result = await repository.save(createArgs);
+
+          result.expectFailureWithCode(AppExceptionCode.programAlreadyExists);
+        },
+      );
+
+      test(
+        'returns failure with internal code '
+        'when unintended exception occurred',
+        () async {
+          whenCalling(Invocation.method(#save, null))
+              .on(repository)
+              .thenThrow(Exception());
+
+          final result = await repository.save(createArgs);
+
+          result.expectFailureWithCode(AppExceptionCode.internal);
+        },
+      );
+    });
     group('watch', () {
       test('emits correct programs', () async {
         final stream = repository.watch();
