@@ -13,7 +13,7 @@ class ProgramListTile extends StatelessWidget {
   });
 
   /// [Program] data that will be shown
-  final Program program;
+  final ProgramUI program;
 
   /// Invoked when this program tile is pressed
   final VoidCallback? onPressed;
@@ -26,6 +26,11 @@ class ProgramListTile extends StatelessWidget {
     return AppListTile(
       selected: selected,
       title: Text(program.name),
+      subtitle: Chip(
+        label: Text(program.faculty.name),
+        backgroundColor: context.color.primaryContainer,
+        color: WidgetStatePropertyAll(context.color.onPrimaryContainer),
+      ),
       trailing: const Icon(Icons.chevron_right_rounded),
       onPressed: onPressed,
     );

@@ -3,9 +3,15 @@ import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/helper.dart';
+import '../../../faculty/domain/mocks.dart';
 
 void main() {
-  const program = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
+  final program = ProgramUI(
+    id: 'id',
+    facultyId: facultyMock.id,
+    name: 'program',
+    faculty: facultyMock,
+  );
 
   Future<void> pumpWidget(
     WidgetTester tester, {
@@ -27,6 +33,12 @@ void main() {
         await pumpWidget(tester);
 
         expect(find.text(program.name), findsOneWidget);
+      });
+
+      testWidgets('shows faculty name', (tester) async {
+        await pumpWidget(tester);
+
+        expect(find.text(program.faculty.name), findsOneWidget);
       });
 
       testWidgets('shows selected AppListTile when selected is true', (
