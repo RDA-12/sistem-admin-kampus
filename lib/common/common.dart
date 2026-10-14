@@ -1,4 +1,5 @@
 export 'app_clock.dart';
+export 'app_logger.dart';
 export 'data/data.dart';
 export 'di.dart';
 export 'exception_message.dart';

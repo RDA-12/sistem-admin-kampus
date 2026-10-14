@@ -4,6 +4,7 @@ import 'package:sistem_admin/common/common.dart';
 
 void main() {
   initializeDependencies();
+  AppLogger.initialize();
   runApp(const MainApp());
 }
 

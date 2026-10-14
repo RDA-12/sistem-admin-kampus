@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/program/domain/entities.dart';
 import 'package:sistem_admin/program/domain/repository.dart';
@@ -21,7 +22,7 @@ final class CreateProgramParams extends Equatable {
 
 /// Use case for creating new [Program]
 @LazySingleton(env: [Environment.prod])
-class CreateProgramUseCase
+class CreateProgramUseCase with AppLoggerMixin
     implements FutureBaseUseCase<CreateProgramParams, Program> {
   /// Creates new [CreateProgramUseCase]
   new({required this._programRepository});
@@ -31,11 +32,17 @@ class CreateProgramUseCase
   /// Run creating new [Program]
   @override
   Future<AppResult<Program>> call(CreateProgramParams params) async {
+    logDebug(
+      'start creating program',
+      extra: {'facultyId': params.facultyId, 'name': params.name},
+    );
     final result = await _programRepository.save(params);
     switch (result) {
       case AppSuccess(:final data):
+        logDebug('program created');
         return AppResult.success(data);
       case AppFailure<Program>(:final exception):
+        logDebug('program creation failed');
         return AppResult.failure(exception);
     }
   }
