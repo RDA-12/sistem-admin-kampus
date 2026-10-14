@@ -224,4 +224,151 @@ void main() {
       );
     });
   });
+
+  group('showAppDialog', () {
+    Future<void> pumpWidget<T>(
+      WidgetTester tester, {
+      String title = 'title',
+      Widget Function(BuildContext)? contentBuilder,
+      void Function(T?)? onResult,
+      List<Widget> Function(BuildContext)? actionsBuilder,
+    }) {
+      return tester.pumpWidgetForTest((context) {
+        return FilledButton(
+          onPressed: () async {
+            final result = await context.showAppDialog<T?>(
+              title: title,
+              contentBuilder: contentBuilder ?? (_) => const Text('data'),
+              actionsBuilder: actionsBuilder,
+            );
+            onResult?.call(result);
+          },
+          child: const Text('show'),
+        );
+      });
+    }
+
+    group('Render', () {
+      testWidgets('shows title', (tester) async {
+        await pumpWidget<void>(tester, title: 'Title');
+
+        await openDialog(tester);
+
+        expect(find.text('Title'), findsOneWidget);
+      });
+
+      testWidgets('shows content', (tester) async {
+        await pumpWidget<void>(
+          tester,
+          contentBuilder: (_) => const Text('content'),
+        );
+
+        await openDialog(tester);
+
+        expect(find.text('content'), findsOneWidget);
+      });
+
+      testWidgets('shows actions', (tester) async {
+        await pumpWidget<void>(
+          tester,
+          actionsBuilder: (context) {
+            return [
+              FilledButton(
+                child: const Text('action 1'),
+                onPressed: () {},
+              ),
+              FilledButton(
+                child: const Text('action 2'),
+                onPressed: () {},
+              ),
+            ];
+          },
+        );
+
+        await openDialog(tester);
+
+        expect(find.text('action 1'), findsOneWidget);
+        expect(find.text('action 2'), findsOneWidget);
+      });
+    });
+
+    group('Interactions', () {
+      testWidgets('can close dialog from actionsBuilder', (tester) async {
+        await pumpWidget<void>(
+          tester,
+          title: 'Title',
+          actionsBuilder: (context) {
+            return [
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('close'),
+              ),
+            ];
+          },
+        );
+
+        await openDialog(tester);
+        expect(find.text('Title'), findsOneWidget);
+
+        await tester.tap(find.text('close'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Title'), findsNothing);
+      });
+
+      testWidgets('can close dialog from contentBuilder', (tester) async {
+        await pumpWidget<void>(
+          tester,
+          title: 'Title',
+          contentBuilder: (context) {
+            return FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('close'),
+            );
+          },
+        );
+
+        await openDialog(tester);
+        expect(find.text('Title'), findsOneWidget);
+
+        await tester.tap(find.text('close'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Title'), findsNothing);
+      });
+
+      testWidgets('returns correct data', (tester) async {
+        String? res;
+        await pumpWidget<String?>(
+          tester,
+          title: 'Title',
+          onResult: (v) {
+            res = v;
+          },
+          actionsBuilder: (context) {
+            return [
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context, 'result');
+                },
+                child: const Text('close'),
+              ),
+            ];
+          },
+        );
+
+        await openDialog(tester);
+        expect(find.text('Title'), findsOneWidget);
+
+        await tester.tap(find.text('close'));
+        await tester.pumpAndSettle();
+
+        expect(res, 'result');
+      });
+    });
+  });
 }

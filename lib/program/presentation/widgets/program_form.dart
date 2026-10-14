@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
 import 'package:sistem_admin/program/presentation/bloc/bloc.dart';
+import 'package:sistem_admin/program/presentation/models.dart';
 import 'package:sistem_admin/program/presentation/widgets/delete_program_button.dart';
 
 enum _FormState {
@@ -20,7 +22,7 @@ enum _FormState {
 class ProgramForm extends StatefulWidget {
   /// Creates new [ProgramForm]
   ///
-  /// It reacts to [ProgramMutationBloc]'s state changes.
+  /// It reacts to [ProgramMutationBloc] and [FacultiesBloc] state changes.
   /// So, make sure to provide that bloc in the widget tree.
   const new({
     this.initial,
@@ -29,7 +31,7 @@ class ProgramForm extends StatefulWidget {
   });
 
   /// Initial program data that will be showed
-  final Program? initial;
+  final ProgramUI? initial;
 
   /// Invoked when [initial] program data is deleted successfully
   final void Function(Program)? onProgramDeleted;
@@ -41,22 +43,22 @@ class ProgramForm extends StatefulWidget {
 class _ProgramFormState extends State<ProgramForm> {
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _nameController;
-  late final TextEditingController _facultyIdController;
+  late final FacultySelectorController _facultyController;
 
   @override
   void initState() {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _nameController = TextEditingController(text: widget.initial?.name);
-    _facultyIdController = TextEditingController(
-      text: widget.initial?.facultyId,
+    _facultyController = FacultySelectorController(
+      initial: widget.initial?.faculty,
     );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _facultyIdController.dispose();
+    _facultyController.dispose();
     super.dispose();
   }
 
@@ -104,7 +106,7 @@ class _ProgramFormState extends State<ProgramForm> {
               ),
             );
             _nameController.clear();
-            _facultyIdController.clear();
+            _facultyController.clear();
           case ProgramDeletedNotice(:final deleted):
             await context.showSuccessDialog(
               title: 'Program studi berhasil dihapus',
@@ -122,9 +124,9 @@ class _ProgramFormState extends State<ProgramForm> {
           spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AppFormField(
-              controller: _facultyIdController,
-              label: 'ID Fakultas',
+            FacultySelector(
+              label: 'Fakultas',
+              controller: _facultyController,
             ),
             AppFormField(
               controller: _nameController,
@@ -159,9 +161,11 @@ class _ProgramFormState extends State<ProgramForm> {
                           ? null
                           : () {
                               if (!_formKey.currentState!.validate()) return;
+                              if (_facultyController.selected == null) {
+                                return;
+                              }
                               final name = _nameController.text.trim();
-                              final facultyId = _facultyIdController.text
-                                  .trim();
+                              final facultyId = _facultyController.selected!.id;
                               if (widget.initial == null) {
                                 context.read<ProgramMutationBloc>().add(
                                   ProgramMutationCreateRequested(

@@ -27,7 +27,7 @@ final programsMock = List<Program>.generate(
   5,
   (index) => Program(id: '$index', facultyId: 'faculty_1', name: 'name $index'),
 );
-const programMock = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
+const programMock = Program(id: 'id', facultyId: 'faculty_1', name: 'program');
 final List<ProgramUI> programsUIMock = programsMock
     .map(
       (it) => ProgramUI(

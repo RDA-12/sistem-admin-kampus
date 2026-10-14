@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
 import 'package:sistem_admin/program/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/program/presentation/widgets/program_form.dart';
@@ -9,7 +10,8 @@ import 'package:sistem_admin/program/presentation/widgets/program_form.dart';
 class ProgramDetail extends StatelessWidget {
   /// Creates new [ProgramDetail]
   ///
-  /// It reacts to [ProgramDetailBloc] state changes.
+  /// It reacts to [ProgramDetailBloc], [FacultiesBloc],
+  /// and [ProgramMutationBloc] state changes.
   /// So, ensure to provide it with that bloc.
   const new({
     this.onRetryPressed,

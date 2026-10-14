@@ -9,21 +9,18 @@ extension AppDialogX on BuildContext {
     required String title,
     required String message,
   }) {
-    return showDialog(
-      context: this,
-      builder: (context) {
-        return _AppDialog(
-          title: title,
-          content: Text(message),
-          actions: [
-            AppButton(
-              label: 'OK',
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
+    return showAppDialog(
+      title: title,
+      contentBuilder: (_) => Text(message),
+      actionsBuilder: (context) {
+        return [
+          AppButton(
+            label: 'OK',
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ];
       },
     );
   }
@@ -34,21 +31,18 @@ extension AppDialogX on BuildContext {
     required String title,
     required String message,
   }) {
-    return showDialog(
-      context: this,
-      builder: (context) {
-        return _AppDialog(
-          title: title,
-          content: Text(message),
-          actions: [
-            AppButton(
-              label: 'OK',
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
+    return showAppDialog(
+      title: title,
+      contentBuilder: (_) => Text(message),
+      actionsBuilder: (context) {
+        return [
+          AppButton(
+            label: 'OK',
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ];
       },
     );
   }
@@ -60,32 +54,47 @@ extension AppDialogX on BuildContext {
     required String title,
     required String message,
   }) async {
-    final result = await showDialog<bool?>(
+    final result = await showAppDialog<bool?>(
+      title: title,
+      contentBuilder: (_) => Text(message),
+      actionsBuilder: (context) {
+        return [
+          AppButton(
+            type: .text,
+            label: 'Batal',
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+          ),
+          AppButton(
+            type: .text,
+            label: 'OK',
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+          ),
+        ];
+      },
+    );
+    return result ?? false;
+  }
+
+  /// Shows styled dialog for the app
+  Future<T?> showAppDialog<T>({
+    required String title,
+    required Widget Function(BuildContext) contentBuilder,
+    List<Widget> Function(BuildContext)? actionsBuilder,
+  }) {
+    return showDialog<T>(
       context: this,
       builder: (context) {
         return _AppDialog(
           title: title,
-          content: Text(message),
-          actions: [
-            AppButton(
-              type: .text,
-              label: 'Batal',
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-            ),
-            AppButton(
-              type: .text,
-              label: 'OK',
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-            ),
-          ],
+          content: contentBuilder(context),
+          actions: actionsBuilder?.call(context),
         );
       },
     );
-    return result ?? false;
   }
 }
 

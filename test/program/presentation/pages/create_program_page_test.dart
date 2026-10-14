@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
@@ -48,6 +49,18 @@ void main() {
 
           expect(
             find.byType(BlocProvider<ProgramMutationBloc>),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testWidgets(
+        'provides BlocProvider<FacultiesBloc>',
+        (tester) async {
+          await pumpWidget(tester);
+
+          expect(
+            find.byType(BlocProvider<FacultiesBloc>),
             findsOneWidget,
           );
         },

@@ -43,6 +43,8 @@ void main() {
       bool isRequired = true,
       TextEditingController? controller,
       String? Function(String?)? validator,
+      bool readOnly = false,
+      VoidCallback? onPressed,
     }) {
       return tester.pumpWidgetForTest(
         (context) => _TestWidget(
@@ -51,6 +53,8 @@ void main() {
             isRequired: isRequired,
             label: label,
             validator: validator,
+            readOnly: readOnly,
+            onPressed: onPressed,
           ),
         ),
       );
@@ -111,6 +115,34 @@ void main() {
           expect(find.text('invalid content'), findsOneWidget);
         },
       );
+
+      testWidgets('cannot enter text when readOnly is true', (tester) async {
+        await pumpWidget(
+          tester,
+          readOnly: true,
+        );
+
+        await tester.enterText(find.byType(TextFormField), 'text');
+        await tester.pumpAndSettle();
+
+        expect(find.text('text'), findsNothing);
+      });
+    });
+
+    group('Interactions', () {
+      testWidgets('calls onPressed when field is pressed', (tester) async {
+        var pressed = false;
+        await pumpWidget(
+          tester,
+          onPressed: () {
+            pressed = true;
+          },
+        );
+
+        await tester.tap(find.byType(TextFormField));
+
+        expect(pressed, isTrue);
+      });
     });
   });
 }

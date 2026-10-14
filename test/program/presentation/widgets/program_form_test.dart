@@ -7,14 +7,18 @@ import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
+import '../../../faculty/domain/mocks.dart';
+import '../../domain/mocks.dart';
 
 void main() {
-  const program = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
+  final program = programUIMock;
   late ProgramMutationBloc programMutationBlocMock;
+  late FacultiesBloc facultiesBlocMock;
 
   group('ProgramForm', () {
     setUpAll(initializeMockDependencies);
@@ -26,11 +30,18 @@ void main() {
         Stream.value(const ProgramMutationState()),
         initialState: const ProgramMutationState(),
       );
+
+      facultiesBlocMock = getIt<FacultiesBloc>();
+      whenListen(
+        facultiesBlocMock,
+        Stream.value(FacultiesLoaded(facultiesMock)),
+        initialState: FacultiesLoaded(facultiesMock),
+      );
     });
 
     Future<void> pumpWidget(
       WidgetTester tester, {
-      Program? initial,
+      ProgramUI? initial,
       void Function(Program)? onProgramDeleted,
     }) {
       return tester.pumpWidgetForTest(
@@ -39,18 +50,37 @@ void main() {
           onProgramDeleted: onProgramDeleted,
         ),
         providerBuilder: (context, child) {
-          return BlocProvider.value(
-            value: programMutationBlocMock,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: programMutationBlocMock,
+              ),
+              BlocProvider.value(
+                value: facultiesBlocMock,
+              ),
+            ],
             child: child,
           );
         },
       );
     }
 
-    final facultyIdFieldFinder = find.ancestor(
-      of: find.text('ID Fakultas *'),
-      matching: find.byType(TextFormField),
+    final facultySelectorFinder = find.ancestor(
+      of: find.text('Fakultas *'),
+      matching: find.byType(FacultySelector),
     );
+    Future<void> selectFaculty(WidgetTester tester) async {
+      await tester.tap(facultySelectorFinder);
+      await tester.pumpAndSettle();
+      final firstFinder = find.ancestor(
+        of: find.text(facultiesMock.first.name),
+        matching: find.byType(AppListTile),
+      );
+      await tester.ensureVisible(firstFinder);
+      await tester.tap(firstFinder);
+      await tester.pumpAndSettle();
+    }
+
     final nameFieldFinder = find.ancestor(
       of: find.text('Nama Program Studi *'),
       matching: find.byType(TextFormField),
@@ -65,10 +95,10 @@ void main() {
     );
 
     group('Render', () {
-      testWidgets('shows ID Fakultas and name fields', (tester) async {
+      testWidgets('shows Fakultas selector and name fields', (tester) async {
         await pumpWidget(tester);
 
-        expect(facultyIdFieldFinder, findsOneWidget);
+        expect(facultySelectorFinder, findsOneWidget);
         expect(nameFieldFinder, findsOneWidget);
       });
 
@@ -198,15 +228,15 @@ void main() {
         (tester) async {
           await pumpWidget(tester);
 
-          await tester.enterText(facultyIdFieldFinder, 'faculty_1');
+          await selectFaculty(tester);
           await tester.enterText(nameFieldFinder, 'Ilmu Komputer');
           await tester.tap(saveButtonFinder);
           await tester.pumpAndSettle();
 
           verify(
             () => programMutationBlocMock.add(
-              const ProgramMutationCreateRequested(
-                facultyId: 'faculty_1',
+              ProgramMutationCreateRequested(
+                facultyId: facultiesMock.first.id,
                 name: 'Ilmu Komputer',
               ),
             ),
@@ -226,7 +256,7 @@ void main() {
 
           verify(
             () => programMutationBlocMock.add(
-              const ProgramMutationUpdateRequested(
+              ProgramMutationUpdateRequested(
                 program: program,
                 name: 'Teknik Informatika',
               ),
@@ -248,7 +278,7 @@ void main() {
 
           verify(
             () => programMutationBlocMock.add(
-              const ProgramMutationDeleteRequested(
+              ProgramMutationDeleteRequested(
                 program: program,
               ),
             ),
@@ -258,7 +288,7 @@ void main() {
     });
 
     group('Side Effects', () {
-      testWidgets('not clear name and facultyId field when update success', (
+      testWidgets('not clear name and selector field when update success', (
         tester,
       ) async {
         final controller = StreamController<ProgramMutationState>.broadcast();
@@ -267,21 +297,21 @@ void main() {
 
         await pumpWidget(tester, initial: program);
 
-        await tester.enterText(facultyIdFieldFinder, 'faculty_1');
+        await selectFaculty(tester);
         await tester.enterText(nameFieldFinder, 'text');
         await tester.pumpAndSettle();
 
-        expect(find.text('faculty_1'), findsOneWidget);
+        expect(find.text(facultiesMock.first.name), findsOneWidget);
         expect(find.text('text'), findsOneWidget);
 
         controller.add(
-          const ProgramMutationState(
+          ProgramMutationState(
             notice: ProgramUpdatedNotice(before: program, after: program),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('faculty_1'), findsOneWidget);
+        expect(find.text(facultiesMock.first.name), findsOneWidget);
         expect(find.text('text'), findsOneWidget);
       });
 
@@ -292,21 +322,21 @@ void main() {
 
         await pumpWidget(tester);
 
-        await tester.enterText(facultyIdFieldFinder, 'faculty_1');
+        await selectFaculty(tester);
         await tester.enterText(nameFieldFinder, 'Ilmu Komputer');
         await tester.pumpAndSettle();
 
-        expect(find.text('faculty_1'), findsOneWidget);
+        expect(find.text(facultiesMock.first.name), findsOneWidget);
         expect(find.text('Ilmu Komputer'), findsOneWidget);
 
         controller.add(
-          const ProgramMutationState(
+          ProgramMutationState(
             notice: ProgramCreatedNotice(program),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('faculty_1'), findsNothing);
+        expect(find.text(facultiesMock.first.name), findsNothing);
         expect(find.text('Ilmu Komputer'), findsNothing);
       });
 
@@ -321,7 +351,7 @@ void main() {
           await pumpWidget(tester);
 
           controller.add(
-            const ProgramMutationState(
+            ProgramMutationState(
               notice: ProgramCreatedNotice(program),
             ),
           );
@@ -329,7 +359,9 @@ void main() {
 
           expect(find.text('Program studi berhasil disimpan'), findsOneWidget);
           expect(
-            find.text('Program studi dengan nama "name" berhasil disimpan'),
+            find.text(
+              'Program studi dengan nama "${program.name}" berhasil disimpan',
+            ),
             findsOneWidget,
           );
         },
@@ -350,7 +382,7 @@ void main() {
 
           await pumpWidget(tester);
           controller.add(
-            const ProgramMutationState(
+            ProgramMutationState(
               notice: ProgramUpdatedNotice(before: program, after: updated),
             ),
           );
@@ -440,7 +472,7 @@ void main() {
 
         await pumpWidget(tester);
         controller.add(
-          const ProgramMutationState(
+          ProgramMutationState(
             notice: ProgramDeletedNotice(program),
           ),
         );

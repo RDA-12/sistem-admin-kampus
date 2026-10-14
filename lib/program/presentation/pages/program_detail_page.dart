@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
 import 'package:sistem_admin/program/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/program/presentation/widgets/widgets.dart';
@@ -31,6 +32,9 @@ class ProgramDetailPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<ProgramMutationBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<FacultiesBloc>(),
         ),
       ],
       child: Scaffold(

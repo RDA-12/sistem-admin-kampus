@@ -7,8 +7,10 @@ class AppFormField extends StatelessWidget {
   const new({
     required this.label,
     this.isRequired = true,
+    this.readOnly = false,
     this.controller,
     this.validator,
+    this.onPressed,
     super.key,
   });
 
@@ -28,6 +30,14 @@ class AppFormField extends StatelessWidget {
   /// again, the String passed to this validator will always be non null
   final String? Function(String?)? validator;
 
+  /// Invoked when this form field is pressed
+  final VoidCallback? onPressed;
+
+  /// Whether this form field is readonly or not
+  ///
+  /// When its true, user cannot enter text to it.
+  final bool readOnly;
+
   @override
   Widget build(BuildContext context) {
     var effectiveLabel = label;
@@ -37,6 +47,8 @@ class AppFormField extends StatelessWidget {
 
     return TextFormField(
       controller: controller,
+      readOnly: readOnly,
+      onTap: onPressed,
       decoration: InputDecoration(
         label: Text(effectiveLabel),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
