@@ -27,7 +27,7 @@ final class ProgramsLoaded extends ProgramsState {
   const new(this.data);
 
   /// Loaded programs data
-  final List<Program> data;
+  final List<ProgramUI> data;
 
   @override
   List<Object> get props => [data];

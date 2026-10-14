@@ -2,6 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/program/program.dart';
 
+import '../../faculty/domain/mocks.dart';
+
 @LazySingleton(as: IProgramRepository, env: [Environment.test])
 class MockProgramRepository extends Mock implements IProgramRepository;
 
@@ -26,3 +28,13 @@ final programsMock = List<Program>.generate(
   (index) => Program(id: '$index', facultyId: 'faculty_1', name: 'name $index'),
 );
 const programMock = Program(id: 'id', facultyId: 'faculty_1', name: 'name');
+final List<ProgramUI> programsUIMock = programsMock
+    .map(
+      (it) => ProgramUI(
+        id: it.id,
+        facultyId: facultyMock.id,
+        name: it.name,
+        faculty: facultyMock,
+      ),
+    )
+    .toList();

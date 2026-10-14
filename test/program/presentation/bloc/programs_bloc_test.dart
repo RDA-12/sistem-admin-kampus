@@ -3,34 +3,49 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
+import '../../../faculty/domain/mocks.dart';
 
 void main() {
   final programs = List.generate(
     5,
-    (index) => Program(
+    (index) => ProgramUI(
       id: '$index',
-      facultyId: 'faculty_1',
+      facultyId: facultyMock.id,
       name: '$index',
+      faculty: facultyMock,
     ),
   );
 
   group('ProgramsBloc', () {
+    late WatchFacultiesUseCase watchFacultiesMock;
     late WatchProgramsUseCase watchProgramsMock;
 
     setUpAll(initializeMockDependencies);
 
     setUp(() {
       watchProgramsMock = getIt<WatchProgramsUseCase>();
-      when(() => watchProgramsMock(null))
-          .thenAnswer((_) => Stream.value(AppResult.success(programs)));
+      when(() => watchProgramsMock(null)).thenAnswer(
+        (_) => Stream.value(
+          AppResult.success([
+            ...programs,
+            const Program(id: 'id', facultyId: 'facultyId', name: 'name'),
+          ]),
+        ),
+      );
+
+      watchFacultiesMock = getIt<WatchFacultiesUseCase>();
+      when(() => watchFacultiesMock(null))
+          .thenAnswer((_) => Stream.value(AppResult.success([facultyMock])));
     });
 
     ProgramsBloc buildBloc() {
       return ProgramsBloc(
         watchPrograms: watchProgramsMock,
+        watchFaculties: watchFacultiesMock,
       );
     }
 
@@ -44,7 +59,7 @@ void main() {
       blocTest<ProgramsBloc, ProgramsState>(
         'emits [LoadingPrograms, ProgramsLoaded] '
         'when ProgramsSubscriptionRequested is added '
-        'and WatchProgramsUseCase emits success',
+        'and WatchProgramsUseCase and WatchFacultiesUseCase emits success',
         build: buildBloc,
         act: (bloc) => bloc.add(const ProgramsSubscriptionRequested()),
         expect: () => <ProgramsState>[
@@ -54,6 +69,23 @@ void main() {
         verify: (_) {
           verify(() => watchProgramsMock(null)).called(1);
         },
+      );
+
+      blocTest<ProgramsBloc, ProgramsState>(
+        'emits [LoadingPrograms, ProgramsFailure] '
+        'when ProgramsSubscriptionRequested is added '
+        'and WatchFacultiesUseCase emits failure',
+        setUp: () {
+          when(() => watchFacultiesMock(null)).thenAnswer(
+            (_) => Stream.value(AppResult.failure(AppException.test())),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(const ProgramsSubscriptionRequested()),
+        expect: () => <ProgramsState>[
+          const LoadingPrograms(),
+          ProgramsFailure(AppException.test()),
+        ],
       );
 
       blocTest<ProgramsBloc, ProgramsState>(

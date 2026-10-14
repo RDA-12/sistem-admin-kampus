@@ -27,8 +27,8 @@ void main() {
       programsBlocMock = getIt<ProgramsBloc>();
       whenListen(
         programsBlocMock,
-        Stream.value(ProgramsLoaded(programsMock)),
-        initialState: ProgramsLoaded(programsMock),
+        Stream.value(ProgramsLoaded(programsUIMock)),
+        initialState: ProgramsLoaded(programsUIMock),
       );
     });
 
@@ -63,7 +63,7 @@ void main() {
       testWidgets('shows all programs when state is loaded', (tester) async {
         await pumpWidget(tester);
 
-        for (final program in programsMock) {
+        for (final program in programsUIMock) {
           final programFinder = find.ancestor(
             of: find.text(program.name),
             matching: find.byType(ProgramListTile),
@@ -119,16 +119,16 @@ void main() {
       });
 
       testWidgets('shows selected ProgramListTile', (tester) async {
-        await pumpWidget(tester, selectedId: programsMock.first.id);
+        await pumpWidget(tester, selectedId: programsUIMock.first.id);
 
-        for (final program in programsMock) {
+        for (final program in programsUIMock) {
           final finder = find.ancestor(
             of: find.text(program.name),
             matching: find.byType(ProgramListTile),
           );
           await tester.ensureVisible(finder);
           final widget = tester.widget<ProgramListTile>(finder);
-          expect(widget.selected, program.id == programsMock.first.id);
+          expect(widget.selected, program.id == programsUIMock.first.id);
         }
       });
     });
@@ -146,12 +146,12 @@ void main() {
             },
           );
 
-          final programFinder = find.text(programsMock.first.name);
+          final programFinder = find.text(programsUIMock.first.name);
           await tester.ensureVisible(programFinder);
           await tester.pumpAndSettle();
           await tester.tap(programFinder);
 
-          expect(pressedProgram, programsMock.first);
+          expect(pressedProgram, programsUIMock.first);
         },
       );
 

@@ -20,8 +20,8 @@ void main() {
     programsBlocMock = getIt<ProgramsBloc>();
     whenListen(
       programsBlocMock,
-      Stream.value(ProgramsLoaded(programsMock)),
-      initialState: ProgramsLoaded(programsMock),
+      Stream.value(ProgramsLoaded(programsUIMock)),
+      initialState: ProgramsLoaded(programsUIMock),
     );
     when(programsBlocMock.close).thenAnswer((_) async {});
 
