@@ -1,9 +1,13 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/domain/domain.dart';
+import 'package:sistem_admin/program/presentation/models.dart';
 
 part 'program_detail_event.dart';
 part 'program_detail_state.dart';
@@ -12,8 +16,10 @@ part 'program_detail_state.dart';
 @Injectable(env: [Environment.prod])
 class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState> {
   /// Creates new [ProgramDetailBloc]
-  new({required this._watchSingleProgram})
-    : super(const ProgramDetailInitial()) {
+  new({
+    required this._watchSingleProgram,
+    required this._watchFaculties,
+  }) : super(const ProgramDetailInitial()) {
     on<ProgramDetailSubscriptionRequested>(
       _onProgramDetailSubscriptionRequested,
       transformer: restartable(),
@@ -21,6 +27,7 @@ class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState> {
   }
 
   final WatchSingleProgramUseCase _watchSingleProgram;
+  final WatchFacultiesUseCase _watchFaculties;
 
   Future<void> _onProgramDetailSubscriptionRequested(
     ProgramDetailSubscriptionRequested event,
@@ -28,7 +35,40 @@ class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState> {
   ) async {
     emit(const LoadingProgramDetail());
 
-    final stream = _watchSingleProgram(event.id);
+    final stream = CombineLatestStream.combine2(
+      _watchFaculties(null),
+      _watchSingleProgram(event.id),
+      (facultiesResult, programResult) {
+        late final List<Faculty> faculties;
+        switch (facultiesResult) {
+          case AppFailure<List<Faculty>>(:final exception):
+            return AppResult<ProgramUI>.failure(exception);
+          case AppSuccess<List<Faculty>>(:final data):
+            faculties = data;
+        }
+        switch (programResult) {
+          case AppFailure<Program>(:final exception):
+            return AppResult<ProgramUI>.failure(exception);
+          case AppSuccess<Program>(:final data):
+            final faculty = faculties.firstWhereOrNull(
+              (it) => it.id == data.facultyId,
+            );
+            if (faculty == null) {
+              return AppResult<ProgramUI>.failure(
+                const AppException('faculty not found', code: .programNotFound),
+              );
+            }
+            return AppResult.success(
+              ProgramUI(
+                id: data.id,
+                facultyId: data.facultyId,
+                name: data.name,
+                faculty: faculty,
+              ),
+            );
+        }
+      },
+    );
 
     await emit.forEach(
       stream,

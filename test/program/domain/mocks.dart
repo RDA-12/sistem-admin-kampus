@@ -38,3 +38,4 @@ final List<ProgramUI> programsUIMock = programsMock
       ),
     )
     .toList();
+final ProgramUI programUIMock = programsUIMock.first;

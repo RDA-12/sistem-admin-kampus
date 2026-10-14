@@ -18,8 +18,8 @@ void main() {
     programDetailBlocMock = getIt<ProgramDetailBloc>();
     whenListen(
       programDetailBlocMock,
-      Stream.value(const ProgramDetailLoaded(program: programMock)),
-      initialState: const ProgramDetailLoaded(program: programMock),
+      Stream.value(ProgramDetailLoaded(program: programUIMock)),
+      initialState: ProgramDetailLoaded(program: programUIMock),
     );
     when(programDetailBlocMock.close).thenAnswer((_) async {});
 

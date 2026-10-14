@@ -26,8 +26,8 @@ final class ProgramDetailLoaded extends ProgramDetailState {
   /// Creates new [ProgramDetailLoaded]
   const new({required this.program});
 
-  /// Loaded [Program] data
-  final Program program;
+  /// Loaded [ProgramUI] data
+  final ProgramUI program;
 
   @override
   List<Object> get props => [program];

@@ -27,8 +27,8 @@ void main() {
 
     whenListen(
       getIt<ProgramDetailBloc>(),
-      Stream.value(const ProgramDetailLoaded(program: programMock)),
-      initialState: const ProgramDetailLoaded(program: programMock),
+      Stream.value(ProgramDetailLoaded(program: programUIMock)),
+      initialState: ProgramDetailLoaded(program: programUIMock),
     );
     when(getIt<ProgramDetailBloc>().close).thenAnswer((_) async {});
 
@@ -103,7 +103,7 @@ void main() {
       final widget = tester.widget<ProgramsList>(
         find.byType(ProgramsList),
       );
-      widget.onPressed!(programMock);
+      widget.onPressed!(programUIMock);
       await tester.pumpAndSettle();
     }
 
