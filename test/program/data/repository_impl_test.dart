@@ -253,6 +253,19 @@ void main() {
         result.expectFailureWithCode(AppExceptionCode.programNotFound);
       });
 
+      test('returns failure with programAlreadyExists code '
+          'when update with existing name', () async {
+        final result = await repository.update(
+          seededPrograms.first.id,
+          args: UpdateProgramParams(
+            createdProgram,
+            name: seededPrograms[1].name,
+          ),
+        );
+
+        result.expectFailureWithCode(AppExceptionCode.programAlreadyExists);
+      });
+
       test('returns failure with internal code '
           'when unintended exception occurred', () async {
         whenCalling(Invocation.method(#update, null))

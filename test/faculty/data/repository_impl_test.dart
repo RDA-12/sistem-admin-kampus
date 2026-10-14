@@ -188,6 +188,19 @@ void main() {
         result.expectFailureWithCode(.facultyNotFound);
       });
 
+      test('returns failure with facultyAlreadyExists code '
+          'when update with existing name', () async {
+        final result = await repository.update(
+          seededFaculty.first.id,
+          args: UpdateFacultyParams(
+            createdFaculty,
+            name: seededFaculty[1].name,
+          ),
+        );
+
+        result.expectFailureWithCode(.facultyAlreadyExists);
+      });
+
       test('returns failure with internal code '
           'when unintended exception occurred', () async {
         whenCalling(Invocation.method(#update, null))

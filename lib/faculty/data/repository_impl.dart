@@ -77,6 +77,19 @@ class FacultyRepository implements IFacultyRepository {
           AppException('faculty with id $id not found', code: .facultyNotFound),
         );
       }
+      if (args.name != null) {
+        final nameExistingQuery = _db.select(_db.facultiesDrift)
+          ..where((tbl) => tbl.name.equals(args.name!));
+        final nameExists = await nameExistingQuery.getSingleOrNull();
+        if (nameExists != null) {
+          return AppResult.failure(
+            AppException(
+              'faculty with name ${args.name} already exists',
+              code: .facultyAlreadyExists,
+            ),
+          );
+        }
+      }
       final updateQuery = _db.update(_db.facultiesDrift)
         ..where((tbl) => tbl.id.equals(id));
       final facultiesDb = await updateQuery.writeReturning(args.toCompanion());

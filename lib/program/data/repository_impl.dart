@@ -83,6 +83,24 @@ class ProgramRepository implements IProgramRepository {
           AppException('program with id $id not found', code: .programNotFound),
         );
       }
+      if (args.name != null) {
+        final existingNameQuery = _db.select(_db.programsDrift)
+          ..where(
+            (tbl) =>
+                tbl.name.equals(args.name!) &
+                tbl.facultyId.equals(programDb.facultyId),
+          );
+        final nameExists = await existingNameQuery.getSingleOrNull();
+        if (nameExists != null) {
+          return AppResult.failure(
+            AppException(
+              'program with name ${args.name} '
+              'within same faculty already exists',
+              code: .programAlreadyExists,
+            ),
+          );
+        }
+      }
       final updateQuery = _db.update(_db.programsDrift)
         ..where((tbl) => tbl.id.equals(id));
       final programsDb = await updateQuery.writeReturning(args.toCompanion());
