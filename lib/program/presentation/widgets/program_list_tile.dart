@@ -23,18 +23,11 @@ class ProgramListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return AppListTile(
       selected: selected,
-      selectedTileColor: context.color.primaryContainer,
-      selectedColor: context.color.onPrimaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: selected
-            ? BorderRadiusGeometry.circular(16)
-            : BorderRadius.zero,
-      ),
       title: Text(program.name),
       trailing: const Icon(Icons.chevron_right_rounded),
-      onTap: onPressed,
+      onPressed: onPressed,
     );
   }
 }

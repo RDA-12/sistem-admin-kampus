@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 
 import '../../../common/helper.dart';
@@ -29,14 +29,14 @@ void main() {
         expect(find.text(faculty.name), findsOneWidget);
       });
 
-      testWidgets('shows selected ListTile when selected is true', (
+      testWidgets('shows selected AppListTile when selected is true', (
         tester,
       ) async {
         await pumpWidget(tester, selected: true);
 
-        final finder = find.byType(ListTile);
+        final finder = find.byType(AppListTile);
         expect(finder, findsOneWidget);
-        final widget = tester.widget<ListTile>(finder);
+        final widget = tester.widget<AppListTile>(finder);
         expect(widget.selected, isTrue);
       });
     });
