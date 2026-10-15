@@ -2,9 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/domain/domain.dart';
+import 'package:sistem_admin/program/program.dart';
 
 part 'faculty_detail_event.dart';
 part 'faculty_detail_state.dart';
@@ -14,8 +16,10 @@ part 'faculty_detail_state.dart';
 class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
     with AppLoggerMixin {
   /// Creates new [FacultyDetailBloc]
-  new({required this._watchSingleFaculty})
-    : super(const FacultyDetailInitial()) {
+  new({
+    required this._watchSingleFaculty,
+    required this._watchProgramsByFaculty,
+  }) : super(const FacultyDetailInitial()) {
     on<FacultyDetailSubscriptionRequested>(
       _onFacultyDetailSubscriptionRequested,
       transformer: restartable(),
@@ -23,6 +27,7 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
   }
 
   final WatchSingleFacultyUseCase _watchSingleFaculty;
+  final WatchProgramsByFacultyUseCase _watchProgramsByFaculty;
 
   Future<void> _onFacultyDetailSubscriptionRequested(
     FacultyDetailSubscriptionRequested event,
@@ -35,7 +40,30 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
       );
       emit(const LoadingFacultyDetail());
 
-      final stream = _watchSingleFaculty(event.id);
+      final stream = CombineLatestStream.combine2(
+        _watchSingleFaculty(event.id),
+        _watchProgramsByFaculty(event.id),
+        (facultyResult, programsResult) {
+          late final Faculty faculty;
+          switch (facultyResult) {
+            case AppFailure<Faculty>(:final exception):
+              return AppResult<FacultyDetailLoaded>.failure(exception);
+            case AppSuccess<Faculty>(:final data):
+              faculty = data;
+          }
+          switch (programsResult) {
+            case AppFailure<List<Program>>(:final exception):
+              return AppResult<FacultyDetailLoaded>.failure(exception);
+            case AppSuccess<List<Program>>(:final data):
+              return AppResult.success(
+                FacultyDetailLoaded(
+                  faculty: faculty,
+                  programs: data,
+                ),
+              );
+          }
+        },
+      );
 
       await emit.forEach(
         stream,
@@ -43,7 +71,7 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
           switch (result) {
             case AppSuccess(:final data):
               logDebug('new faculty detail received. emit loaded');
-              return FacultyDetailLoaded(faculty: data);
+              return data;
             case AppFailure(:final exception):
               logDebug('failure result received. emit failure');
               return FacultyDetailLoadFailed(exception: exception);

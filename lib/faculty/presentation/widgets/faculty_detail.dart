@@ -4,6 +4,7 @@ import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/domain/domain.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/faculty_form.dart';
+import 'package:sistem_admin/faculty/presentation/widgets/faculty_programs.dart';
 
 /// Shows detail of a faculty
 class FacultyDetail extends StatelessWidget {
@@ -33,10 +34,21 @@ class FacultyDetail extends StatelessWidget {
             return const Center(
               child: LoadingIndicator(),
             );
-          case FacultyDetailLoaded(:final faculty):
-            return FacultyForm(
-              initial: faculty,
-              onFacultyDeleted: onFacultyDeleted,
+          case FacultyDetailLoaded(:final faculty, :final programs):
+            return Column(
+              spacing: 16,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FacultyForm(
+                  initial: faculty,
+                  onFacultyDeleted: onFacultyDeleted,
+                ),
+                Expanded(
+                  child: FacultyPrograms(
+                    programs: programs,
+                  ),
+                ),
+              ],
             );
           case FacultyDetailLoadFailed(:final exception):
             return Center(

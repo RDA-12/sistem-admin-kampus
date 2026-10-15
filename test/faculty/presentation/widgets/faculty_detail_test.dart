@@ -7,6 +7,7 @@ import 'package:sistem_admin/faculty/faculty.dart';
 
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
+import '../../../program/domain/mocks.dart';
 import '../../domain/mocks.dart';
 
 void main() {
@@ -18,8 +19,16 @@ void main() {
     facultyDetailBlocMock = getIt<FacultyDetailBloc>();
     whenListen(
       facultyDetailBlocMock,
-      Stream.value(const FacultyDetailLoaded(faculty: facultyMock)),
-      initialState: const FacultyDetailLoaded(faculty: facultyMock),
+      Stream.value(
+        FacultyDetailLoaded(
+          faculty: facultyMock,
+          programs: programsMock,
+        ),
+      ),
+      initialState: FacultyDetailLoaded(
+        faculty: facultyMock,
+        programs: programsMock,
+      ),
     );
 
     whenListen(
@@ -69,6 +78,19 @@ void main() {
           expect(finder, findsOneWidget);
           final widget = tester.widget<FacultyForm>(finder);
           expect(widget.initial, facultyMock);
+        },
+      );
+
+      testWidgets(
+        'shows FacultyPrograms with correct programs '
+        'when state is loaded',
+        (tester) async {
+          await pumpWidget(tester);
+
+          final finder = find.byType(FacultyPrograms);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<FacultyPrograms>(finder);
+          expect(widget.programs, programsMock);
         },
       );
 

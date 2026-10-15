@@ -24,13 +24,19 @@ final class LoadingFacultyDetail extends FacultyDetailState {
 /// State when faculty detail is loaded
 final class FacultyDetailLoaded extends FacultyDetailState {
   /// Creates new [FacultyDetailLoaded]
-  const new({required this.faculty});
+  const new({
+    required this.faculty,
+    this.programs = const [],
+  });
 
   /// Loaded [Faculty] data
   final Faculty faculty;
 
+  /// Programs related to the faculty
+  final List<Program> programs;
+
   @override
-  List<Object> get props => [faculty];
+  List<Object> get props => [faculty, programs];
 }
 
 /// State when faculty detail data failed to load

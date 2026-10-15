@@ -10,6 +10,10 @@ class MockProgramRepository extends Mock implements IProgramRepository;
 @LazySingleton(as: WatchProgramsUseCase, env: [Environment.test])
 class MockWatchProgramsUseCase extends Mock implements WatchProgramsUseCase;
 
+@LazySingleton(as: WatchProgramsByFacultyUseCase, env: [Environment.test])
+class MockWatchProgramsByFacultyUseCase extends Mock
+    implements WatchProgramsByFacultyUseCase;
+
 @LazySingleton(as: WatchSingleProgramUseCase, env: [Environment.test])
 class MockWatchSingleProgramUseCase extends Mock
     implements WatchSingleProgramUseCase;
