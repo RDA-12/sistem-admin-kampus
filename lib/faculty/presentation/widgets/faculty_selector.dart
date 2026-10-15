@@ -119,6 +119,9 @@ class FacultySelector extends StatelessWidget {
           controller: controller.textEditingController,
           label: label,
           onPressed: () async {
+            context.read<FacultiesBloc>().add(
+              const FacultiesSubscriptionRequested(),
+            );
             final result = await _showSelector(
               context: context,
               breakPoint: breakPoint,
