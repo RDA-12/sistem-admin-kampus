@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
@@ -61,125 +62,100 @@ void main() {
     }
   }
 
+  group('FacultySelectorController', () {
+    test('sets itemAsString to (it) => it.name on initial', () {
+      final ctrl = FacultySelectorController(initial: facultiesMock.first);
+
+      expect(ctrl.selected, facultiesMock.first);
+      expect(ctrl.textEditingController.text, facultiesMock.first.name);
+    });
+
+    test('sets itemAsString to (it) => it.name when selected is changed', () {
+      controller.selected = facultiesMock.first;
+
+      expect(controller.textEditingController.text, facultiesMock.first.name);
+    });
+  });
+
   group('FacultySelector', () {
-    group('Render', () {
-      testWidgets('shows selected faculty on field', (tester) async {
+    testWidgets('configures AppSelector correctly', (tester) async {
+      await pumpWidget(tester, label: 'Custom Faculty');
+
+      final appSelectorFinder = find.byType(AppSelector<Faculty>);
+      expect(appSelectorFinder, findsOneWidget);
+
+      final appSelector = tester.widget<AppSelector<Faculty>>(
+        appSelectorFinder,
+      );
+      expect(appSelector.label, 'Custom Faculty');
+      expect(appSelector.dialogTitle, 'Pilih Fakultas');
+      expect(appSelector.controller, controller);
+    });
+
+    testWidgets(
+      'triggers FacultiesSubscriptionRequested when selector is pressed',
+      (tester) async {
         await pumpWidget(tester);
 
-        controller.selected = facultiesMock.first;
-        await tester.pumpAndSettle();
+        await openSelector(tester);
 
-        expect(find.text(facultiesMock.first.name), findsOneWidget);
-      });
+        verify(
+          () => facultiesBlocMock.add(const FacultiesSubscriptionRequested()),
+        ).called(1);
+      },
+    );
 
-      testWidgets(
-        'shows LoadingIndicator on dialog when state is loading',
-        (tester) async {
-          whenListen(
-            facultiesBlocMock,
-            Stream.value(const LoadingFaculties()),
-            initialState: const LoadingFaculties(),
-          );
-          await pumpWidget(tester);
+    testWidgets(
+      'shows LoadingIndicator on dialog when state is loading',
+      (tester) async {
+        whenListen(
+          facultiesBlocMock,
+          Stream.value(const LoadingFaculties()),
+          initialState: const LoadingFaculties(),
+        );
+        await pumpWidget(tester);
 
-          await openSelector(tester, pumpOnly: true);
+        await openSelector(tester, pumpOnly: true);
 
-          expect(find.byType(LoadingIndicator), findsOneWidget);
-        },
-      );
+        expect(find.byType(LoadingIndicator), findsOneWidget);
+      },
+    );
 
-      testWidgets(
-        'shows AppExceptionBox on dialog when state is failed',
-        (tester) async {
-          whenListen(
-            facultiesBlocMock,
-            Stream.value(FacultiesFailure(AppException.test())),
-            initialState: FacultiesFailure(AppException.test()),
-          );
-          await pumpWidget(tester);
+    testWidgets(
+      'shows AppExceptionBox on dialog when state is failed',
+      (tester) async {
+        whenListen(
+          facultiesBlocMock,
+          Stream.value(FacultiesFailure(AppException.test())),
+          initialState: FacultiesFailure(AppException.test()),
+        );
+        await pumpWidget(tester);
 
-          await openSelector(tester);
+        await openSelector(tester);
 
-          final finder = find.byType(AppExceptionBox);
-          expect(finder, findsOneWidget);
-          final widget = tester.widget<AppExceptionBox>(finder);
-          expect(widget.exception, AppException.test());
-        },
-      );
+        final finder = find.byType(AppExceptionBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppExceptionBox>(finder);
+        expect(widget.exception, AppException.test());
+      },
+    );
 
-      testWidgets(
-        'shows correct list of faculties on dialog when state is loaded',
-        (tester) async {
-          await pumpWidget(tester);
+    testWidgets(
+      'ensures options showed to users is the name of Faculty',
+      (tester) async {
+        await pumpWidget(tester);
 
-          await openSelector(tester);
+        await openSelector(tester);
 
-          for (final f in facultiesMock) {
-            final finder = find.ancestor(
-              of: find.text(f.name),
-              matching: find.byType(CheckboxListTile),
-            );
-            await tester.ensureVisible(finder);
-            expect(finder, findsOneWidget);
-          }
-        },
-      );
-
-      testWidgets(
-        'shows selected faculty on dialog when state is loaded',
-        (tester) async {
-          await pumpWidget(tester);
-          controller.selected = facultiesMock.first;
-
-          await openSelector(tester);
-
-          for (final f in facultiesMock) {
-            final finder = find.ancestor(
-              of: find.text(f.name),
-              matching: find.byType(CheckboxListTile),
-            );
-            await tester.ensureVisible(finder);
-            expect(finder, findsOneWidget);
-            final widget = tester.widget<CheckboxListTile>(finder);
-            expect(widget.selected, f == facultiesMock.first);
-            expect(widget.value, f == facultiesMock.first);
-          }
-        },
-      );
-    });
-
-    group('Interactions', () {
-      testWidgets(
-        'open selector dialog when field is pressed',
-        (tester) async {
-          await pumpWidget(tester);
-
-          await openSelector(tester);
-
-          expect(find.text('Pilih Fakultas'), findsOneWidget);
-        },
-      );
-
-      testWidgets(
-        'can select a faculty',
-        (tester) async {
-          await pumpWidget(tester);
-          final first = facultiesMock.first;
-
-          expect(find.text(first.name), findsNothing);
-          await openSelector(tester);
-          final firstFinder = find.ancestor(
-            of: find.text(first.name),
+        for (final f in facultiesMock) {
+          final finder = find.ancestor(
+            of: find.text(f.name),
             matching: find.byType(CheckboxListTile),
           );
-          await tester.ensureVisible(firstFinder);
-          await tester.tap(firstFinder);
-          await tester.pumpAndSettle();
-
-          expect(find.text(first.name), findsOneWidget);
-          expect(controller.selected, first);
-        },
-      );
-    });
+          await tester.ensureVisible(finder);
+          expect(finder, findsOneWidget);
+        }
+      },
+    );
   });
 }
