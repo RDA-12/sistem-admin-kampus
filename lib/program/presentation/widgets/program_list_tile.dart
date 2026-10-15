@@ -26,11 +26,7 @@ class ProgramListTile extends StatelessWidget {
     return AppListTile(
       selected: selected,
       title: Text(program.name),
-      subtitle: Chip(
-        label: Text(program.faculty.name),
-        backgroundColor: context.color.primaryContainer,
-        color: WidgetStatePropertyAll(context.color.onPrimaryContainer),
-      ),
+      subtitle: Text(program.faculty.name),
       trailing: const Icon(Icons.chevron_right_rounded),
       onPressed: onPressed,
     );
