@@ -74,7 +74,7 @@ void main() {
       await tester.pumpAndSettle();
       final firstFinder = find.ancestor(
         of: find.text(facultiesMock.first.name),
-        matching: find.byType(AppListTile),
+        matching: find.byType(CheckboxListTile),
       );
       await tester.ensureVisible(firstFinder);
       await tester.tap(firstFinder);

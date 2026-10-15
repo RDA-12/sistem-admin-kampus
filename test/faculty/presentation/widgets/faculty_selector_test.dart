@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
@@ -116,7 +117,7 @@ void main() {
           for (final f in facultiesMock) {
             final finder = find.ancestor(
               of: find.text(f.name),
-              matching: find.byType(AppListTile),
+              matching: find.byType(CheckboxListTile),
             );
             await tester.ensureVisible(finder);
             expect(finder, findsOneWidget);
@@ -135,12 +136,13 @@ void main() {
           for (final f in facultiesMock) {
             final finder = find.ancestor(
               of: find.text(f.name),
-              matching: find.byType(AppListTile),
+              matching: find.byType(CheckboxListTile),
             );
             await tester.ensureVisible(finder);
             expect(finder, findsOneWidget);
-            final widget = tester.widget<AppListTile>(finder);
+            final widget = tester.widget<CheckboxListTile>(finder);
             expect(widget.selected, f == facultiesMock.first);
+            expect(widget.value, f == facultiesMock.first);
           }
         },
       );
@@ -168,7 +170,7 @@ void main() {
           await openSelector(tester);
           final firstFinder = find.ancestor(
             of: find.text(first.name),
-            matching: find.byType(AppListTile),
+            matching: find.byType(CheckboxListTile),
           );
           await tester.ensureVisible(firstFinder);
           await tester.tap(firstFinder);
