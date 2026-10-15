@@ -84,11 +84,13 @@ extension AppDialogX on BuildContext {
     required String title,
     required Widget Function(BuildContext) contentBuilder,
     List<Widget> Function(BuildContext)? actionsBuilder,
+    BoxConstraints? constraints,
   }) {
     return showDialog<T>(
       context: this,
       builder: (context) {
         return _AppDialog(
+          constraints: constraints,
           title: title,
           content: contentBuilder(context),
           actions: actionsBuilder?.call(context),
@@ -103,16 +105,19 @@ class _AppDialog extends StatelessWidget {
     required this.title,
     required this.content,
     this.actions,
+    this.constraints,
   });
 
   final String title;
   final Widget content;
   final List<Widget>? actions;
+  final BoxConstraints? constraints;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      constraints: const BoxConstraints(minWidth: 280, maxWidth: 560),
+      constraints:
+          constraints ?? const BoxConstraints(minWidth: 280, maxWidth: 560),
       title: Text(title),
       content: content,
       actionsAlignment: MainAxisAlignment.end,

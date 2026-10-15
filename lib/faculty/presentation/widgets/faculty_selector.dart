@@ -66,6 +66,11 @@ class FacultySelector extends StatelessWidget {
     required BreakPoint breakPoint,
   }) {
     return context.showAppDialog(
+      constraints: const BoxConstraints(
+        minWidth: 560,
+        maxWidth: 560,
+        maxHeight: 560,
+      ),
       title: 'Pilih Fakultas',
       contentBuilder: (_) {
         return BlocBuilder<FacultiesBloc, FacultiesState>(
@@ -83,6 +88,7 @@ class FacultySelector extends StatelessWidget {
                   builder: (context, child) {
                     return SingleChildScrollView(
                       child: Column(
+                        mainAxisSize: .min,
                         children: data.map((it) {
                           return AppListTile(
                             selected: it == controller.selected,
