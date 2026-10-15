@@ -11,6 +11,9 @@ void main() {
     .programNotFound: 'Program studi tidak dapat ditemukan',
     .programAlreadyExists:
         'Program studi dengan nama tersebut sudah ada pada fakultas ini',
+    .lecturerNotFound: 'Dosen tidak dapat ditemukan',
+    .lecturerAlreadyExists:
+        'Dosen dengan nama tersebut sudah ada pada program studi ini',
   };
 
   group('AppExceptionCode.message', () {

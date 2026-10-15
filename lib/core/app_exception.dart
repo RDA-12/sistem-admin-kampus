@@ -20,6 +20,12 @@ enum AppExceptionCode {
 
   /// Code caused by new program have existing name in the faculty
   programAlreadyExists,
+
+  /// Code caused by requested lecturer not found in db
+  lecturerNotFound,
+
+  /// Code caused by new lecturer have existing name in the program
+  lecturerAlreadyExists,
 }
 
 /// Exception class for this app
