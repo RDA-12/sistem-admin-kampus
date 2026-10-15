@@ -90,11 +90,26 @@ class FacultySelector extends StatelessWidget {
                       child: Column(
                         mainAxisSize: .min,
                         children: data.map((it) {
-                          return AppListTile(
-                            selected: it == controller.selected,
-                            title: Text(it.name),
-                            onPressed: () {
-                              Navigator.pop(context, it);
+                          final selected = it == controller.selected;
+                          return CheckboxListTile(
+                            value: selected,
+                            title: Text(
+                              it.name,
+                              style: context.text.titleMedium?.copyWith(
+                                color: selected
+                                    ? context.color.onPrimaryContainer
+                                    : null,
+                              ),
+                            ),
+                            selected: selected,
+                            selectedTileColor: context.color.primaryContainer,
+                            onChanged: (checked) {
+                              final selected = checked ?? false;
+                              if (selected) {
+                                Navigator.pop(context, it);
+                              } else {
+                                Navigator.pop(context);
+                              }
                             },
                           );
                         }).toList(),
