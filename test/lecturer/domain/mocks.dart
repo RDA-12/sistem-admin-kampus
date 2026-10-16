@@ -2,6 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/lecturer/lecturer.dart';
 
+import '../../program/domain/mocks.dart';
+
 @LazySingleton(as: ILecturerRepository, env: [Environment.test])
 class MockLecturerRepository extends Mock implements ILecturerRepository;
 
@@ -40,3 +42,15 @@ const lecturerMock = Lecturer(
   name: 'Lecturer',
   pangkatGolongan: 'III/a',
 );
+final List<LecturerUI> lecturersUIMock = lecturersMock
+    .map(
+      (it) => LecturerUI(
+        id: it.id,
+        programId: programMock.id,
+        name: it.name,
+        pangkatGolongan: it.pangkatGolongan,
+        program: programMock,
+      ),
+    )
+    .toList();
+final LecturerUI lecturerUIMock = lecturersUIMock.first;
