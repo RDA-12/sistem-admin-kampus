@@ -20,6 +20,11 @@ void main() {
     .roomNotFound: 'Ruangan tidak dapat ditemukan',
     .roomAlreadyExists:
         'Ruangan dengan nama tersebut sudah ada pada fakultas ini',
+    .academicYearNotFound: 'Tahun akademik tidak dapat ditemukan',
+    .academicYearAlreadyExists: 'Tahun akademik dengan nama tersebut sudah ada',
+    .academicTermNotFound: 'Semester tidak dapat ditemukan',
+    .academicTermAlreadyExists:
+        'Semester dengan nama tersebut sudah ada pada tahun akademik ini',
   };
 
   group('AppExceptionCode.message', () {

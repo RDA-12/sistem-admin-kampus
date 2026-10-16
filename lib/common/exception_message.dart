@@ -23,5 +23,12 @@ extension ExceptionMessageX on AppExceptionCode {
     AppExceptionCode.roomNotFound => 'Ruangan tidak dapat ditemukan',
     AppExceptionCode.roomAlreadyExists =>
       'Ruangan dengan nama tersebut sudah ada pada fakultas ini',
+    AppExceptionCode.academicYearNotFound =>
+      'Tahun akademik tidak dapat ditemukan',
+    AppExceptionCode.academicYearAlreadyExists =>
+      'Tahun akademik dengan nama tersebut sudah ada',
+    AppExceptionCode.academicTermNotFound => 'Semester tidak dapat ditemukan',
+    AppExceptionCode.academicTermAlreadyExists =>
+      'Semester dengan nama tersebut sudah ada pada tahun akademik ini',
   };
 }

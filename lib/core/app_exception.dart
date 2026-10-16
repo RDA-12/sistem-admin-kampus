@@ -38,6 +38,18 @@ enum AppExceptionCode {
 
   /// Code caused by new room have existing name in the faculty
   roomAlreadyExists,
+
+  /// Code caused by requested academic year not found in db
+  academicYearNotFound,
+
+  /// Code caused by new academic year have existing name
+  academicYearAlreadyExists,
+
+  /// Code caused by requested academic term not found in db
+  academicTermNotFound,
+
+  /// Code caused by new academic term have existing name in the academic year
+  academicTermAlreadyExists,
 }
 
 /// Exception class for this app
