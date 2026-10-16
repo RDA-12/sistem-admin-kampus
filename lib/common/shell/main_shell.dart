@@ -21,6 +21,10 @@ const _destinations = <_MainDestination>[
     icon: Icons.person_rounded,
     label: 'Dosen',
   ),
+  _MainDestination(
+    icon: Icons.menu_book_rounded,
+    label: 'Mata Kuliah',
+  ),
 ];
 
 /// Main shell which contains nav rail for large screen and
