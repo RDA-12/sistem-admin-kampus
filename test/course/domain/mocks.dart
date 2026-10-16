@@ -2,6 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/course/course.dart';
 
+import '../../program/domain/mocks.dart';
+
 @LazySingleton(as: ICourseRepository, env: [Environment.test])
 class MockCourseRepository extends Mock implements ICourseRepository;
 
@@ -44,3 +46,17 @@ const courseMock = Course(
   semester: 1,
   credit: 3,
 );
+final List<CourseUI> coursesUIMock = coursesMock
+    .map(
+      (it) => CourseUI(
+        id: it.id,
+        programId: programMock.id,
+        code: it.code,
+        name: it.name,
+        semester: it.semester,
+        credit: it.credit,
+        program: programMock,
+      ),
+    )
+    .toList();
+final CourseUI courseUIMock = coursesUIMock.first;
