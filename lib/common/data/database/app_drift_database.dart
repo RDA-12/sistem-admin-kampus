@@ -6,13 +6,20 @@ import 'package:sistem_admin/course/course.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/lecturer/lecturer.dart';
 import 'package:sistem_admin/program/program.dart';
+import 'package:sistem_admin/room/room.dart';
 
 part 'app_drift_database.g.dart';
 
 /// Drift database class for this app
 @LazySingleton(env: [Environment.prod])
 @DriftDatabase(
-  tables: [FacultiesDrift, ProgramsDrift, LecturersDrift, CoursesDrift],
+  tables: [
+    FacultiesDrift,
+    ProgramsDrift,
+    LecturersDrift,
+    CoursesDrift,
+    RoomsDrift,
+  ],
 )
 class AppDriftDatabase extends _$AppDriftDatabase {
   /// Creates new [AppDriftDatabase]
