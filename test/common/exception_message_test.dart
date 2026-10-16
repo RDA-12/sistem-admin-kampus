@@ -17,6 +17,9 @@ void main() {
     .courseNotFound: 'Mata kuliah tidak dapat ditemukan',
     .courseAlreadyExists:
         'Mata kuliah dengan kode tersebut sudah ada pada program studi ini',
+    .roomNotFound: 'Ruangan tidak dapat ditemukan',
+    .roomAlreadyExists:
+        'Ruangan dengan nama tersebut sudah ada pada fakultas ini',
   };
 
   group('AppExceptionCode.message', () {

@@ -20,5 +20,8 @@ extension ExceptionMessageX on AppExceptionCode {
     AppExceptionCode.courseNotFound => 'Mata kuliah tidak dapat ditemukan',
     AppExceptionCode.courseAlreadyExists =>
       'Mata kuliah dengan kode tersebut sudah ada pada program studi ini',
+    AppExceptionCode.roomNotFound => 'Ruangan tidak dapat ditemukan',
+    AppExceptionCode.roomAlreadyExists =>
+      'Ruangan dengan nama tersebut sudah ada pada fakultas ini',
   };
 }

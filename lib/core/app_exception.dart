@@ -32,6 +32,12 @@ enum AppExceptionCode {
 
   /// Code caused by new course have existing code in the program
   courseAlreadyExists,
+
+  /// Code caused by requested room not found in db
+  roomNotFound,
+
+  /// Code caused by new room have existing name in the faculty
+  roomAlreadyExists,
 }
 
 /// Exception class for this app
