@@ -2,6 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/room/room.dart';
 
+import '../../faculty/domain/mocks.dart';
+
 @LazySingleton(as: IRoomRepository, env: [Environment.test])
 class MockRoomRepository extends Mock implements IRoomRepository;
 
@@ -28,12 +30,23 @@ final roomsMock = List<Room>.generate(
   5,
   (index) => Room(
     id: '$index',
-    facultyId: 'faculty_1',
+    facultyId: facultyMock.id,
     name: 'Room $index',
   ),
 );
 const roomMock = Room(
   id: 'id',
-  facultyId: 'faculty_1',
+  facultyId: 'id',
   name: 'Room',
 );
+final List<RoomUI> roomsUIMock = roomsMock
+    .map(
+      (it) => RoomUI(
+        id: it.id,
+        facultyId: facultyMock.id,
+        name: it.name,
+        faculty: facultyMock,
+      ),
+    )
+    .toList();
+final RoomUI roomUIMock = roomsUIMock.first;
