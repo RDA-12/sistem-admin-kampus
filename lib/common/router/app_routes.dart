@@ -288,6 +288,76 @@ class CourseDetailCompactRoute extends GoRouteData
   );
 }
 
+/// Route for [CreateRoomPage]
+class CreateRoomRoute extends GoRouteData with $CreateRoomRoute {
+  /// Creates new [CreateRoomRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateRoomPage();
+}
+
+/// Route for [CreateRoomPage] in compact screen
+class CreateRoomCompactRoute extends GoRouteData with $CreateRoomCompactRoute {
+  /// Creates new [CreateRoomRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateRoomPage();
+}
+
+/// Route for [RoomsListPage]
+class RoomsListRoute extends GoRouteData with $RoomsListRoute {
+  /// Creates new [RoomsListRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const RoomsListPage();
+}
+
+/// Route for [RoomDetailPage]
+class RoomDetailRoute extends GoRouteData with $RoomDetailRoute {
+  /// Creates new [RoomDetailRoute]
+  const new(this.id);
+
+  /// ID of the room that will be loaded
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => RoomDetailPage(
+    id: id,
+    onRoomDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
+/// Route for [RoomDetailPage] in compact screen
+class RoomDetailCompactRoute extends GoRouteData with $RoomDetailCompactRoute {
+  /// Creates new [RoomDetailRoute]
+  const new(this.id);
+
+  /// ID of the room that will be loaded
+  final String id;
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => RoomDetailPage(
+    id: id,
+    onRoomDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
 /// Branch for [Faculty] in [MainShell]
 class FacultyMainShellData extends StatefulShellBranchData;
 
@@ -299,6 +369,9 @@ class LecturerMainShellData extends StatefulShellBranchData;
 
 /// Branch for [Course] in [MainShell]
 class CourseMainShellData extends StatefulShellBranchData;
+
+/// Branch for [Room] in [MainShell]
+class RoomMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -351,6 +424,19 @@ class CourseMainShellData extends StatefulShellBranchData;
             TypedGoRoute<CreateCourseCompactRoute>(path: 'create-compact'),
             TypedGoRoute<CourseDetailRoute>(path: ':id'),
             TypedGoRoute<CourseDetailCompactRoute>(path: 'compact/:id'),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<RoomMainShellData>(
+      routes: [
+        TypedGoRoute<RoomsListRoute>(
+          path: '/rooms',
+          routes: [
+            TypedGoRoute<CreateRoomRoute>(path: 'create'),
+            TypedGoRoute<CreateRoomCompactRoute>(path: 'create-compact'),
+            TypedGoRoute<RoomDetailRoute>(path: ':id'),
+            TypedGoRoute<RoomDetailCompactRoute>(path: 'compact/:id'),
           ],
         ),
       ],

@@ -5,6 +5,7 @@ import 'package:sistem_admin/course/course.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/lecturer/lecturer.dart';
 import 'package:sistem_admin/program/program.dart';
+import 'package:sistem_admin/room/room.dart';
 
 part 'app_routes.dart';
 part 'app_router.g.dart';
