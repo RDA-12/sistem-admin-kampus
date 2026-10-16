@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:meta/meta.dart';
+import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/course/course.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/lecturer/lecturer.dart';
@@ -19,6 +20,8 @@ part 'app_drift_database.g.dart';
     LecturersDrift,
     CoursesDrift,
     RoomsDrift,
+    AcademicYearsDrift,
+    AcademicTermsDrift,
   ],
 )
 class AppDriftDatabase extends _$AppDriftDatabase {
