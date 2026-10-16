@@ -14,6 +14,9 @@ void main() {
     .lecturerNotFound: 'Dosen tidak dapat ditemukan',
     .lecturerAlreadyExists:
         'Dosen dengan nama tersebut sudah ada pada program studi ini',
+    .courseNotFound: 'Mata kuliah tidak dapat ditemukan',
+    .courseAlreadyExists:
+        'Mata kuliah dengan kode tersebut sudah ada pada program studi ini',
   };
 
   group('AppExceptionCode.message', () {
