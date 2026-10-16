@@ -67,6 +67,7 @@ class CourseRepository with AppLoggerMixin implements ICourseRepository {
         code: args.code,
         name: args.name,
         semester: args.semester,
+        credit: args.credit,
       );
       logDebug('start inserting course');
       final courseDb = await _db

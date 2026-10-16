@@ -9,6 +9,7 @@ final class UpdateCourseParams extends Equatable {
     this.code,
     this.name,
     this.semester,
+    this.credit,
     this.programId,
   });
 
@@ -24,9 +25,12 @@ final class UpdateCourseParams extends Equatable {
   /// Updated semester
   final int? semester;
 
+  /// Updated weight / credit (SKS)
+  final int? credit;
+
   /// Updated program ID
   final String? programId;
 
   @override
-  List<Object?> get props => [course, code, name, semester, programId];
+  List<Object?> get props => [course, code, name, semester, credit, programId];
 }

@@ -25,6 +25,9 @@ class CoursesDrift extends Table with AppClockMixin {
   /// Semester of the course
   IntColumn get semester => integer()();
 
+  /// Weight / credit (SKS) of the course
+  IntColumn get credit => integer()();
+
   /// When this course created
   DateTimeColumn get createdAt =>
       dateTime().clientDefault(getCurrentDateTime)();
@@ -51,6 +54,7 @@ extension ToDomainX on CourseDb {
     code: code,
     name: name,
     semester: semester,
+    credit: credit,
   );
 }
 
@@ -61,6 +65,7 @@ extension ToCompanionX on UpdateCourseParams {
     code: code == null ? const Value.absent() : Value(code!),
     name: name == null ? const Value.absent() : Value(name!),
     semester: semester == null ? const Value.absent() : Value(semester!),
+    credit: credit == null ? const Value.absent() : Value(credit!),
     programId: programId == null ? const Value.absent() : Value(programId!),
   );
 }

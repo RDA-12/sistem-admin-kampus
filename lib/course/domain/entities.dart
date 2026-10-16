@@ -9,6 +9,7 @@ class Course extends Equatable {
     required this.code,
     required this.name,
     required this.semester,
+    required this.credit,
   });
 
   /// ID of this course
@@ -26,6 +27,9 @@ class Course extends Equatable {
   /// Semester of this course
   final int semester;
 
+  /// Weight / credit (SKS) of this course
+  final int credit;
+
   @override
-  List<Object?> get props => [id, programId, code, name, semester];
+  List<Object?> get props => [id, programId, code, name, semester, credit];
 }

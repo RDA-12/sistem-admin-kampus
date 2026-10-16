@@ -12,6 +12,7 @@ void main() {
         code: 'CS101',
         name: 'Pemrograman Dasar',
         semester: 1,
+        credit: 3,
       );
 
       final result = CourseDb(
@@ -20,6 +21,7 @@ void main() {
         code: 'CS101',
         name: 'Pemrograman Dasar',
         semester: 1,
+        credit: 3,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -36,6 +38,7 @@ void main() {
           code: Value('CS102'),
           name: Value('new name'),
           semester: Value(2),
+          credit: Value(4),
         );
 
         final result = const UpdateCourseParams(
@@ -45,10 +48,12 @@ void main() {
             code: 'CS101',
             name: 'name',
             semester: 1,
+            credit: 3,
           ),
           code: 'CS102',
           name: 'new name',
           semester: 2,
+          credit: 4,
         ).toCompanion();
 
         expect(result, expected);
@@ -60,6 +65,7 @@ void main() {
             code: 'CS101',
             name: 'name',
             semester: 1,
+            credit: 3,
           ),
         ).toCompanion();
 

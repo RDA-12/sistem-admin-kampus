@@ -24,6 +24,7 @@ void main() {
     code: 'CS_NEW',
     name: 'Pemrograman Dasar',
     semester: 1,
+    credit: 3,
   );
   final seededCourses = List.generate(
     5,
@@ -33,6 +34,7 @@ void main() {
       code: 'CS10$index',
       name: 'Course $index',
       semester: index + 1,
+      credit: 3,
     ),
   );
   late CourseRepository repository;
@@ -67,6 +69,7 @@ void main() {
               code: c.code,
               name: c.name,
               semester: c.semester,
+              credit: c.credit,
             ),
           );
     }
@@ -93,6 +96,7 @@ void main() {
         code: 'CS_NEW',
         name: 'Pemrograman Dasar',
         semester: 1,
+        credit: 3,
       );
 
       test('returns correct new course and save it', () async {
@@ -110,6 +114,7 @@ void main() {
           expect(exists.code, createArgs.code);
           expect(exists.name, createArgs.name);
           expect(exists.semester, createArgs.semester);
+          expect(exists.credit, createArgs.credit);
           expect(exists.createdAt, now);
           expect(exists.updatedAt, now);
         });
@@ -252,6 +257,7 @@ void main() {
           code: 'CS999',
           name: 'updated name',
           semester: 4,
+          credit: 4,
         );
 
         final now = DateTime.now();
@@ -263,6 +269,7 @@ void main() {
               code: expectedUpdated.code,
               name: expectedUpdated.name,
               semester: expectedUpdated.semester,
+              credit: expectedUpdated.credit,
             ),
           );
 
@@ -345,6 +352,7 @@ void main() {
             code: 'CS999',
             name: 'Course Prog 2',
             semester: 1,
+            credit: 2,
           );
           await database
               .into(database.coursesDrift)
@@ -355,6 +363,7 @@ void main() {
                   code: courseInProg2.code,
                   name: courseInProg2.name,
                   semester: courseInProg2.semester,
+                  credit: courseInProg2.credit,
                 ),
               );
 
@@ -373,6 +382,7 @@ void main() {
                 code: 'CS999',
                 name: target.name,
                 semester: target.semester,
+                credit: target.credit,
               ),
             ),
           );

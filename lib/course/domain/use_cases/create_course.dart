@@ -9,6 +9,7 @@ final class CreateCourseParams extends Equatable {
     required this.code,
     required this.name,
     required this.semester,
+    required this.credit,
   });
 
   /// ID of the affiliated program
@@ -23,6 +24,9 @@ final class CreateCourseParams extends Equatable {
   /// Semester for the course
   final int semester;
 
+  /// Weight / credit (SKS) for the course
+  final int credit;
+
   @override
-  List<Object?> get props => [programId, code, name, semester];
+  List<Object?> get props => [programId, code, name, semester, credit];
 }
