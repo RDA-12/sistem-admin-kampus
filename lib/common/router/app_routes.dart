@@ -144,11 +144,86 @@ class ProgramDetailCompactRoute extends GoRouteData
   );
 }
 
+/// Route for [CreateLecturerPage]
+class CreateLecturerRoute extends GoRouteData with $CreateLecturerRoute {
+  /// Creates new [CreateLecturerRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateLecturerPage();
+}
+
+/// Route for [CreateLecturerPage] in compact screen
+class CreateLecturerCompactRoute extends GoRouteData
+    with $CreateLecturerCompactRoute {
+  /// Creates new [CreateLecturerRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateLecturerPage();
+}
+
+/// Route for [LecturersListPage]
+class LecturersListRoute extends GoRouteData with $LecturersListRoute {
+  /// Creates new [LecturersListRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const LecturersListPage();
+}
+
+/// Route for [LecturerDetailPage]
+class LecturerDetailRoute extends GoRouteData with $LecturerDetailRoute {
+  /// Creates new [LecturerDetailRoute]
+  const new(this.id);
+
+  /// ID of the lecturer that will be loaded
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => LecturerDetailPage(
+    id: id,
+    onLecturerDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
+/// Route for [LecturerDetailPage] in compact screen
+class LecturerDetailCompactRoute extends GoRouteData
+    with $LecturerDetailCompactRoute {
+  /// Creates new [LecturerDetailRoute]
+  const new(this.id);
+
+  /// ID of the lecturer that will be loaded
+  final String id;
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => LecturerDetailPage(
+    id: id,
+    onLecturerDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
 /// Branch for [Faculty] in [MainShell]
 class FacultyMainShellData extends StatefulShellBranchData;
 
 /// Branch for [Program] in [MainShell]
 class ProgramMainShellData extends StatefulShellBranchData;
+
+/// Branch for [Lecturer] in [MainShell]
+class LecturerMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -175,6 +250,19 @@ class ProgramMainShellData extends StatefulShellBranchData;
             TypedGoRoute<CreateProgramCompactRoute>(path: 'create-compact'),
             TypedGoRoute<ProgramDetailRoute>(path: ':id'),
             TypedGoRoute<ProgramDetailCompactRoute>(path: 'compact/:id'),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<LecturerMainShellData>(
+      routes: [
+        TypedGoRoute<LecturersListRoute>(
+          path: '/lecturers',
+          routes: [
+            TypedGoRoute<CreateLecturerRoute>(path: 'create'),
+            TypedGoRoute<CreateLecturerCompactRoute>(path: 'create-compact'),
+            TypedGoRoute<LecturerDetailRoute>(path: ':id'),
+            TypedGoRoute<LecturerDetailCompactRoute>(path: 'compact/:id'),
           ],
         ),
       ],
