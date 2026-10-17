@@ -1,4 +1,11 @@
 export 'create_academic_term.dart';
 export 'create_academic_year.dart';
+export 'delete_academic_term.dart';
+export 'delete_academic_year.dart';
 export 'update_academic_term.dart';
 export 'update_academic_year.dart';
+export 'watch_academic_terms.dart';
+export 'watch_academic_terms_by_year.dart';
+export 'watch_academic_years.dart';
+export 'watch_single_academic_term.dart';
+export 'watch_single_academic_year.dart';

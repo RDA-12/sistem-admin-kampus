@@ -1,0 +1,80 @@
+import 'package:injectable/injectable.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
+
+@LazySingleton(as: IAcademicYearRepository, env: [Environment.test])
+class MockAcademicYearRepository extends Mock
+    implements IAcademicYearRepository;
+
+@LazySingleton(as: IAcademicTermRepository, env: [Environment.test])
+class MockAcademicTermRepository extends Mock
+    implements IAcademicTermRepository;
+
+@LazySingleton(as: WatchAcademicYearsUseCase, env: [Environment.test])
+class MockWatchAcademicYearsUseCase extends Mock
+    implements WatchAcademicYearsUseCase;
+
+@LazySingleton(as: WatchSingleAcademicYearUseCase, env: [Environment.test])
+class MockWatchSingleAcademicYearUseCase extends Mock
+    implements WatchSingleAcademicYearUseCase;
+
+@LazySingleton(as: CreateAcademicYearUseCase, env: [Environment.test])
+class MockCreateAcademicYearUseCase extends Mock
+    implements CreateAcademicYearUseCase;
+
+@LazySingleton(as: UpdateAcademicYearUseCase, env: [Environment.test])
+class MockUpdateAcademicYearUseCase extends Mock
+    implements UpdateAcademicYearUseCase;
+
+@LazySingleton(as: DeleteAcademicYearUseCase, env: [Environment.test])
+class MockDeleteAcademicYearUseCase extends Mock
+    implements DeleteAcademicYearUseCase;
+
+@LazySingleton(as: WatchAcademicTermsUseCase, env: [Environment.test])
+class MockWatchAcademicTermsUseCase extends Mock
+    implements WatchAcademicTermsUseCase;
+
+@LazySingleton(as: WatchAcademicTermsByYearUseCase, env: [Environment.test])
+class MockWatchAcademicTermsByYearUseCase extends Mock
+    implements WatchAcademicTermsByYearUseCase;
+
+@LazySingleton(as: WatchSingleAcademicTermUseCase, env: [Environment.test])
+class MockWatchSingleAcademicTermUseCase extends Mock
+    implements WatchSingleAcademicTermUseCase;
+
+@LazySingleton(as: CreateAcademicTermUseCase, env: [Environment.test])
+class MockCreateAcademicTermUseCase extends Mock
+    implements CreateAcademicTermUseCase;
+
+@LazySingleton(as: UpdateAcademicTermUseCase, env: [Environment.test])
+class MockUpdateAcademicTermUseCase extends Mock
+    implements UpdateAcademicTermUseCase;
+
+@LazySingleton(as: DeleteAcademicTermUseCase, env: [Environment.test])
+class MockDeleteAcademicTermUseCase extends Mock
+    implements DeleteAcademicTermUseCase;
+
+final academicYearsMock = List<AcademicYear>.generate(
+  5,
+  (index) => AcademicYear(
+    id: '$index',
+    name: '202$index/202${index + 1}',
+    startDate: DateTime(2020 + index, 9),
+    endDate: DateTime(2021 + index, 8, 31),
+  ),
+);
+
+final AcademicYear academicYearMock = academicYearsMock.first;
+
+final academicTermsMock = List<AcademicTerm>.generate(
+  3,
+  (index) => AcademicTerm(
+    id: '$index',
+    academicYearId: academicYearMock.id,
+    name: 'Semester ${index + 1}',
+    startDate: DateTime(2020, index * 4 + 1),
+    endDate: DateTime(2020, index * 4 + 4),
+  ),
+);
+
+final AcademicTerm academicTermMock = academicTermsMock.first;
