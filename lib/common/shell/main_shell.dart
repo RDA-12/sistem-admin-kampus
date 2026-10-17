@@ -29,6 +29,10 @@ const _destinations = <_MainDestination>[
     icon: Icons.meeting_room_rounded,
     label: 'Ruangan',
   ),
+  _MainDestination(
+    icon: Icons.calendar_month_rounded,
+    label: 'Kalender Akademik',
+  ),
 ];
 
 /// Main shell which contains nav rail for large screen and

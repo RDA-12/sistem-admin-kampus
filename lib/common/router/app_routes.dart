@@ -358,6 +358,82 @@ class RoomDetailCompactRoute extends GoRouteData with $RoomDetailCompactRoute {
   );
 }
 
+/// Route for [CreateAcademicYearPage]
+class CreateAcademicYearRoute extends GoRouteData
+    with $CreateAcademicYearRoute {
+  /// Creates new [CreateAcademicYearRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateAcademicYearPage();
+}
+
+/// Route for [CreateAcademicYearPage] in compact screen
+class CreateAcademicYearCompactRoute extends GoRouteData
+    with $CreateAcademicYearCompactRoute {
+  /// Creates new [CreateAcademicYearRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateAcademicYearPage();
+}
+
+/// Route for [AcademicYearsListPage]
+class AcademicYearsListRoute extends GoRouteData with $AcademicYearsListRoute {
+  /// Creates new [AcademicYearsListRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const AcademicYearsListPage();
+}
+
+/// Route for [AcademicYearDetailPage]
+class AcademicYearDetailRoute extends GoRouteData
+    with $AcademicYearDetailRoute {
+  /// Creates new [AcademicYearDetailRoute]
+  const new(this.id);
+
+  /// ID of the academic year that will be loaded
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      AcademicYearDetailPage(
+        id: id,
+        onAcademicYearDeleted: (_) {
+          context.pop();
+        },
+      );
+}
+
+/// Route for [AcademicYearDetailPage] in compact screen
+class AcademicYearDetailCompactRoute extends GoRouteData
+    with $AcademicYearDetailCompactRoute {
+  /// Creates new [AcademicYearDetailRoute]
+  const new(this.id);
+
+  /// ID of the academic year that will be loaded
+  final String id;
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      AcademicYearDetailPage(
+        id: id,
+        onAcademicYearDeleted: (_) {
+          context.pop();
+        },
+      );
+}
+
 /// Branch for [Faculty] in [MainShell]
 class FacultyMainShellData extends StatefulShellBranchData;
 
@@ -372,6 +448,9 @@ class CourseMainShellData extends StatefulShellBranchData;
 
 /// Branch for [Room] in [MainShell]
 class RoomMainShellData extends StatefulShellBranchData;
+
+/// Branch for [AcademicYear] in [MainShell]
+class AcademicCalendarMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -437,6 +516,23 @@ class RoomMainShellData extends StatefulShellBranchData;
             TypedGoRoute<CreateRoomCompactRoute>(path: 'create-compact'),
             TypedGoRoute<RoomDetailRoute>(path: ':id'),
             TypedGoRoute<RoomDetailCompactRoute>(path: 'compact/:id'),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<AcademicCalendarMainShellData>(
+      routes: [
+        TypedGoRoute<AcademicYearsListRoute>(
+          path: '/academic-calendar',
+          routes: [
+            TypedGoRoute<CreateAcademicYearRoute>(path: 'create'),
+            TypedGoRoute<CreateAcademicYearCompactRoute>(
+              path: 'create-compact',
+            ),
+            TypedGoRoute<AcademicYearDetailRoute>(path: ':id'),
+            TypedGoRoute<AcademicYearDetailCompactRoute>(
+              path: 'compact/:id',
+            ),
           ],
         ),
       ],

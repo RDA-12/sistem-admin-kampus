@@ -35,9 +35,11 @@ class AcademicYearTerms extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Daftar Semester',
-              style: context.text.titleMedium,
+            Expanded(
+              child: Text(
+                'Daftar Semester',
+                style: context.text.titleMedium,
+              ),
             ),
             AppButton(
               leadingIcon: const Icon(Icons.add_rounded),
