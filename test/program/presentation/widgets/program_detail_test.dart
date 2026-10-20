@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
+import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
+import '../../../course/domain/mocks.dart';
+import '../../../faculty/domain/mocks.dart';
+import '../../../lecturer/domain/mocks.dart';
 import '../../domain/mocks.dart';
 
 void main() {
@@ -18,14 +22,30 @@ void main() {
     programDetailBlocMock = getIt<ProgramDetailBloc>();
     whenListen(
       programDetailBlocMock,
-      Stream.value(ProgramDetailLoaded(program: programUIMock)),
-      initialState: ProgramDetailLoaded(program: programUIMock),
+      Stream.value(
+        ProgramDetailLoaded(
+          program: programUIMock,
+          lecturers: lecturersMock,
+          courses: coursesMock,
+        ),
+      ),
+      initialState: ProgramDetailLoaded(
+        program: programUIMock,
+        lecturers: lecturersMock,
+        courses: coursesMock,
+      ),
     );
 
     whenListen(
       getIt<ProgramMutationBloc>(),
       Stream.value(const ProgramMutationState()),
       initialState: const ProgramMutationState(),
+    );
+
+    whenListen(
+      getIt<FacultiesBloc>(),
+      Stream.value(FacultiesLoaded(facultiesMock)),
+      initialState: FacultiesLoaded(facultiesMock),
     );
   });
 
@@ -50,6 +70,9 @@ void main() {
             BlocProvider.value(
               value: getIt<ProgramMutationBloc>(),
             ),
+            BlocProvider.value(
+              value: getIt<FacultiesBloc>(),
+            ),
           ],
           child: child,
         );
@@ -69,6 +92,40 @@ void main() {
           expect(finder, findsOneWidget);
           final widget = tester.widget<ProgramForm>(finder);
           expect(widget.initial, programUIMock);
+        },
+      );
+
+      testWidgets(
+        'shows ProgramLecturersList with correct lecturers '
+        'when state is loaded',
+        (tester) async {
+          await pumpWidget(tester);
+
+          expect(find.text('Daftar Dosen'), findsOneWidget);
+          final finder = find.byType(ProgramLecturersList);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<ProgramLecturersList>(finder);
+          expect(widget.lecturers, lecturersMock);
+        },
+      );
+
+      testWidgets(
+        'shows ProgramCoursesList with correct courses '
+        'when state is loaded',
+        (tester) async {
+          await pumpWidget(tester);
+
+          await tester.drag(
+            find.byType(ProgramDetail),
+            const Offset(0, -500),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Daftar Mata Kuliah'), findsOneWidget);
+          final finder = find.byType(ProgramCoursesList);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<ProgramCoursesList>(finder);
+          expect(widget.courses, coursesMock);
         },
       );
 

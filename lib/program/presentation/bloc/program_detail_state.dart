@@ -24,13 +24,23 @@ final class LoadingProgramDetail extends ProgramDetailState {
 /// State when program detail is loaded
 final class ProgramDetailLoaded extends ProgramDetailState {
   /// Creates new [ProgramDetailLoaded]
-  const new({required this.program});
+  const new({
+    required this.program,
+    required this.lecturers,
+    required this.courses,
+  });
 
   /// Loaded [ProgramUI] data
   final ProgramUI program;
 
+  /// Loaded [Lecturer] list for this program
+  final List<Lecturer> lecturers;
+
+  /// Loaded [Course] list for this program
+  final List<Course> courses;
+
   @override
-  List<Object> get props => [program];
+  List<Object> get props => [program, lecturers, courses];
 }
 
 /// State when program detail data failed to load

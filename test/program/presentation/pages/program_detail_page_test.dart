@@ -8,6 +8,9 @@ import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
+import '../../../course/domain/mocks.dart';
+import '../../../faculty/domain/mocks.dart';
+import '../../../lecturer/domain/mocks.dart';
 import '../../domain/mocks.dart';
 
 void main() {
@@ -19,8 +22,18 @@ void main() {
     programDetailBlocMock = getIt<ProgramDetailBloc>();
     whenListen(
       programDetailBlocMock,
-      Stream.value(ProgramDetailLoaded(program: programUIMock)),
-      initialState: ProgramDetailLoaded(program: programUIMock),
+      Stream.value(
+        ProgramDetailLoaded(
+          program: programUIMock,
+          lecturers: lecturersMock,
+          courses: coursesMock,
+        ),
+      ),
+      initialState: ProgramDetailLoaded(
+        program: programUIMock,
+        lecturers: lecturersMock,
+        courses: coursesMock,
+      ),
     );
     when(programDetailBlocMock.close).thenAnswer((_) async {});
 
@@ -30,6 +43,13 @@ void main() {
       initialState: const ProgramMutationState(),
     );
     when(getIt<ProgramMutationBloc>().close).thenAnswer((_) async {});
+
+    whenListen(
+      getIt<FacultiesBloc>(),
+      Stream.value(FacultiesLoaded(facultiesMock)),
+      initialState: FacultiesLoaded(facultiesMock),
+    );
+    when(getIt<FacultiesBloc>().close).thenAnswer((_) async {});
   });
 
   Future<void> pumpWidget(
