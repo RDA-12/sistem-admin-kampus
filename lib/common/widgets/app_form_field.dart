@@ -135,6 +135,12 @@ final class AppNumberFormFieldController {
     }
   }
 
+  /// Clear the text field and reset value to 0
+  void clear() {
+    _value = 0;
+    _textEditingController.clear();
+  }
+
   /// Dispose this controller
   void dispose() {
     _textEditingController

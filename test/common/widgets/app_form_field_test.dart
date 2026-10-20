@@ -233,6 +233,14 @@ void main() {
 
       expect(controller.value, 0);
     });
+
+    test('clear resets value to 0 and clears text', () {
+      final controller = AppNumberFormFieldController(initial: 10)..clear();
+      addTearDown(controller.dispose);
+
+      expect(controller.value, 0);
+      expect(controller.textEditingController.text, isEmpty);
+    });
   });
 
   group('AppNumberFormField', () {

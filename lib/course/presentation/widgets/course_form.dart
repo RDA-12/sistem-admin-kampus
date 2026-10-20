@@ -45,7 +45,7 @@ class _CourseFormState extends State<CourseForm> {
   late final TextEditingController _codeController;
   late final TextEditingController _nameController;
   late final TextEditingController _semesterController;
-  late final TextEditingController _creditController;
+  late final AppNumberFormFieldController _creditController;
   late final ProgramSelectorController _programController;
 
   @override
@@ -57,8 +57,8 @@ class _CourseFormState extends State<CourseForm> {
     _semesterController = TextEditingController(
       text: widget.initial?.semester.toString(),
     );
-    _creditController = TextEditingController(
-      text: widget.initial?.credit.toString(),
+    _creditController = AppNumberFormFieldController(
+      initial: widget.initial?.credit,
     );
     _programController = ProgramSelectorController(
       initial: widget.initial?.program,
@@ -163,12 +163,11 @@ class _CourseFormState extends State<CourseForm> {
                 return null;
               },
             ),
-            AppFormField(
+            AppNumberFormField(
               controller: _creditController,
               label: 'Bobot SKS',
               validator: (value) {
-                final parsed = int.tryParse(value ?? '');
-                if (parsed == null || parsed <= 0) {
+                if (value is! int || value <= 0) {
                   return 'SKS harus berupa angka positif';
                 }
                 return null;
@@ -211,9 +210,7 @@ class _CourseFormState extends State<CourseForm> {
                               final semester = int.parse(
                                 _semesterController.text.trim(),
                               );
-                              final credit = int.parse(
-                                _creditController.text.trim(),
-                              );
+                              final credit = _creditController.value.toInt();
                               final programId = _programController.selected!.id;
                               if (widget.initial == null) {
                                 context.read<CourseMutationBloc>().add(
