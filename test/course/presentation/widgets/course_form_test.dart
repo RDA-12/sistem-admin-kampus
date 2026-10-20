@@ -89,13 +89,24 @@ void main() {
       of: find.text('Nama Mata Kuliah *'),
       matching: find.byType(TextFormField),
     );
-    final semesterFieldFinder = find.ancestor(
+    final semesterDropdownFinder = find.ancestor(
       of: find.text('Semester *'),
-      matching: find.byType(TextFormField),
+      matching: find.byType(SemesterDropdown),
     );
+    Future<void> selectSemester(WidgetTester tester, int semester) async {
+      await tester.tap(semesterDropdownFinder);
+      await tester.pumpAndSettle();
+      final optionFinder = find.descendant(
+        of: find.byType(MenuItemButton),
+        matching: find.text('$semester'),
+      );
+      await tester.tap(optionFinder.last);
+      await tester.pumpAndSettle();
+    }
+
     final creditFieldFinder = find.ancestor(
       of: find.text('Bobot SKS *'),
-      matching: find.byType(TextFormField),
+      matching: find.byType(AppNumberFormField),
     );
     final saveButtonFinder = find.ancestor(
       of: find.text('Simpan'),
@@ -117,7 +128,7 @@ void main() {
           expect(programSelectorFinder, findsOneWidget);
           expect(codeFieldFinder, findsOneWidget);
           expect(nameFieldFinder, findsOneWidget);
-          expect(semesterFieldFinder, findsOneWidget);
+          expect(semesterDropdownFinder, findsOneWidget);
           expect(creditFieldFinder, findsOneWidget);
         },
       );
@@ -252,7 +263,7 @@ void main() {
           await selectProgram(tester);
           await tester.enterText(codeFieldFinder, 'CS101');
           await tester.enterText(nameFieldFinder, 'Algoritma');
-          await tester.enterText(semesterFieldFinder, '1');
+          await selectSemester(tester, 1);
           await tester.enterText(creditFieldFinder, '3');
           await tester.tap(saveButtonFinder);
           await tester.pumpAndSettle();
@@ -279,7 +290,7 @@ void main() {
 
           await tester.enterText(codeFieldFinder, 'CS102');
           await tester.enterText(nameFieldFinder, 'Algoritma Lanjut');
-          await tester.enterText(semesterFieldFinder, '2');
+          await selectSemester(tester, 2);
           await tester.enterText(creditFieldFinder, '4');
           await tester.tap(saveButtonFinder);
           await tester.pumpAndSettle();
@@ -334,15 +345,30 @@ void main() {
           await selectProgram(tester);
           await tester.enterText(codeFieldFinder, 'CS999');
           await tester.enterText(nameFieldFinder, 'Nama Baru');
-          await tester.enterText(semesterFieldFinder, '3');
+          await selectSemester(tester, 3);
           await tester.enterText(creditFieldFinder, '2');
           await tester.pumpAndSettle();
+
+          final semesterTextFieldFinder = find.descendant(
+            of: semesterDropdownFinder,
+            matching: find.byType(TextField),
+          );
+          final creditTextFieldFinder = find.descendant(
+            of: creditFieldFinder,
+            matching: find.byType(TextField),
+          );
 
           expect(find.text(programsMock.first.name), findsOneWidget);
           expect(find.text('CS999'), findsOneWidget);
           expect(find.text('Nama Baru'), findsOneWidget);
-          expect(find.text('3'), findsOneWidget);
-          expect(find.text('2'), findsOneWidget);
+          expect(
+            tester.widget<TextField>(semesterTextFieldFinder).controller?.text,
+            '3',
+          );
+          expect(
+            tester.widget<TextField>(creditTextFieldFinder).controller?.text,
+            '2',
+          );
 
           controller.add(
             CourseMutationState(
@@ -354,8 +380,14 @@ void main() {
           expect(find.text(programsMock.first.name), findsOneWidget);
           expect(find.text('CS999'), findsOneWidget);
           expect(find.text('Nama Baru'), findsOneWidget);
-          expect(find.text('3'), findsOneWidget);
-          expect(find.text('2'), findsOneWidget);
+          expect(
+            tester.widget<TextField>(semesterTextFieldFinder).controller?.text,
+            '3',
+          );
+          expect(
+            tester.widget<TextField>(creditTextFieldFinder).controller?.text,
+            '2',
+          );
         },
       );
 
@@ -369,15 +401,30 @@ void main() {
         await selectProgram(tester);
         await tester.enterText(codeFieldFinder, 'CS101');
         await tester.enterText(nameFieldFinder, 'Algoritma');
-        await tester.enterText(semesterFieldFinder, '1');
+        await selectSemester(tester, 1);
         await tester.enterText(creditFieldFinder, '3');
         await tester.pumpAndSettle();
+
+        final semesterTextFieldFinder = find.descendant(
+          of: semesterDropdownFinder,
+          matching: find.byType(TextField),
+        );
+        final creditTextFieldFinder = find.descendant(
+          of: creditFieldFinder,
+          matching: find.byType(TextField),
+        );
 
         expect(find.text(programsMock.first.name), findsOneWidget);
         expect(find.text('CS101'), findsOneWidget);
         expect(find.text('Algoritma'), findsOneWidget);
-        expect(find.text('1'), findsOneWidget);
-        expect(find.text('3'), findsOneWidget);
+        expect(
+          tester.widget<TextField>(semesterTextFieldFinder).controller?.text,
+          '1',
+        );
+        expect(
+          tester.widget<TextField>(creditTextFieldFinder).controller?.text,
+          '3',
+        );
 
         controller.add(
           CourseMutationState(
@@ -389,8 +436,14 @@ void main() {
         expect(find.text(programsMock.first.name), findsNothing);
         expect(find.text('CS101'), findsNothing);
         expect(find.text('Algoritma'), findsNothing);
-        expect(find.text('1'), findsNothing);
-        expect(find.text('3'), findsNothing);
+        expect(
+          tester.widget<TextField>(semesterTextFieldFinder).controller?.text,
+          isEmpty,
+        );
+        expect(
+          tester.widget<TextField>(creditTextFieldFinder).controller?.text,
+          isEmpty,
+        );
       });
 
       testWidgets(

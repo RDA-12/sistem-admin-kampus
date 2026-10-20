@@ -7,6 +7,7 @@ import 'package:sistem_admin/course/domain/domain.dart';
 import 'package:sistem_admin/course/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/course/presentation/models.dart';
 import 'package:sistem_admin/course/presentation/widgets/delete_course_button.dart';
+import 'package:sistem_admin/course/presentation/widgets/semester_dropdown.dart';
 import 'package:sistem_admin/program/program.dart';
 
 enum _FormState {
@@ -44,7 +45,7 @@ class _CourseFormState extends State<CourseForm> {
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _codeController;
   late final TextEditingController _nameController;
-  late final TextEditingController _semesterController;
+  late final SemesterDropdownController _semesterController;
   late final AppNumberFormFieldController _creditController;
   late final ProgramSelectorController _programController;
 
@@ -54,8 +55,8 @@ class _CourseFormState extends State<CourseForm> {
     _formKey = GlobalKey<FormState>();
     _codeController = TextEditingController(text: widget.initial?.code);
     _nameController = TextEditingController(text: widget.initial?.name);
-    _semesterController = TextEditingController(
-      text: widget.initial?.semester.toString(),
+    _semesterController = SemesterDropdownController(
+      initial: widget.initial?.semester,
     );
     _creditController = AppNumberFormFieldController(
       initial: widget.initial?.credit,
@@ -152,16 +153,8 @@ class _CourseFormState extends State<CourseForm> {
               controller: _nameController,
               label: 'Nama Mata Kuliah',
             ),
-            AppFormField(
+            SemesterDropdown(
               controller: _semesterController,
-              label: 'Semester',
-              validator: (value) {
-                final parsed = int.tryParse(value ?? '');
-                if (parsed == null || parsed <= 0) {
-                  return 'Semester harus berupa angka positif';
-                }
-                return null;
-              },
             ),
             AppNumberFormField(
               controller: _creditController,
@@ -205,11 +198,12 @@ class _CourseFormState extends State<CourseForm> {
                               if (_programController.selected == null) {
                                 return;
                               }
+                              final semester = _semesterController.value;
+                              if (semester <= 0) {
+                                return;
+                              }
                               final code = _codeController.text.trim();
                               final name = _nameController.text.trim();
-                              final semester = int.parse(
-                                _semesterController.text.trim(),
-                              );
                               final credit = _creditController.value.toInt();
                               final programId = _programController.selected!.id;
                               if (widget.initial == null) {
