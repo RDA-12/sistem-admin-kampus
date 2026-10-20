@@ -19,6 +19,14 @@ class ProgramLecturersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (lecturers.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: AppEmptyBox(
+          message: 'Belum ada data dosen',
+        ),
+      );
+    }
+
     return SliverList.separated(
       itemCount: lecturers.length,
       separatorBuilder: (_, _) => const SizedBox(height: 4),

@@ -55,10 +55,16 @@ void main() {
         },
       );
 
-      testWidgets('handles empty course list', (tester) async {
+      testWidgets('shows AppEmptyBox when course list is empty', (
+        tester,
+      ) async {
         await pumpWidget(tester, courses: const []);
 
         expect(find.byType(AppListTile), findsNothing);
+        final finder = find.byType(AppEmptyBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppEmptyBox>(finder);
+        expect(widget.message, 'Belum ada data mata kuliah');
       });
     });
 

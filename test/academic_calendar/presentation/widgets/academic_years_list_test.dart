@@ -93,6 +93,24 @@ void main() {
       );
 
       testWidgets(
+        'shows AppEmptyBox when state is AcademicYearsLoaded with empty data',
+        (tester) async {
+          whenListen(
+            academicYearsBlocMock,
+            Stream.value(const AcademicYearsLoaded([])),
+            initialState: const AcademicYearsLoaded([]),
+          );
+
+          await pumpWidget(tester);
+
+          final finder = find.byType(AppEmptyBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppEmptyBox>(finder);
+          expect(widget.message, 'Belum ada data tahun akademik');
+        },
+      );
+
+      testWidgets(
         'shows AppExceptionBox when state is AcademicYearsFailure',
         (tester) async {
           whenListen(

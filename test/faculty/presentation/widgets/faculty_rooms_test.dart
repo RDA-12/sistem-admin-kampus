@@ -42,10 +42,14 @@ void main() {
         }
       });
 
-      testWidgets('handles empty room list', (tester) async {
+      testWidgets('shows AppEmptyBox when room list is empty', (tester) async {
         await pumpWidget(tester, rooms: const []);
 
         expect(find.byType(AppListTile), findsNothing);
+        final finder = find.byType(AppEmptyBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppEmptyBox>(finder);
+        expect(widget.message, 'Belum ada data ruangan');
       });
     });
 

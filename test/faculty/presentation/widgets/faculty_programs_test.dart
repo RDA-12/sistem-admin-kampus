@@ -42,10 +42,16 @@ void main() {
         }
       });
 
-      testWidgets('handles empty program list', (tester) async {
+      testWidgets('shows AppEmptyBox when program list is empty', (
+        tester,
+      ) async {
         await pumpWidget(tester, programs: const []);
 
         expect(find.byType(AppListTile), findsNothing);
+        final finder = find.byType(AppEmptyBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppEmptyBox>(finder);
+        expect(widget.message, 'Belum ada data program studi');
       });
     });
 

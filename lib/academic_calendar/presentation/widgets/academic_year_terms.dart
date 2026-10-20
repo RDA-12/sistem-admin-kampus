@@ -49,11 +49,8 @@ class AcademicYearTerms extends StatelessWidget {
           ],
         ),
         if (terms.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text('Belum ada semester'),
-            ),
+          const AppEmptyBox(
+            message: 'Belum ada semester',
           )
         else
           Expanded(

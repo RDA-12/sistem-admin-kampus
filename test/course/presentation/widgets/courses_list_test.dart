@@ -73,6 +73,24 @@ void main() {
         }
       });
 
+      testWidgets(
+        'shows AppEmptyBox when state is loaded with empty data',
+        (tester) async {
+          whenListen(
+            coursesBlocMock,
+            Stream.value(const CoursesLoaded([])),
+            initialState: const CoursesLoaded([]),
+          );
+
+          await pumpWidget(tester);
+
+          final finder = find.byType(AppEmptyBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppEmptyBox>(finder);
+          expect(widget.message, 'Belum ada data mata kuliah');
+        },
+      );
+
       testWidgets('shows LoadingIndicator when state is loading/initial', (
         tester,
       ) async {

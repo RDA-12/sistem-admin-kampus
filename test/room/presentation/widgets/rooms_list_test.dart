@@ -73,6 +73,24 @@ void main() {
         }
       });
 
+      testWidgets(
+        'shows AppEmptyBox when state is loaded with empty data',
+        (tester) async {
+          whenListen(
+            roomsBlocMock,
+            Stream.value(const RoomsLoaded([])),
+            initialState: const RoomsLoaded([]),
+          );
+
+          await pumpWidget(tester);
+
+          final finder = find.byType(AppEmptyBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppEmptyBox>(finder);
+          expect(widget.message, 'Belum ada data ruangan');
+        },
+      );
+
       testWidgets('shows LoadingIndicator when state is loading/initial', (
         tester,
       ) async {

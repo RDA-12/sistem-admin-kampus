@@ -19,6 +19,14 @@ class FacultyRooms extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (rooms.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: AppEmptyBox(
+          message: 'Belum ada data ruangan',
+        ),
+      );
+    }
+
     return SliverList.separated(
       itemCount: rooms.length,
       separatorBuilder: (_, _) => const SizedBox(height: 4),

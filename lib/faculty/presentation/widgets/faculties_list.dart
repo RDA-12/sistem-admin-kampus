@@ -51,6 +51,13 @@ class FacultiesList extends StatelessWidget {
                     child: LoadingIndicator(size: 32),
                   );
                 case FacultiesLoaded(:final data):
+                  if (data.isEmpty) {
+                    return const Center(
+                      child: AppEmptyBox(
+                        message: 'Belum ada data fakultas',
+                      ),
+                    );
+                  }
                   return ListView.separated(
                     itemCount: data.length,
                     separatorBuilder: (_, _) => const Divider(height: 4),

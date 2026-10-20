@@ -73,6 +73,24 @@ void main() {
         }
       });
 
+      testWidgets(
+        'shows AppEmptyBox when state is loaded with empty data',
+        (tester) async {
+          whenListen(
+            programsBlocMock,
+            Stream.value(const ProgramsLoaded([])),
+            initialState: const ProgramsLoaded([]),
+          );
+
+          await pumpWidget(tester);
+
+          final finder = find.byType(AppEmptyBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppEmptyBox>(finder);
+          expect(widget.message, 'Belum ada data program studi');
+        },
+      );
+
       testWidgets('shows LoadingIndicator when state is loading/initial', (
         tester,
       ) async {

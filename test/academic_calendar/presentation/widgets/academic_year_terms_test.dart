@@ -34,10 +34,13 @@ void main() {
         expect(find.text('Tambah'), findsOneWidget);
       });
 
-      testWidgets('shows empty text when terms is empty', (tester) async {
+      testWidgets('shows AppEmptyBox when terms is empty', (tester) async {
         await pumpWidget(tester);
 
-        expect(find.text('Belum ada semester'), findsOneWidget);
+        final finder = find.byType(AppEmptyBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppEmptyBox>(finder);
+        expect(widget.message, 'Belum ada semester');
       });
 
       testWidgets('shows all terms when terms is not empty', (tester) async {

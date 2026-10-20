@@ -52,10 +52,16 @@ void main() {
         },
       );
 
-      testWidgets('handles empty lecturer list', (tester) async {
+      testWidgets('shows AppEmptyBox when lecturer list is empty', (
+        tester,
+      ) async {
         await pumpWidget(tester, lecturers: const []);
 
         expect(find.byType(AppListTile), findsNothing);
+        final finder = find.byType(AppEmptyBox);
+        expect(finder, findsOneWidget);
+        final widget = tester.widget<AppEmptyBox>(finder);
+        expect(widget.message, 'Belum ada data dosen');
       });
     });
 
