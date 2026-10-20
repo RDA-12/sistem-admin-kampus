@@ -30,6 +30,10 @@ void main() {
     controller = ProgramSelectorController();
   });
 
+  tearDown(() {
+    reset(programsBlocMock);
+  });
+
   Future<void> pumpWidget(
     WidgetTester tester, {
     String? label,
@@ -78,84 +82,88 @@ void main() {
   });
 
   group('ProgramSelector', () {
-    testWidgets('configures AppSelector correctly', (tester) async {
-      await pumpWidget(tester, label: 'Custom Program');
+    group('Render', () {
+      testWidgets('configures AppSelector correctly', (tester) async {
+        await pumpWidget(tester, label: 'Custom Program');
 
-      final appSelectorFinder = find.byType(AppSelector<Program>);
-      expect(appSelectorFinder, findsOneWidget);
+        final appSelectorFinder = find.byType(AppSelector<Program>);
+        expect(appSelectorFinder, findsOneWidget);
 
-      final appSelector = tester.widget<AppSelector<Program>>(
-        appSelectorFinder,
+        final appSelector = tester.widget<AppSelector<Program>>(
+          appSelectorFinder,
+        );
+        expect(appSelector.label, 'Custom Program');
+        expect(appSelector.dialogTitle, 'Pilih Program Studi');
+        expect(appSelector.controller, controller);
+      });
+
+      testWidgets(
+        'shows LoadingIndicator on dialog when state is loading',
+        (tester) async {
+          whenListen(
+            programsBlocMock,
+            Stream.value(const LoadingPrograms()),
+            initialState: const LoadingPrograms(),
+          );
+          await pumpWidget(tester);
+
+          await openSelector(tester, pumpOnly: true);
+
+          expect(find.byType(LoadingIndicator), findsOneWidget);
+        },
       );
-      expect(appSelector.label, 'Custom Program');
-      expect(appSelector.dialogTitle, 'Pilih Program Studi');
-      expect(appSelector.controller, controller);
+
+      testWidgets(
+        'shows AppExceptionBox on dialog when state is failed',
+        (tester) async {
+          whenListen(
+            programsBlocMock,
+            Stream.value(ProgramsFailure(AppException.test())),
+            initialState: ProgramsFailure(AppException.test()),
+          );
+          await pumpWidget(tester);
+
+          await openSelector(tester);
+
+          final finder = find.byType(AppExceptionBox);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<AppExceptionBox>(finder);
+          expect(widget.exception, AppException.test());
+        },
+      );
+
+      testWidgets(
+        'ensures options showed to users is the name of Program',
+        (tester) async {
+          await pumpWidget(tester);
+
+          await openSelector(tester);
+
+          for (final p in programsUIMock) {
+            final finder = find.ancestor(
+              of: find.text(p.name),
+              matching: find.byType(CheckboxListTile),
+            );
+            await tester.ensureVisible(finder);
+            expect(finder, findsOneWidget);
+          }
+        },
+      );
     });
 
-    testWidgets(
-      'triggers ProgramsSubscriptionRequested when selector is pressed',
-      (tester) async {
-        await pumpWidget(tester);
+    group('Interactions', () {
+      testWidgets(
+        'triggers ProgramsSubscriptionRequested when selector is pressed',
+        (tester) async {
+          await pumpWidget(tester);
 
-        await openSelector(tester);
+          await openSelector(tester);
 
-        verify(
-          () => programsBlocMock.add(const ProgramsSubscriptionRequested()),
-        ).called(1);
-      },
-    );
-
-    testWidgets(
-      'shows LoadingIndicator on dialog when state is loading',
-      (tester) async {
-        whenListen(
-          programsBlocMock,
-          Stream.value(const LoadingPrograms()),
-          initialState: const LoadingPrograms(),
-        );
-        await pumpWidget(tester);
-
-        await openSelector(tester, pumpOnly: true);
-
-        expect(find.byType(LoadingIndicator), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'shows AppExceptionBox on dialog when state is failed',
-      (tester) async {
-        whenListen(
-          programsBlocMock,
-          Stream.value(ProgramsFailure(AppException.test())),
-          initialState: ProgramsFailure(AppException.test()),
-        );
-        await pumpWidget(tester);
-
-        await openSelector(tester);
-
-        final finder = find.byType(AppExceptionBox);
-        expect(finder, findsOneWidget);
-        final widget = tester.widget<AppExceptionBox>(finder);
-        expect(widget.exception, AppException.test());
-      },
-    );
-
-    testWidgets(
-      'ensures options showed to users is the name of Program',
-      (tester) async {
-        await pumpWidget(tester);
-
-        await openSelector(tester);
-
-        for (final p in programsUIMock) {
-          final finder = find.ancestor(
-            of: find.text(p.name),
-            matching: find.byType(CheckboxListTile),
-          );
-          await tester.ensureVisible(finder);
-          expect(finder, findsOneWidget);
-        }
-      },
-    );
+          verify(
+            () => programsBlocMock.add(const ProgramsSubscriptionRequested()),
+          ).called(1);
+        },
+      );
+    });
   });
 }
