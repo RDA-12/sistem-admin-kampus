@@ -7,6 +7,7 @@ import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/faculty/domain/domain.dart';
 import 'package:sistem_admin/program/program.dart';
+import 'package:sistem_admin/room/room.dart';
 
 part 'faculty_detail_event.dart';
 part 'faculty_detail_state.dart';
@@ -19,6 +20,7 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
   new({
     required this._watchSingleFaculty,
     required this._watchProgramsByFaculty,
+    required this._watchRoomsByFaculty,
   }) : super(const FacultyDetailInitial()) {
     on<FacultyDetailSubscriptionRequested>(
       _onFacultyDetailSubscriptionRequested,
@@ -28,6 +30,7 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
 
   final WatchSingleFacultyUseCase _watchSingleFaculty;
   final WatchProgramsByFacultyUseCase _watchProgramsByFaculty;
+  final WatchRoomsByFacultyUseCase _watchRoomsByFaculty;
 
   Future<void> _onFacultyDetailSubscriptionRequested(
     FacultyDetailSubscriptionRequested event,
@@ -40,10 +43,11 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
       );
       emit(const LoadingFacultyDetail());
 
-      final stream = CombineLatestStream.combine2(
+      final stream = CombineLatestStream.combine3(
         _watchSingleFaculty(event.id),
         _watchProgramsByFaculty(event.id),
-        (facultyResult, programsResult) {
+        _watchRoomsByFaculty(event.id),
+        (facultyResult, programsResult, roomsResult) {
           late final Faculty faculty;
           switch (facultyResult) {
             case AppFailure<Faculty>(:final exception):
@@ -51,14 +55,22 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
             case AppSuccess<Faculty>(:final data):
               faculty = data;
           }
+          late final List<Program> programs;
           switch (programsResult) {
             case AppFailure<List<Program>>(:final exception):
               return AppResult<FacultyDetailLoaded>.failure(exception);
             case AppSuccess<List<Program>>(:final data):
+              programs = data;
+          }
+          switch (roomsResult) {
+            case AppFailure<List<Room>>(:final exception):
+              return AppResult<FacultyDetailLoaded>.failure(exception);
+            case AppSuccess<List<Room>>(:final data):
               return AppResult.success(
                 FacultyDetailLoaded(
                   faculty: faculty,
-                  programs: data,
+                  programs: programs,
+                  rooms: data,
                 ),
               );
           }

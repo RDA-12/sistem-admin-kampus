@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/program/program.dart';
 
-/// Shows list of [Program] belonging to a faculty
+/// Shows list of [Program] belonging to a faculty as a sliver
 class FacultyPrograms extends StatelessWidget {
   /// Creates new [FacultyPrograms]
   const new({
@@ -19,7 +19,7 @@ class FacultyPrograms extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return SliverList.separated(
       itemCount: programs.length,
       separatorBuilder: (_, _) => const SizedBox(height: 4),
       itemBuilder: (context, index) {

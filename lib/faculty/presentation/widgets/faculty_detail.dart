@@ -5,6 +5,7 @@ import 'package:sistem_admin/faculty/domain/domain.dart';
 import 'package:sistem_admin/faculty/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/faculty_form.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/faculty_programs.dart';
+import 'package:sistem_admin/faculty/presentation/widgets/faculty_rooms.dart';
 
 /// Shows detail of a faculty
 class FacultyDetail extends StatelessWidget {
@@ -34,19 +35,42 @@ class FacultyDetail extends StatelessWidget {
             return const Center(
               child: LoadingIndicator(),
             );
-          case FacultyDetailLoaded(:final faculty, :final programs):
-            return Column(
-              spacing: 16,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FacultyForm(
-                  initial: faculty,
-                  onFacultyDeleted: onFacultyDeleted,
-                ),
-                Expanded(
-                  child: FacultyPrograms(
-                    programs: programs,
+          case FacultyDetailLoaded(
+            :final faculty,
+            :final programs,
+            :final rooms,
+          ):
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: FacultyForm(
+                    initial: faculty,
+                    onFacultyDeleted: onFacultyDeleted,
                   ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 24, bottom: 12),
+                    child: Text(
+                      'Daftar Program Studi',
+                      style: context.text.titleMedium,
+                    ),
+                  ),
+                ),
+                FacultyPrograms(
+                  programs: programs,
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 24, bottom: 12),
+                    child: Text(
+                      'Daftar Ruangan',
+                      style: context.text.titleMedium,
+                    ),
+                  ),
+                ),
+                FacultyRooms(
+                  rooms: rooms,
                 ),
               ],
             );

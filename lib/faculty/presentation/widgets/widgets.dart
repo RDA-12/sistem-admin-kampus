@@ -4,4 +4,5 @@ export 'faculty_detail.dart';
 export 'faculty_form.dart';
 export 'faculty_list_tile.dart';
 export 'faculty_programs.dart';
+export 'faculty_rooms.dart';
 export 'faculty_selector.dart';

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/faculty/presentation/widgets/faculty_programs.dart';
@@ -14,9 +15,13 @@ void main() {
   }) {
     return tester.pumpWidgetForTest(
       (context) {
-        return FacultyPrograms(
-          programs: programs,
-          onPressed: onPressed,
+        return CustomScrollView(
+          slivers: [
+            FacultyPrograms(
+              programs: programs,
+              onPressed: onPressed,
+            ),
+          ],
         );
       },
     );

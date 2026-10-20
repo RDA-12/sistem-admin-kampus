@@ -27,6 +27,7 @@ final class FacultyDetailLoaded extends FacultyDetailState {
   const new({
     required this.faculty,
     this.programs = const [],
+    this.rooms = const [],
   });
 
   /// Loaded [Faculty] data
@@ -35,8 +36,11 @@ final class FacultyDetailLoaded extends FacultyDetailState {
   /// Programs related to the faculty
   final List<Program> programs;
 
+  /// Rooms related to the faculty
+  final List<Room> rooms;
+
   @override
-  List<Object> get props => [faculty, programs];
+  List<Object> get props => [faculty, programs, rooms];
 }
 
 /// State when faculty detail data failed to load

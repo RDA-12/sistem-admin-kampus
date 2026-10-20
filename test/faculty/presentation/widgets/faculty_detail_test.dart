@@ -8,6 +8,7 @@ import 'package:sistem_admin/faculty/faculty.dart';
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
 import '../../../program/domain/mocks.dart';
+import '../../../room/domain/mocks.dart';
 import '../../domain/mocks.dart';
 
 void main() {
@@ -23,11 +24,13 @@ void main() {
         FacultyDetailLoaded(
           faculty: facultyMock,
           programs: programsMock,
+          rooms: roomsMock,
         ),
       ),
       initialState: FacultyDetailLoaded(
         faculty: facultyMock,
         programs: programsMock,
+        rooms: roomsMock,
       ),
     );
 
@@ -87,10 +90,31 @@ void main() {
         (tester) async {
           await pumpWidget(tester);
 
+          expect(find.text('Daftar Program Studi'), findsOneWidget);
           final finder = find.byType(FacultyPrograms);
           expect(finder, findsOneWidget);
           final widget = tester.widget<FacultyPrograms>(finder);
           expect(widget.programs, programsMock);
+        },
+      );
+
+      testWidgets(
+        'shows FacultyRooms with correct rooms '
+        'when state is loaded',
+        (tester) async {
+          await pumpWidget(tester);
+
+          await tester.drag(
+            find.byType(FacultyDetail),
+            const Offset(0, -500),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Daftar Ruangan'), findsOneWidget);
+          final finder = find.byType(FacultyRooms);
+          expect(finder, findsOneWidget);
+          final widget = tester.widget<FacultyRooms>(finder);
+          expect(widget.rooms, roomsMock);
         },
       );
 
