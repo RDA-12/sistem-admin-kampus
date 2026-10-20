@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -336,6 +337,175 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(find.text('Harus lebih dari 0'), findsOneWidget);
+        },
+      );
+    });
+  });
+
+  group('AppDateFormFieldController', () {
+    final testDate = DateTime(2026, 10, 20);
+
+    test('initial value configures text and value', () {
+      final controller = AppDateFormFieldController(initial: testDate);
+      addTearDown(controller.dispose);
+
+      expect(controller.value, testDate);
+      expect(controller.textEditingController.text, '2026-10-20');
+    });
+
+    test('defaults value to null and empty text when initial is null', () {
+      final controller = AppDateFormFieldController();
+      addTearDown(controller.dispose);
+
+      expect(controller.value, isNull);
+      expect(controller.textEditingController.text, isEmpty);
+    });
+
+    test('setting value updates value and text', () {
+      final controller = AppDateFormFieldController()..value = testDate;
+      addTearDown(controller.dispose);
+
+      expect(controller.value, testDate);
+      expect(controller.textEditingController.text, '2026-10-20');
+    });
+
+    test('parses valid date when text changes', () {
+      final controller = AppDateFormFieldController();
+      addTearDown(controller.dispose);
+
+      controller.textEditingController.text = '2026-10-20';
+
+      expect(controller.value, testDate);
+    });
+
+    test('resets value to null when text is not a valid date', () {
+      final controller = AppDateFormFieldController(initial: testDate);
+      addTearDown(controller.dispose);
+
+      controller.textEditingController.text = 'invalid';
+
+      expect(controller.value, isNull);
+    });
+
+    test('clear resets value to null and clears text', () {
+      final controller = AppDateFormFieldController(initial: testDate)..clear();
+      addTearDown(controller.dispose);
+
+      expect(controller.value, isNull);
+      expect(controller.textEditingController.text, isEmpty);
+    });
+  });
+
+  group('AppDateFormField', () {
+    final testDate = DateTime(2026, 10, 20);
+
+    Future<void> pumpWidget(
+      WidgetTester tester, {
+      String label = 'Label',
+      bool isRequired = true,
+      AppDateFormFieldController? controller,
+      String? Function(DateTime)? validator,
+      DateTime? initialDate,
+      DateTime? firstDate,
+      DateTime? lastDate,
+    }) {
+      return tester.pumpWidgetForTest(
+        (context) => _TestWidget(
+          builder: (context) => AppDateFormField(
+            controller: controller,
+            isRequired: isRequired,
+            label: label,
+            validator: validator,
+            initialDate: initialDate,
+            firstDate: firstDate,
+            lastDate: lastDate,
+          ),
+        ),
+      );
+    }
+
+    group('Render', () {
+      testWidgets('configures AppFormField correctly', (tester) async {
+        final controller = AppDateFormFieldController(initial: testDate);
+        addTearDown(controller.dispose);
+
+        await pumpWidget(
+          tester,
+          label: 'Tanggal Mulai',
+          isRequired: false,
+          controller: controller,
+        );
+
+        final appFormFieldFinder = find.byType(AppFormField);
+        expect(appFormFieldFinder, findsOneWidget);
+
+        final appFormField = tester.widget<AppFormField>(appFormFieldFinder);
+        expect(appFormField.label, 'Tanggal Mulai');
+        expect(appFormField.isRequired, isFalse);
+        expect(appFormField.readOnly, isTrue);
+        expect(appFormField.controller, controller.textEditingController);
+      });
+
+      testWidgets('does not show error '
+          'when isRequired is false and save empty field', (tester) async {
+        await pumpWidget(tester, isRequired: false);
+
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Kolom ini wajib diisi'), findsNothing);
+        expect(find.text('Tanggal tidak valid'), findsNothing);
+      });
+
+      testWidgets(
+        'shows validator error message '
+        'when validator is provided and save invalid date',
+        (tester) async {
+          final controller = AppDateFormFieldController(
+            initial: DateTime(2024),
+          );
+          addTearDown(controller.dispose);
+
+          await pumpWidget(
+            tester,
+            controller: controller,
+            validator: (value) {
+              if (value.isBefore(DateTime(2025))) {
+                return 'Tanggal harus setelah 2025';
+              }
+              return null;
+            },
+          );
+
+          await tester.tap(find.byType(FilledButton));
+          await tester.pumpAndSettle();
+
+          expect(find.text('Tanggal harus setelah 2025'), findsOneWidget);
+        },
+      );
+    });
+
+    group('Interactions', () {
+      testWidgets(
+        'opens date picker when pressed and updates controller on confirm',
+        (tester) async {
+          await withClock(Clock.fixed(testDate), () async {
+            final controller = AppDateFormFieldController();
+            addTearDown(controller.dispose);
+
+            await pumpWidget(tester, controller: controller);
+
+            await tester.tap(find.byType(AppDateFormField));
+            await tester.pumpAndSettle();
+
+            expect(find.byType(DatePickerDialog), findsOneWidget);
+
+            await tester.tap(find.text('OK'));
+            await tester.pumpAndSettle();
+
+            expect(controller.value, testDate);
+            expect(controller.textEditingController.text, '2026-10-20');
+          });
         },
       );
     });

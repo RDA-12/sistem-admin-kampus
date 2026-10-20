@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/theme/theme.dart';
@@ -202,6 +203,139 @@ class AppNumberFormField extends StatelessWidget {
         final parsed = num.tryParse(value?.trim() ?? '');
         if (parsed == null) {
           return 'Angka tidak valid';
+        }
+        return validator?.call(parsed);
+      },
+    );
+  }
+}
+
+String _formatDate(DateTime date) {
+  final y = date.year.toString().padLeft(4, '0');
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
+
+/// Controls [AppDateFormField] value
+final class AppDateFormFieldController {
+  /// Creates new [AppDateFormFieldController] with [initial] date
+  new({DateTime? initial})
+    : _textEditingController = TextEditingController(
+        text: initial != null ? _formatDate(initial) : null,
+      ),
+      _value = initial {
+    _textEditingController.addListener(_onTextChanged);
+  }
+
+  final TextEditingController _textEditingController;
+
+  /// Returns [TextEditingController] to be passed to [TextField]
+  TextEditingController get textEditingController => _textEditingController;
+
+  DateTime? _value;
+
+  /// Returns current selected [DateTime] value
+  DateTime? get value => _value;
+
+  /// Updates the value of this controller and syncs the text field
+  set value(DateTime? newValue) {
+    final formatted = newValue != null ? _formatDate(newValue) : '';
+    if (_value == newValue && _textEditingController.text == formatted) {
+      return;
+    }
+    _value = newValue;
+    _textEditingController.text = formatted;
+  }
+
+  void _onTextChanged() {
+    final text = _textEditingController.text.trim();
+    if (text.isEmpty) {
+      _value = null;
+      return;
+    }
+    if (_value != null && _formatDate(_value!) == text) {
+      return;
+    }
+    _value = DateTime.tryParse(text);
+  }
+
+  /// Clear the text field and reset value to null
+  void clear() {
+    _value = null;
+    _textEditingController.clear();
+  }
+
+  /// Dispose this controller
+  void dispose() {
+    _textEditingController
+      ..removeListener(_onTextChanged)
+      ..dispose();
+  }
+}
+
+/// [AppFormField] that opens a date picker when pressed
+class AppDateFormField extends StatelessWidget {
+  /// Creates new [AppDateFormField]
+  const new({
+    required this.label,
+    this.isRequired = true,
+    this.controller,
+    this.validator,
+    this.initialDate,
+    this.firstDate,
+    this.lastDate,
+    super.key,
+  });
+
+  /// Controller that manages the selected [DateTime]
+  final AppDateFormFieldController? controller;
+
+  /// Label for this field
+  final String label;
+
+  /// Whether this field is required or not
+  final bool isRequired;
+
+  /// Optional validator to be passed after date parsing
+  final String? Function(DateTime)? validator;
+
+  /// Fallback initial date when opening date picker if [controller] has no date
+  final DateTime? initialDate;
+
+  /// Earliest allowable date in the date picker
+  final DateTime? firstDate;
+
+  /// Latest allowable date in the date picker
+  final DateTime? lastDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppFormField(
+      controller: controller?.textEditingController,
+      label: label,
+      isRequired: isRequired,
+      readOnly: true,
+      onPressed: () async {
+        final now = clock.now();
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: controller?.value ?? initialDate ?? now,
+          firstDate: firstDate ?? DateTime(2000),
+          lastDate: lastDate ?? DateTime(2100),
+        );
+        if (picked != null) {
+          controller?.value = picked;
+        }
+      },
+      validator: (value) {
+        if (!isRequired && (value == null || value.trim().isEmpty)) {
+          return null;
+        }
+        final parsed =
+            controller?.value ?? DateTime.tryParse(value?.trim() ?? '');
+        if (parsed == null) {
+          return 'Tanggal tidak valid';
         }
         return validator?.call(parsed);
       },

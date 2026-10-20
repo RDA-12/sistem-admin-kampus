@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -58,12 +59,25 @@ void main() {
     );
     final startDateFieldFinder = find.ancestor(
       of: find.text('Tanggal Mulai *'),
-      matching: find.byType(TextFormField),
+      matching: find.byType(AppDateFormField),
     );
     final endDateFieldFinder = find.ancestor(
       of: find.text('Tanggal Selesai *'),
-      matching: find.byType(TextFormField),
+      matching: find.byType(AppDateFormField),
     );
+    Future<void> selectDate(
+      WidgetTester tester,
+      Finder fieldFinder,
+      DateTime date,
+    ) async {
+      await withClock(Clock.fixed(date), () async {
+        await tester.tap(fieldFinder);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+      });
+    }
+
     final saveButtonFinder = find.ancestor(
       of: find.text('Simpan'),
       matching: find.byType(AppButton),
@@ -104,8 +118,8 @@ void main() {
           await pumpWidget(tester);
 
           await tester.enterText(nameFieldFinder, 'Ganjil');
-          await tester.enterText(startDateFieldFinder, '2025-09-01');
-          await tester.enterText(endDateFieldFinder, '2026-01-31');
+          await selectDate(tester, startDateFieldFinder, DateTime(2025, 9));
+          await selectDate(tester, endDateFieldFinder, DateTime(2026, 1, 31));
 
           await tester.tap(saveButtonFinder);
           await tester.pumpAndSettle();
@@ -115,8 +129,8 @@ void main() {
               AcademicTermMutationCreateRequested(
                 academicYearId: year.id,
                 name: 'Ganjil',
-                startDate: DateTime.parse('2025-09-01'),
-                endDate: DateTime.parse('2026-01-31'),
+                startDate: DateTime(2025, 9),
+                endDate: DateTime(2026, 1, 31),
               ),
             ),
           ).called(1);
@@ -190,8 +204,8 @@ void main() {
         );
 
         await tester.enterText(nameFieldFinder, 'Ganjil');
-        await tester.enterText(startDateFieldFinder, '2025-09-01');
-        await tester.enterText(endDateFieldFinder, '2026-01-31');
+        await selectDate(tester, startDateFieldFinder, DateTime(2025, 9));
+        await selectDate(tester, endDateFieldFinder, DateTime(2026, 1, 31));
 
         controller.add(
           AcademicTermMutationState(

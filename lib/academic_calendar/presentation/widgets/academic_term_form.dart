@@ -49,30 +49,19 @@ class AcademicTermForm extends StatefulWidget {
 class _AcademicTermFormState extends State<AcademicTermForm> {
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _nameController;
-  late final TextEditingController _startDateController;
-  late final TextEditingController _endDateController;
-  DateTime? _startDate;
-  DateTime? _endDate;
-
-  String _formatDate(DateTime date) {
-    final y = date.year.toString().padLeft(4, '0');
-    final m = date.month.toString().padLeft(2, '0');
-    final d = date.day.toString().padLeft(2, '0');
-    return '$y-$m-$d';
-  }
+  late final AppDateFormFieldController _startDateController;
+  late final AppDateFormFieldController _endDateController;
 
   @override
   void initState() {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _nameController = TextEditingController(text: widget.initial?.name);
-    _startDate = widget.initial?.startDate;
-    _endDate = widget.initial?.endDate;
-    _startDateController = TextEditingController(
-      text: _startDate != null ? _formatDate(_startDate!) : '',
+    _startDateController = AppDateFormFieldController(
+      initial: widget.initial?.startDate,
     );
-    _endDateController = TextEditingController(
-      text: _endDate != null ? _formatDate(_endDate!) : '',
+    _endDateController = AppDateFormFieldController(
+      initial: widget.initial?.endDate,
     );
   }
 
@@ -82,38 +71,6 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
     _startDateController.dispose();
     _endDateController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickStartDate() async {
-    final now = widget.academicYear.startDate;
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _startDate ?? now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        _startDate = picked;
-        _startDateController.text = _formatDate(picked);
-      });
-    }
-  }
-
-  Future<void> _pickEndDate() async {
-    final now = _startDate ?? widget.academicYear.startDate;
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _endDate ?? now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        _endDate = picked;
-        _endDateController.text = _formatDate(picked);
-      });
-    }
   }
 
   @override
@@ -158,8 +115,6 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
             _nameController.clear();
             _startDateController.clear();
             _endDateController.clear();
-            _startDate = null;
-            _endDate = null;
             widget.onSaved?.call(created);
           case AcademicTermDeletedNotice(:final deleted):
             await context.showSuccessDialog(
@@ -182,38 +137,15 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
               controller: _nameController,
               label: 'Nama Semester',
             ),
-            AppFormField(
+            AppDateFormField(
               controller: _startDateController,
               label: 'Tanggal Mulai',
-              onPressed: _pickStartDate,
-              validator: (val) {
-                if (val == null || val.trim().isEmpty) {
-                  return 'Harap isi bidang ini';
-                }
-                if (DateTime.tryParse(val.trim()) == null) {
-                  return 'Format tanggal tidak valid';
-                }
-                return null;
-              },
             ),
-            AppFormField(
+            AppDateFormField(
               controller: _endDateController,
               label: 'Tanggal Selesai',
-              onPressed: _pickEndDate,
-              validator: (val) {
-                if (val == null || val.trim().isEmpty) {
-                  return 'Harap isi bidang ini';
-                }
-                final end = DateTime.tryParse(val.trim());
-                if (end == null) {
-                  return 'Format tanggal tidak valid';
-                }
-                final start =
-                    _startDate != null &&
-                        _startDateController.text.trim() ==
-                            _formatDate(_startDate!)
-                    ? _startDate
-                    : DateTime.tryParse(_startDateController.text.trim());
+              validator: (end) {
+                final start = _startDateController.value;
                 if (start != null && end.isBefore(start)) {
                   return 'Tanggal selesai harus setelah tanggal mulai';
                 }
@@ -253,23 +185,10 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
                           ? null
                           : () {
                               if (!_formKey.currentState!.validate()) return;
+                              final start = _startDateController.value;
+                              final end = _endDateController.value;
+                              if (start == null || end == null) return;
                               final name = _nameController.text.trim();
-                              final start =
-                                  _startDate != null &&
-                                      _startDateController.text.trim() ==
-                                          _formatDate(_startDate!)
-                                  ? _startDate!
-                                  : DateTime.parse(
-                                      _startDateController.text.trim(),
-                                    );
-                              final end =
-                                  _endDate != null &&
-                                      _endDateController.text.trim() ==
-                                          _formatDate(_endDate!)
-                                  ? _endDate!
-                                  : DateTime.parse(
-                                      _endDateController.text.trim(),
-                                    );
                               if (widget.initial == null) {
                                 context.read<AcademicTermMutationBloc>().add(
                                   AcademicTermMutationCreateRequested(
