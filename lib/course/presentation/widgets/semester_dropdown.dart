@@ -71,8 +71,9 @@ class SemesterDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenu<int>(
       controller: controller?.textEditingController,
-      initialSelection:
-          controller != null && controller!.value > 0 ? controller!.value : null,
+      initialSelection: controller != null && controller!.value > 0
+          ? controller!.value
+          : null,
       expandedInsets: EdgeInsets.zero,
       label: const Text('Semester *'),
       inputDecorationTheme: InputDecorationTheme(
