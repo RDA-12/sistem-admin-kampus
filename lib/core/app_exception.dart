@@ -50,6 +50,12 @@ enum AppExceptionCode {
 
   /// Code caused by new academic term have existing name in the academic year
   academicTermAlreadyExists,
+
+  /// Code caused by requested cohort not found in db
+  cohortNotFound,
+
+  /// Code caused by new cohort have existing name
+  cohortAlreadyExists,
 }
 
 /// Exception class for this app

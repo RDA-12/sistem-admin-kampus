@@ -25,6 +25,8 @@ void main() {
     .academicTermNotFound: 'Semester tidak dapat ditemukan',
     .academicTermAlreadyExists:
         'Semester dengan nama tersebut sudah ada pada tahun akademik ini',
+    .cohortNotFound: 'Angkatan tidak dapat ditemukan',
+    .cohortAlreadyExists: 'Angkatan dengan nama tersebut sudah ada',
   };
 
   group('AppExceptionCode.message', () {
