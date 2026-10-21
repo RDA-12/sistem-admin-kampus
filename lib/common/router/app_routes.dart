@@ -434,6 +434,78 @@ class AcademicYearDetailCompactRoute extends GoRouteData
       );
 }
 
+/// Route for [CreateCohortPage]
+class CreateCohortRoute extends GoRouteData with $CreateCohortRoute {
+  /// Creates new [CreateCohortRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateCohortPage();
+}
+
+/// Route for [CreateCohortPage] in compact screen
+class CreateCohortCompactRoute extends GoRouteData
+    with $CreateCohortCompactRoute {
+  /// Creates new [CreateCohortCompactRoute]
+  const new();
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CreateCohortPage();
+}
+
+/// Route for [CohortsListPage]
+class CohortsListRoute extends GoRouteData with $CohortsListRoute {
+  /// Creates new [CohortsListRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CohortsListPage();
+}
+
+/// Route for [CohortDetailPage]
+class CohortDetailRoute extends GoRouteData with $CohortDetailRoute {
+  /// Creates new [CohortDetailRoute]
+  const new(this.id);
+
+  /// ID of the cohort that will be loaded
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CohortDetailPage(
+    id: id,
+    onCohortDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
+/// Route for [CohortDetailPage] in compact screen
+class CohortDetailCompactRoute extends GoRouteData
+    with $CohortDetailCompactRoute {
+  /// Creates new [CohortDetailCompactRoute]
+  const new(this.id);
+
+  /// ID of the cohort that will be loaded
+  final String id;
+
+  /// Parent navigator for this route
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavKey;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CohortDetailPage(
+    id: id,
+    onCohortDeleted: (_) {
+      context.pop();
+    },
+  );
+}
+
 /// Branch for [Faculty] in [MainShell]
 class FacultyMainShellData extends StatefulShellBranchData;
 
@@ -451,6 +523,9 @@ class RoomMainShellData extends StatefulShellBranchData;
 
 /// Branch for [AcademicYear] in [MainShell]
 class AcademicCalendarMainShellData extends StatefulShellBranchData;
+
+/// Branch for [Cohort] in [MainShell]
+class CohortMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -533,6 +608,19 @@ class AcademicCalendarMainShellData extends StatefulShellBranchData;
             TypedGoRoute<AcademicYearDetailCompactRoute>(
               path: 'compact/:id',
             ),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<CohortMainShellData>(
+      routes: [
+        TypedGoRoute<CohortsListRoute>(
+          path: '/cohorts',
+          routes: [
+            TypedGoRoute<CreateCohortRoute>(path: 'create'),
+            TypedGoRoute<CreateCohortCompactRoute>(path: 'create-compact'),
+            TypedGoRoute<CohortDetailRoute>(path: ':id'),
+            TypedGoRoute<CohortDetailCompactRoute>(path: 'compact/:id'),
           ],
         ),
       ],

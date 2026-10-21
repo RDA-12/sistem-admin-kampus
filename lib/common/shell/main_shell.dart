@@ -33,6 +33,10 @@ const _destinations = <_MainDestination>[
     icon: Icons.calendar_month_rounded,
     label: 'Kalender Akademik',
   ),
+  _MainDestination(
+    icon: Icons.groups_rounded,
+    label: 'Angkatan',
+  ),
 ];
 
 /// Main shell which contains nav rail for large screen and
