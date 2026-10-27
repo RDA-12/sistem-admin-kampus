@@ -8,6 +8,7 @@ import 'package:sistem_admin/program/program.dart';
 
 import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
+import '../../../faculty/domain/mocks.dart';
 
 void main() {
   group('CreateProgramPage', () {
@@ -21,6 +22,14 @@ void main() {
         initialState: const ProgramMutationState(),
       );
       when(programMutationBlocMock.close).thenAnswer((_) async {});
+
+      final facultiesBlocMock = getIt<FacultiesBloc>();
+      whenListen(
+        facultiesBlocMock,
+        Stream.value(FacultiesLoaded(facultiesMock)),
+        initialState: FacultiesLoaded(facultiesMock),
+      );
+      when(facultiesBlocMock.close).thenAnswer((_) async {});
     });
 
     Future<void> pumpWidget(WidgetTester tester) {
