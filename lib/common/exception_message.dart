@@ -31,6 +31,8 @@ extension ExceptionMessageX on AppExceptionCode {
     AppExceptionCode.academicTermAlreadyExists =>
       'Semester dengan nama tersebut sudah ada pada tahun akademik ini',
     AppExceptionCode.cohortNotFound => 'Angkatan tidak dapat ditemukan',
+    AppExceptionCode.academicTermOverlapped =>
+      'Semester tumpang tindih dengan yang lain',
     AppExceptionCode.cohortAlreadyExists =>
       'Angkatan dengan nama tersebut sudah ada',
   };

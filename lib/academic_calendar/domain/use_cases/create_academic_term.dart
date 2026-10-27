@@ -42,15 +42,76 @@ class CreateAcademicTermUseCase
     with AppLoggerMixin
     implements FutureBaseUseCase<CreateAcademicTermParams, AcademicTerm> {
   /// Creates new [CreateAcademicTermUseCase]
-  new({required this._academicTermRepository});
+  new({
+    required this._academicTermRepository,
+    required this._academicYearRepository,
+  });
 
+  final IAcademicYearRepository _academicYearRepository;
   final IAcademicTermRepository _academicTermRepository;
 
   /// Run creating new [AcademicTerm]
   @override
   Future<AppResult<AcademicTerm>> call(CreateAcademicTermParams params) async {
     logDebug(
-      'start creating academic term',
+      'start getting academic year',
+      extra: {'academicYearId': params.academicYearId},
+    );
+    late final AcademicYear year;
+    final academicYearResult = await _academicYearRepository
+        .watchSingle(
+          params.academicYearId,
+        )
+        .first;
+    switch (academicYearResult) {
+      case AppFailure<AcademicYear>(:final exception):
+        logDebug('failed to get academic year');
+        return AppResult.failure(exception);
+      case AppSuccess<AcademicYear>(:final data):
+        year = data;
+    }
+
+    logDebug('start getting existing terms from year');
+    late final List<AcademicTerm> terms;
+    final termsResult = await _academicTermRepository
+        .watchByAcademicYear(
+          year.id,
+        )
+        .first;
+    switch (termsResult) {
+      case AppFailure<List<AcademicTerm>>(:final exception):
+        logDebug('failed to get terms');
+        return AppResult.failure(exception);
+      case AppSuccess<List<AcademicTerm>>(:final data):
+        terms = data;
+    }
+
+    logDebug(
+      'start checking whether new term can be added or not',
+      extra: {
+        'startDate': params.startDate,
+        'endDate': params.endDate,
+      },
+    );
+    final calendar = AcademicCalendar(year: year, terms: terms);
+    final allowed = calendar.canAddNewTerm(
+      startDate: params.startDate,
+      endDate: params.endDate,
+    );
+    if (!allowed) {
+      logDebug(
+        'new term overlapped with existing terms. failed to create new term',
+      );
+      return AppResult.failure(
+        const AppException(
+          'new term overlapped with exising term',
+          code: .academicTermOverlapped,
+        ),
+      );
+    }
+
+    logDebug(
+      'new term allowed. start creating academic term',
       extra: {
         'academicYearId': params.academicYearId,
         'name': params.name,

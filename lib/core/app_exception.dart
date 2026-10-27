@@ -51,6 +51,9 @@ enum AppExceptionCode {
   /// Code caused by new academic term have existing name in the academic year
   academicTermAlreadyExists,
 
+  /// Code caused by new academic term overlapped with existing terms
+  academicTermOverlapped,
+
   /// Code caused by requested cohort not found in db
   cohortNotFound,
 
