@@ -99,22 +99,16 @@ class UpdateAcademicTermUseCase
       },
     );
     final calendar = AcademicCalendar(year: year, terms: terms);
-    final allowed = calendar.canUpdateTerm(
+    final allowedResult = calendar.canUpdateTerm(
       term: params.academicTerm,
       startDate: startDate,
       endDate: endDate,
     );
-    if (!allowed) {
-      logDebug(
-        'updated term overlapped with existing terms. '
-        'failed to update academic term',
-      );
-      return AppResult.failure(
-        const AppException(
-          'updated term overlapped with existing term',
-          code: .academicTermOverlapped,
-        ),
-      );
+    switch (allowedResult) {
+      case AppFailure<Null>(:final exception):
+        logDebug('failed to update academic term');
+        return AppResult.failure(exception);
+      case AppSuccess<Null>():
     }
 
     logDebug(

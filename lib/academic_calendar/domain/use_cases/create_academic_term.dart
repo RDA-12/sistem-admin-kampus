@@ -94,20 +94,15 @@ class CreateAcademicTermUseCase
       },
     );
     final calendar = AcademicCalendar(year: year, terms: terms);
-    final allowed = calendar.canAddNewTerm(
+    final allowedResult = calendar.canAddTerm(
       startDate: params.startDate,
       endDate: params.endDate,
     );
-    if (!allowed) {
-      logDebug(
-        'new term overlapped with existing terms. failed to create new term',
-      );
-      return AppResult.failure(
-        const AppException(
-          'new term overlapped with exising term',
-          code: .academicTermOverlapped,
-        ),
-      );
+    switch (allowedResult) {
+      case AppFailure<Null>(:final exception):
+        logDebug('failed to add new term');
+        return AppResult.failure(exception);
+      case AppSuccess<Null>():
     }
 
     logDebug(

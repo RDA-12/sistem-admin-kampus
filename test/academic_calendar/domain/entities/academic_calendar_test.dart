@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
+import 'package:sistem_admin/core/core.dart';
 
 void main() {
   group('AcademicCalendar', () {
@@ -48,93 +49,209 @@ void main() {
       expect(calendar1, isNot(equals(differentTerms)));
     });
 
-    group('canAddNewTerm', () {
-      test('returns true when terms list is empty', () {
+    group('canAddTerm', () {
+      test('returns success when terms list is empty', () {
         final calendar = AcademicCalendar(year: year, terms: const []);
-        final canAdd = calendar.canAddNewTerm(
+        final result = calendar.canAddTerm(
           startDate: DateTime(2025, 9),
           endDate: DateTime(2026, 1, 31),
         );
 
-        expect(canAdd, isTrue);
+        expect(result, AppResult.success(null));
       });
 
       test(
-        'returns true when new term does not overlap with existing terms',
+        'returns success when new term does not overlap with existing terms',
         () {
           final calendar = AcademicCalendar(year: year, terms: [term1]);
-          final canAdd = calendar.canAddNewTerm(
+          final result = calendar.canAddTerm(
             startDate: DateTime(2026, 2),
             endDate: DateTime(2026, 6, 30),
           );
 
-          expect(canAdd, isTrue);
+          expect(result, AppResult.success(null));
         },
       );
 
-      test('returns false when new term overlaps with an existing term', () {
-        final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
-        final canAdd = calendar.canAddNewTerm(
-          startDate: DateTime(2025, 10),
-          endDate: DateTime(2025, 12, 31),
-        );
+      test(
+        'returns failure with academicTermOutsideYear when startDate is before '
+        'academic year startDate',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: const []);
+          final result = calendar.canAddTerm(
+            startDate: DateTime(2025, 8, 31),
+            endDate: DateTime(2026, 1, 31),
+          );
 
-        expect(canAdd, isFalse);
-      });
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOutsideYear,
+            ),
+          );
+        },
+      );
 
       test(
-        'returns false when new term partially overlaps with second term',
+        'returns failure with academicTermOutsideYear when endDate is after '
+        'academic year endDate',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: const []);
+          final result = calendar.canAddTerm(
+            startDate: DateTime(2026, 2),
+            endDate: DateTime(2026, 9),
+          );
+
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOutsideYear,
+            ),
+          );
+        },
+      );
+
+      test(
+        'returns failure with academicTermOverlapped when new term overlaps '
+        'with an existing term',
         () {
           final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
-          final canAdd = calendar.canAddNewTerm(
+          final result = calendar.canAddTerm(
+            startDate: DateTime(2025, 10),
+            endDate: DateTime(2025, 12, 31),
+          );
+
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOverlapped,
+            ),
+          );
+        },
+      );
+
+      test(
+        'returns failure with academicTermOverlapped when new term partially '
+        'overlaps with second term',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
+          final result = calendar.canAddTerm(
             startDate: DateTime(2026, 6),
             endDate: DateTime(2026, 7, 31),
           );
 
-          expect(canAdd, isFalse);
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOverlapped,
+            ),
+          );
         },
       );
     });
 
     group('canUpdateTerm', () {
       test(
-        'returns true when terms list only contains the term being updated',
+        'returns success when terms list only contains the term being updated',
         () {
           final calendar = AcademicCalendar(year: year, terms: [term1]);
-          final canUpdate = calendar.canUpdateTerm(
+          final result = calendar.canUpdateTerm(
             term: term1,
             startDate: DateTime(2025, 9),
             endDate: DateTime(2026, 1, 31),
           );
 
-          expect(canUpdate, isTrue);
+          expect(result, AppResult.success(null));
         },
       );
 
       test(
-        'returns true when updated term does not overlap with other terms',
+        'returns success when updated term does not overlap with other terms',
         () {
           final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
-          final canUpdate = calendar.canUpdateTerm(
+          final result = calendar.canUpdateTerm(
             term: term1,
-            startDate: DateTime(2025, 8),
+            startDate: DateTime(2025, 9, 15),
             endDate: DateTime(2026, 1, 15),
           );
 
-          expect(canUpdate, isTrue);
+          expect(result, AppResult.success(null));
         },
       );
 
-      test('returns false when updated term overlaps with another term', () {
-        final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
-        final canUpdate = calendar.canUpdateTerm(
-          term: term1,
-          startDate: DateTime(2025, 9),
-          endDate: DateTime(2026, 3),
-        );
+      test(
+        'returns failure with academicTermOutsideYear when startDate is before '
+        'academic year startDate',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: [term1]);
+          final result = calendar.canUpdateTerm(
+            term: term1,
+            startDate: DateTime(2025, 8, 31),
+            endDate: DateTime(2026, 1, 31),
+          );
 
-        expect(canUpdate, isFalse);
-      });
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOutsideYear,
+            ),
+          );
+        },
+      );
+
+      test(
+        'returns failure with academicTermOutsideYear when endDate is after '
+        'academic year endDate',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: [term1]);
+          final result = calendar.canUpdateTerm(
+            term: term1,
+            startDate: DateTime(2025, 9),
+            endDate: DateTime(2026, 9),
+          );
+
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOutsideYear,
+            ),
+          );
+        },
+      );
+
+      test(
+        'returns failure with academicTermOverlapped when updated term '
+        'overlaps with another term',
+        () {
+          final calendar = AcademicCalendar(year: year, terms: [term1, term2]);
+          final result = calendar.canUpdateTerm(
+            term: term1,
+            startDate: DateTime(2025, 9),
+            endDate: DateTime(2026, 3),
+          );
+
+          expect(
+            result,
+            isA<AppFailure<Null>>().having(
+              (e) => e.exception.code,
+              'code',
+              AppExceptionCode.academicTermOverlapped,
+            ),
+          );
+        },
+      );
     });
   });
 }

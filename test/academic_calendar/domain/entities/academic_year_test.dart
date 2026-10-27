@@ -49,5 +49,34 @@ void main() {
       expect(testObj, isNot(equals(d)));
       expect(testObj, isNot(equals(e)));
     });
+
+    group('includes', () {
+      final year = AcademicYear(
+        id: 'year_1',
+        name: '2025/2026',
+        startDate: DateTime(2025, 9),
+        endDate: DateTime(2026, 8, 31),
+      );
+
+      test('returns true when date is between startDate and endDate', () {
+        expect(year.includes(DateTime(2026, 1, 15)), isTrue);
+      });
+
+      test('returns true when date equals startDate', () {
+        expect(year.includes(DateTime(2025, 9)), isTrue);
+      });
+
+      test('returns true when date equals endDate', () {
+        expect(year.includes(DateTime(2026, 8, 31)), isTrue);
+      });
+
+      test('returns false when date is before startDate', () {
+        expect(year.includes(DateTime(2025, 8, 31)), isFalse);
+      });
+
+      test('returns false when date is after endDate', () {
+        expect(year.includes(DateTime(2026, 9)), isFalse);
+      });
+    });
   });
 }

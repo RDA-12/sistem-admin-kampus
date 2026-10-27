@@ -118,6 +118,31 @@ void main() {
     );
 
     test(
+      'returns failure with academicTermOutsideYear when new term is outside '
+      'academic year',
+      () async {
+        final outsideParams = CreateAcademicTermParams(
+          academicYearId: 'year_1',
+          name: 'Ganjil',
+          startDate: DateTime(2025, 8),
+          endDate: DateTime(2026, 1, 31),
+        );
+
+        final result = await useCase(outsideParams);
+
+        expect(
+          result,
+          isA<AppFailure<AcademicTerm>>().having(
+            (e) => e.exception.code,
+            'code',
+            AppExceptionCode.academicTermOutsideYear,
+          ),
+        );
+        verifyNever(() => academicTermRepositoryMock.save(any()));
+      },
+    );
+
+    test(
       'returns failure with academicTermOverlapped when new term overlaps '
       'with existing terms',
       () async {

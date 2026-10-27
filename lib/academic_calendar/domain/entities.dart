@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:sistem_admin/core/core.dart';
 
 /// Represent single Academic Year data
 class AcademicYear extends Equatable {
@@ -21,6 +22,11 @@ class AcademicYear extends Equatable {
 
   /// End date of this academic year
   final DateTime endDate;
+
+  /// Returns whether [date] is within this academic year
+  bool includes(DateTime date) {
+    return !date.isBefore(startDate) && !date.isAfter(endDate);
+  }
 
   @override
   List<Object?> get props => [id, name, startDate, endDate];
@@ -99,29 +105,50 @@ class AcademicCalendar extends Equatable {
 
   /// Whether new term can be added to this calendar based on
   /// [startDate] and [endDate]
-  bool canAddNewTerm({
+  AppResult<Null> canAddTerm({
     required DateTime startDate,
     required DateTime endDate,
   }) {
+    if (!year.includes(startDate) || !year.includes(endDate)) {
+      return AppResult.failure(
+        const AppException(
+          'term date is outside academic year',
+          code: .academicTermOutsideYear,
+        ),
+      );
+    }
     for (final term in terms) {
       final overlapped = term.overlapWith(
         startDate: startDate,
         endDate: endDate,
       );
       if (overlapped) {
-        return false;
+        return AppResult.failure(
+          const AppException(
+            'term overlapped with existing term',
+            code: .academicTermOverlapped,
+          ),
+        );
       }
     }
-    return true;
+    return AppResult.success(null);
   }
 
   /// Whether an existing term can be updated in this calendar based on
   /// [startDate] and [endDate]
-  bool canUpdateTerm({
+  AppResult<Null> canUpdateTerm({
     required AcademicTerm term,
     required DateTime startDate,
     required DateTime endDate,
   }) {
+    if (!year.includes(startDate) || !year.includes(endDate)) {
+      return AppResult.failure(
+        const AppException(
+          'term date is outside academic year',
+          code: .academicTermOutsideYear,
+        ),
+      );
+    }
     for (final existingTerm in terms) {
       if (existingTerm.id == term.id) {
         continue;
@@ -131,10 +158,15 @@ class AcademicCalendar extends Equatable {
         endDate: endDate,
       );
       if (overlapped) {
-        return false;
+        return AppResult.failure(
+          const AppException(
+            'term overlapped with existing term',
+            code: .academicTermOverlapped,
+          ),
+        );
       }
     }
-    return true;
+    return AppResult.success(null);
   }
 
   @override

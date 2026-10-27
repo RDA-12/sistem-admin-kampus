@@ -126,6 +126,35 @@ void main() {
     );
 
     test(
+      'returns failure with academicTermOutsideYear when updated term is '
+      'outside academic year',
+      () async {
+        final outsideParams = UpdateAcademicTermParams(
+          term,
+          startDate: DateTime(2025, 8),
+          endDate: DateTime(2026, 1, 31),
+        );
+
+        final result = await useCase(outsideParams);
+
+        expect(
+          result,
+          isA<AppFailure<AcademicTerm>>().having(
+            (e) => e.exception.code,
+            'code',
+            AppExceptionCode.academicTermOutsideYear,
+          ),
+        );
+        verifyNever(
+          () => academicTermRepositoryMock.update(
+            any(),
+            args: any(named: 'args'),
+          ),
+        );
+      },
+    );
+
+    test(
       'returns failure with academicTermOverlapped when updated term overlaps '
       'with another term',
       () async {
