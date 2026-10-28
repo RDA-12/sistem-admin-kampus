@@ -81,128 +81,143 @@ class _AcademicCalendarFormState extends State<AcademicCalendarForm> {
           case _:
         }
       },
-      child: BlocBuilder<
-        AcademicCalendarMutationBloc,
-        AcademicCalendarMutationState
-      >(
-        builder: (context, state) {
-          return Stepper(
-            currentStep: _stepperIndex,
-            controlsBuilder: (context, details) {
-              return const SizedBox.shrink();
-            },
-            steps: [
-              Step(
-                title: const Text('Tahun Akademik'),
-                isActive: _stepperIndex >= 0,
-                state: academicYear.value != null
-                    ? StepState.complete
-                    : StepState.indexed,
-                content: ListenableBuilder(
-                  listenable: academicYear,
-                  builder: (context, _) {
-                    return AcademicYearForm(
-                      initial: academicYear.value,
-                      isProcessing: state.isCreatingYear,
-                      onSave: ({
-                        required name,
-                        required startDate,
-                        required endDate,
-                      }) {
-                        context.read<AcademicCalendarMutationBloc>().add(
-                          AcademicCalendarYearCreateRequested(
-                            name: name,
-                            startDate: startDate,
-                            endDate: endDate,
-                          ),
+      child:
+          BlocBuilder<
+            AcademicCalendarMutationBloc,
+            AcademicCalendarMutationState
+          >(
+            builder: (context, state) {
+              return Stepper(
+                currentStep: _stepperIndex,
+                controlsBuilder: (context, details) {
+                  return const SizedBox.shrink();
+                },
+                onStepTapped: (index) {
+                  setState(() {
+                    _stepperIndex = index;
+                  });
+                },
+                steps: [
+                  Step(
+                    title: const Text('Tahun Akademik'),
+                    isActive: _stepperIndex >= 0,
+                    state: academicYear.value != null
+                        ? StepState.complete
+                        : StepState.indexed,
+                    content: ListenableBuilder(
+                      listenable: academicYear,
+                      builder: (context, _) {
+                        return AcademicYearForm(
+                          initial: academicYear.value,
+                          isProcessing: state.isCreatingYear,
+                          onSave:
+                              ({
+                                required name,
+                                required startDate,
+                                required endDate,
+                              }) {
+                                context
+                                    .read<AcademicCalendarMutationBloc>()
+                                    .add(
+                                      AcademicCalendarYearCreateRequested(
+                                        name: name,
+                                        startDate: startDate,
+                                        endDate: endDate,
+                                      ),
+                                    );
+                              },
                         );
                       },
-                    );
-                  },
-                ),
-              ),
-              Step(
-                title: const Text('Semester Akademik'),
-                isActive: _stepperIndex >= 1,
-                content: ListenableBuilder(
-                  listenable: academicYear,
-                  builder: (context, _) {
-                    final year = academicYear.value;
-                    if (year == null) {
-                      return const Center(
-                        child: AppEmptyBox(
-                          message: 'Harap buat tahun akademik dahulu',
-                        ),
-                      );
-                    }
-                    return Column(
-                      spacing: 16,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ListenableBuilder(
-                          listenable: academicTerms,
-                          builder: (context, _) {
-                            if (academicTerms.value.isEmpty) {
-                              return const SizedBox.shrink();
-                            }
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  'Semester yang telah ditambahkan:',
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                                const SizedBox(height: 8),
-                                ...academicTerms.value.map(
-                                  (term) => Card(
-                                    child: AcademicTermListTile(
-                                      academicTerm: term,
+                    ),
+                  ),
+                  Step(
+                    title: const Text('Semester Akademik'),
+                    isActive: _stepperIndex >= 1,
+                    content: ListenableBuilder(
+                      listenable: academicYear,
+                      builder: (context, _) {
+                        final year = academicYear.value;
+                        if (year == null) {
+                          return const Center(
+                            child: AppEmptyBox(
+                              message: 'Harap buat tahun akademik dahulu',
+                            ),
+                          );
+                        }
+                        return Column(
+                          spacing: 16,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ListenableBuilder(
+                              listenable: academicTerms,
+                              builder: (context, _) {
+                                if (academicTerms.value.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      'Semester yang telah ditambahkan:',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall,
                                     ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        AcademicTermForm(
-                          academicYear: year,
-                          isProcessing: state.isCreatingTerm,
-                          onSave: ({
-                            required name,
-                            required startDate,
-                            required endDate,
-                          }) {
-                            context.read<AcademicCalendarMutationBloc>().add(
-                              AcademicCalendarTermCreateRequested(
-                                academicYearId: year.id,
-                                name: name,
-                                startDate: startDate,
-                                endDate: endDate,
+                                    const SizedBox(height: 8),
+                                    ...academicTerms.value.map(
+                                      (term) => Card(
+                                        child: AcademicTermListTile(
+                                          academicTerm: term,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            AcademicTermForm(
+                              academicYear: year,
+                              isProcessing: state.isCreatingTerm,
+                              onSave:
+                                  ({
+                                    required name,
+                                    required startDate,
+                                    required endDate,
+                                  }) {
+                                    context
+                                        .read<AcademicCalendarMutationBloc>()
+                                        .add(
+                                          AcademicCalendarTermCreateRequested(
+                                            academicYearId: year.id,
+                                            name: name,
+                                            startDate: startDate,
+                                            endDate: endDate,
+                                          ),
+                                        );
+                                  },
+                            ),
+                            if (widget.onCalendarCreated != null)
+                              AppButton(
+                                label: 'Selesai',
+                                onPressed: () {
+                                  widget.onCalendarCreated!(
+                                    AcademicCalendar(
+                                      year: year,
+                                      terms: academicTerms.value,
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
-                        if (widget.onCalendarCreated != null)
-                          AppButton(
-                            label: 'Selesai',
-                            onPressed: () {
-                              widget.onCalendarCreated!(
-                                AcademicCalendar(
-                                  year: year,
-                                  terms: academicTerms.value,
-                                ),
-                              );
-                            },
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 }
