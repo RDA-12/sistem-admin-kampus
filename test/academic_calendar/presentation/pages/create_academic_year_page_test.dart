@@ -13,13 +13,14 @@ void main() {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      final academicYearMutationBlocMock = getIt<AcademicYearMutationBloc>();
+      final academicCalendarMutationBlocMock =
+          getIt<AcademicCalendarMutationBloc>();
       whenListen(
-        academicYearMutationBlocMock,
-        Stream.value(const AcademicYearMutationState()),
-        initialState: const AcademicYearMutationState(),
+        academicCalendarMutationBlocMock,
+        Stream.value(const AcademicCalendarMutationState()),
+        initialState: const AcademicCalendarMutationState(),
       );
-      when(academicYearMutationBlocMock.close).thenAnswer((_) async {});
+      when(academicCalendarMutationBlocMock.close).thenAnswer((_) async {});
     });
 
     Future<void> pumpWidget(WidgetTester tester) {
@@ -42,12 +43,12 @@ void main() {
       });
 
       testWidgets(
-        'provides BlocProvider<AcademicYearMutationBloc>',
+        'provides BlocProvider<AcademicCalendarMutationBloc>',
         (tester) async {
           await pumpWidget(tester);
 
           expect(
-            find.byType(BlocProvider<AcademicYearMutationBloc>),
+            find.byType(BlocProvider<AcademicCalendarMutationBloc>),
             findsOneWidget,
           );
         },

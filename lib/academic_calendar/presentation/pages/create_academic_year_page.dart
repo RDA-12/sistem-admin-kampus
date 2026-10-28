@@ -13,7 +13,7 @@ class CreateAcademicYearPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AcademicYearMutationBloc>(),
+      create: (context) => getIt<AcademicCalendarMutationBloc>(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Buat Tahun Akademik Baru'),

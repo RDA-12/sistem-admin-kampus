@@ -30,10 +30,7 @@ class AcademicYearDetailPage extends StatelessWidget {
                 ..add(AcademicYearDetailSubscriptionRequested(id: id)),
         ),
         BlocProvider(
-          create: (context) => getIt<AcademicYearMutationBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<AcademicTermMutationBloc>(),
+          create: (context) => getIt<AcademicCalendarMutationBloc>(),
         ),
       ],
       child: Scaffold(

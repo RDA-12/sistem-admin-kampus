@@ -26,18 +26,11 @@ void main() {
     when(academicYearsBlocMock.close).thenAnswer((_) async {});
 
     whenListen(
-      getIt<AcademicYearMutationBloc>(),
-      Stream.value(const AcademicYearMutationState()),
-      initialState: const AcademicYearMutationState(),
+      getIt<AcademicCalendarMutationBloc>(),
+      Stream.value(const AcademicCalendarMutationState()),
+      initialState: const AcademicCalendarMutationState(),
     );
-    when(getIt<AcademicYearMutationBloc>().close).thenAnswer((_) async {});
-
-    whenListen(
-      getIt<AcademicTermMutationBloc>(),
-      Stream.value(const AcademicTermMutationState()),
-      initialState: const AcademicTermMutationState(),
-    );
-    when(getIt<AcademicTermMutationBloc>().close).thenAnswer((_) async {});
+    when(getIt<AcademicCalendarMutationBloc>().close).thenAnswer((_) async {});
 
     whenListen(
       getIt<AcademicYearDetailBloc>(),
@@ -57,8 +50,7 @@ void main() {
 
   tearDown(() {
     reset(academicYearsBlocMock);
-    reset(getIt<AcademicYearMutationBloc>());
-    reset(getIt<AcademicTermMutationBloc>());
+    reset(getIt<AcademicCalendarMutationBloc>());
     reset(getIt<AcademicYearDetailBloc>());
   });
 

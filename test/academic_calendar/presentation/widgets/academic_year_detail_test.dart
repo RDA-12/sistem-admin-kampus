@@ -14,15 +14,13 @@ void main() {
   final year = academicYearMock;
   final terms = academicTermsMock;
   late AcademicYearDetailBloc academicYearDetailBlocMock;
-  late AcademicYearMutationBloc academicYearMutationBlocMock;
-  late AcademicTermMutationBloc academicTermMutationBlocMock;
+  late AcademicCalendarMutationBloc academicCalendarMutationBlocMock;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     academicYearDetailBlocMock = getIt<AcademicYearDetailBloc>();
-    academicYearMutationBlocMock = getIt<AcademicYearMutationBloc>();
-    academicTermMutationBlocMock = getIt<AcademicTermMutationBloc>();
+    academicCalendarMutationBlocMock = getIt<AcademicCalendarMutationBloc>();
 
     whenListen(
       academicYearDetailBlocMock,
@@ -39,22 +37,15 @@ void main() {
     );
 
     whenListen(
-      academicYearMutationBlocMock,
-      Stream.value(const AcademicYearMutationState()),
-      initialState: const AcademicYearMutationState(),
-    );
-
-    whenListen(
-      academicTermMutationBlocMock,
-      Stream.value(const AcademicTermMutationState()),
-      initialState: const AcademicTermMutationState(),
+      academicCalendarMutationBlocMock,
+      Stream.value(const AcademicCalendarMutationState()),
+      initialState: const AcademicCalendarMutationState(),
     );
   });
 
   tearDown(() {
     reset(academicYearDetailBlocMock);
-    reset(academicYearMutationBlocMock);
-    reset(academicTermMutationBlocMock);
+    reset(academicCalendarMutationBlocMock);
   });
 
   Future<void> pumpWidget(
@@ -73,8 +64,7 @@ void main() {
         return MultiBlocProvider(
           providers: [
             BlocProvider.value(value: academicYearDetailBlocMock),
-            BlocProvider.value(value: academicYearMutationBlocMock),
-            BlocProvider.value(value: academicTermMutationBlocMock),
+            BlocProvider.value(value: academicCalendarMutationBlocMock),
           ],
           child: child,
         );

@@ -20,7 +20,7 @@ enum _FormState {
 class AcademicTermForm extends StatefulWidget {
   /// Creates new [AcademicTermForm]
   ///
-  /// It reacts to [AcademicTermMutationBloc]'s state changes.
+  /// It reacts to [AcademicCalendarMutationBloc]'s state changes.
   /// So, make sure to provide that bloc in the widget tree.
   const new({
     required this.academicYear,
@@ -75,21 +75,25 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AcademicTermMutationBloc, AcademicTermMutationState>(
+    return BlocListener<
+      AcademicCalendarMutationBloc,
+      AcademicCalendarMutationState
+    >(
       listenWhen: (p, c) => p.notice != c.notice,
       listener: (context, state) async {
         switch (state.notice) {
-          case AcademicTermMutationFailedNotice(
+          case AcademicCalendarMutationFailedNotice(
             :final type,
+            :final target,
             :final exception,
-          ):
+          ) when target == AcademicCalendarTargetType.term:
             late final String title;
             switch (type) {
-              case AcademicTermMutationType.create:
+              case AcademicCalendarMutationType.create:
                 title = 'Gagal menyimpan semester baru';
-              case AcademicTermMutationType.update:
+              case AcademicCalendarMutationType.update:
                 title = 'Gagal memperbarui semester';
-              case AcademicTermMutationType.delete:
+              case AcademicCalendarMutationType.delete:
                 title = 'Gagal menghapus semester';
             }
             unawaited(
@@ -123,7 +127,7 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
                   'Semester dengan nama "${deleted.name}" berhasil dihapus',
             );
             widget.onAcademicTermDeleted?.call(deleted);
-          case null:
+          case _:
         }
       },
       child: Form(
@@ -153,16 +157,16 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
               },
             ),
             BlocSelector<
-              AcademicTermMutationBloc,
-              AcademicTermMutationState,
+              AcademicCalendarMutationBloc,
+              AcademicCalendarMutationState,
               _FormState
             >(
               selector: (state) {
-                if (state.isCreating) {
+                if (state.isCreatingTerm) {
                   return _FormState.creating;
-                } else if (state.updatingIds.contains(widget.initial?.id)) {
+                } else if (state.updatingTermIds.contains(widget.initial?.id)) {
                   return _FormState.updating;
-                } else if (state.deletingIds.contains(widget.initial?.id)) {
+                } else if (state.deletingTermIds.contains(widget.initial?.id)) {
                   return _FormState.deleting;
                 }
                 return _FormState.idle;
@@ -190,23 +194,27 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
                               if (start == null || end == null) return;
                               final name = _nameController.text.trim();
                               if (widget.initial == null) {
-                                context.read<AcademicTermMutationBloc>().add(
-                                  AcademicTermMutationCreateRequested(
-                                    academicYearId: widget.academicYear.id,
-                                    name: name,
-                                    startDate: start,
-                                    endDate: end,
-                                  ),
-                                );
+                                context
+                                    .read<AcademicCalendarMutationBloc>()
+                                    .add(
+                                      AcademicCalendarTermCreateRequested(
+                                        academicYearId: widget.academicYear.id,
+                                        name: name,
+                                        startDate: start,
+                                        endDate: end,
+                                      ),
+                                    );
                               } else {
-                                context.read<AcademicTermMutationBloc>().add(
-                                  AcademicTermMutationUpdateRequested(
-                                    academicTerm: widget.initial!,
-                                    name: name,
-                                    startDate: start,
-                                    endDate: end,
-                                  ),
-                                );
+                                context
+                                    .read<AcademicCalendarMutationBloc>()
+                                    .add(
+                                      AcademicCalendarTermUpdateRequested(
+                                        academicTerm: widget.initial!,
+                                        name: name,
+                                        startDate: start,
+                                        endDate: end,
+                                      ),
+                                    );
                               }
                             },
                     ),
@@ -216,8 +224,8 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
                         isDeleting: formState == _FormState.deleting,
                         disable: formState.isProcessing,
                         onConfirmed: () {
-                          context.read<AcademicTermMutationBloc>().add(
-                            AcademicTermMutationDeleteRequested(
+                          context.read<AcademicCalendarMutationBloc>().add(
+                            AcademicCalendarTermDeleteRequested(
                               academicTerm: widget.initial!,
                             ),
                           );

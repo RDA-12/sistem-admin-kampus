@@ -17,17 +17,17 @@ import '../../domain/mocks.dart';
 void main() {
   final year = academicYearMock;
   final term = academicTermMock;
-  late AcademicTermMutationBloc academicTermMutationBlocMock;
+  late AcademicCalendarMutationBloc academicCalendarMutationBlocMock;
 
   group('AcademicTermForm', () {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      academicTermMutationBlocMock = getIt<AcademicTermMutationBloc>();
+      academicCalendarMutationBlocMock = getIt<AcademicCalendarMutationBloc>();
       whenListen(
-        academicTermMutationBlocMock,
-        Stream.value(const AcademicTermMutationState()),
-        initialState: const AcademicTermMutationState(),
+        academicCalendarMutationBlocMock,
+        Stream.value(const AcademicCalendarMutationState()),
+        initialState: const AcademicCalendarMutationState(),
       );
     });
 
@@ -46,7 +46,7 @@ void main() {
         ),
         providerBuilder: (context, child) {
           return BlocProvider.value(
-            value: academicTermMutationBlocMock,
+            value: academicCalendarMutationBlocMock,
             child: child,
           );
         },
@@ -88,7 +88,7 @@ void main() {
     );
 
     tearDown(() {
-      reset(academicTermMutationBlocMock);
+      reset(academicCalendarMutationBlocMock);
     });
 
     group('Render', () {
@@ -113,7 +113,7 @@ void main() {
 
     group('Interactions', () {
       testWidgets(
-        'adds AcademicTermMutationCreateRequested when initial is null',
+        'adds AcademicCalendarTermCreateRequested when initial is null',
         (tester) async {
           await pumpWidget(tester);
 
@@ -125,8 +125,8 @@ void main() {
           await tester.pumpAndSettle();
 
           verify(
-            () => academicTermMutationBlocMock.add(
-              AcademicTermMutationCreateRequested(
+            () => academicCalendarMutationBlocMock.add(
+              AcademicCalendarTermCreateRequested(
                 academicYearId: year.id,
                 name: 'Ganjil',
                 startDate: DateTime(2025, 9),
@@ -138,7 +138,7 @@ void main() {
       );
 
       testWidgets(
-        'adds AcademicTermMutationUpdateRequested when initial is provided',
+        'adds AcademicCalendarTermUpdateRequested when initial is provided',
         (tester) async {
           await pumpWidget(tester, initial: term);
 
@@ -147,8 +147,8 @@ void main() {
           await tester.pumpAndSettle();
 
           verify(
-            () => academicTermMutationBlocMock.add(
-              AcademicTermMutationUpdateRequested(
+            () => academicCalendarMutationBlocMock.add(
+              AcademicCalendarTermUpdateRequested(
                 academicTerm: term,
                 name: 'Genap',
                 startDate: term.startDate,
@@ -160,7 +160,7 @@ void main() {
       );
 
       testWidgets(
-        'adds AcademicTermMutationDeleteRequested when delete confirmed',
+        'adds AcademicCalendarTermDeleteRequested when delete confirmed',
         (tester) async {
           await pumpWidget(tester, initial: term);
 
@@ -176,8 +176,8 @@ void main() {
           await tester.pumpAndSettle();
 
           verify(
-            () => academicTermMutationBlocMock.add(
-              AcademicTermMutationDeleteRequested(academicTerm: term),
+            () => academicCalendarMutationBlocMock.add(
+              AcademicCalendarTermDeleteRequested(academicTerm: term),
             ),
           ).called(1);
         },
@@ -186,13 +186,13 @@ void main() {
 
     group('Side Effects', () {
       testWidgets('calls onSaved when create success', (tester) async {
-        final controller = StreamController<AcademicTermMutationState>();
+        final controller = StreamController<AcademicCalendarMutationState>();
         addTearDown(controller.close);
 
         whenListen(
-          academicTermMutationBlocMock,
+          academicCalendarMutationBlocMock,
           controller.stream,
-          initialState: const AcademicTermMutationState(),
+          initialState: const AcademicCalendarMutationState(),
         );
 
         AcademicTerm? savedTerm;
@@ -208,7 +208,7 @@ void main() {
         await selectDate(tester, endDateFieldFinder, DateTime(2026, 1, 31));
 
         controller.add(
-          AcademicTermMutationState(
+          AcademicCalendarMutationState(
             notice: AcademicTermCreatedNotice(term),
           ),
         );
@@ -225,13 +225,13 @@ void main() {
       });
 
       testWidgets('calls onSaved when update success', (tester) async {
-        final controller = StreamController<AcademicTermMutationState>();
+        final controller = StreamController<AcademicCalendarMutationState>();
         addTearDown(controller.close);
 
         whenListen(
-          academicTermMutationBlocMock,
+          academicCalendarMutationBlocMock,
           controller.stream,
-          initialState: const AcademicTermMutationState(),
+          initialState: const AcademicCalendarMutationState(),
         );
 
         AcademicTerm? savedTerm;
@@ -244,7 +244,7 @@ void main() {
         );
 
         controller.add(
-          AcademicTermMutationState(
+          AcademicCalendarMutationState(
             notice: AcademicTermUpdatedNotice(
               before: term,
               after: term,
@@ -264,23 +264,23 @@ void main() {
       });
 
       testWidgets('shows failed dialog when mutation fails', (tester) async {
-        final controller = StreamController<AcademicTermMutationState>();
+        final controller = StreamController<AcademicCalendarMutationState>();
         addTearDown(controller.close);
 
         whenListen(
-          academicTermMutationBlocMock,
+          academicCalendarMutationBlocMock,
           controller.stream,
-          initialState: const AcademicTermMutationState(),
+          initialState: const AcademicCalendarMutationState(),
         );
 
         await pumpWidget(tester);
 
         controller.add(
-          AcademicTermMutationState(
-            notice: AcademicTermMutationFailedNotice(
-              type: AcademicTermMutationType.create,
+          AcademicCalendarMutationState(
+            notice: AcademicCalendarMutationFailedNotice(
+              type: AcademicCalendarMutationType.create,
+              target: AcademicCalendarTargetType.term,
               exception: AppException.test(),
-              academicTerm: null,
             ),
           ),
         );
@@ -292,13 +292,13 @@ void main() {
       testWidgets('calls onAcademicTermDeleted when delete success', (
         tester,
       ) async {
-        final controller = StreamController<AcademicTermMutationState>();
+        final controller = StreamController<AcademicCalendarMutationState>();
         addTearDown(controller.close);
 
         whenListen(
-          academicTermMutationBlocMock,
+          academicCalendarMutationBlocMock,
           controller.stream,
-          initialState: const AcademicTermMutationState(),
+          initialState: const AcademicCalendarMutationState(),
         );
 
         AcademicTerm? deletedTerm;
@@ -311,7 +311,7 @@ void main() {
         );
 
         controller.add(
-          AcademicTermMutationState(
+          AcademicCalendarMutationState(
             notice: AcademicTermDeletedNotice(term),
           ),
         );

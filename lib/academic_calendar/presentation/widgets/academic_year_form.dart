@@ -20,7 +20,7 @@ enum _FormState {
 class AcademicYearForm extends StatefulWidget {
   /// Creates new [AcademicYearForm]
   ///
-  /// It reacts to [AcademicYearMutationBloc]'s state changes.
+  /// It reacts to [AcademicCalendarMutationBloc]'s state changes.
   /// So, make sure to provide that bloc in the widget tree.
   const new({
     this.initial,
@@ -67,21 +67,25 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AcademicYearMutationBloc, AcademicYearMutationState>(
+    return BlocListener<
+      AcademicCalendarMutationBloc,
+      AcademicCalendarMutationState
+    >(
       listenWhen: (p, c) => p.notice != c.notice,
       listener: (context, state) async {
         switch (state.notice) {
-          case AcademicYearMutationFailedNotice(
+          case AcademicCalendarMutationFailedNotice(
             :final type,
+            :final target,
             :final exception,
-          ):
+          ) when target == AcademicCalendarTargetType.year:
             late final String title;
             switch (type) {
-              case AcademicYearMutationType.create:
+              case AcademicCalendarMutationType.create:
                 title = 'Gagal menyimpan tahun akademik baru';
-              case AcademicYearMutationType.update:
+              case AcademicCalendarMutationType.update:
                 title = 'Gagal memperbarui tahun akademik';
-              case AcademicYearMutationType.delete:
+              case AcademicCalendarMutationType.delete:
                 title = 'Gagal menghapus tahun akademik';
             }
             unawaited(
@@ -119,7 +123,7 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
                   'berhasil dihapus',
             );
             widget.onAcademicYearDeleted?.call(deleted);
-          case null:
+          case _:
         }
       },
       child: Form(
@@ -148,16 +152,16 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
               },
             ),
             BlocSelector<
-              AcademicYearMutationBloc,
-              AcademicYearMutationState,
+              AcademicCalendarMutationBloc,
+              AcademicCalendarMutationState,
               _FormState
             >(
               selector: (state) {
-                if (state.isCreating) {
+                if (state.isCreatingYear) {
                   return _FormState.creating;
-                } else if (state.updatingIds.contains(widget.initial?.id)) {
+                } else if (state.updatingYearIds.contains(widget.initial?.id)) {
                   return _FormState.updating;
-                } else if (state.deletingIds.contains(widget.initial?.id)) {
+                } else if (state.deletingYearIds.contains(widget.initial?.id)) {
                   return _FormState.deleting;
                 }
                 return _FormState.idle;
@@ -175,7 +179,7 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
                           ].contains(formState)
                           ? const LoadingIndicator()
                           : const Icon(Icons.save_rounded),
-                      label: 'Simpan',
+                       label: 'Simpan',
                       onPressed: formState.isProcessing
                           ? null
                           : () {
@@ -185,22 +189,26 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
                               if (start == null || end == null) return;
                               final name = _nameController.text.trim();
                               if (widget.initial == null) {
-                                context.read<AcademicYearMutationBloc>().add(
-                                  AcademicYearMutationCreateRequested(
-                                    name: name,
-                                    startDate: start,
-                                    endDate: end,
-                                  ),
-                                );
+                                context
+                                    .read<AcademicCalendarMutationBloc>()
+                                    .add(
+                                      AcademicCalendarYearCreateRequested(
+                                        name: name,
+                                        startDate: start,
+                                        endDate: end,
+                                      ),
+                                    );
                               } else {
-                                context.read<AcademicYearMutationBloc>().add(
-                                  AcademicYearMutationUpdateRequested(
-                                    academicYear: widget.initial!,
-                                    name: name,
-                                    startDate: start,
-                                    endDate: end,
-                                  ),
-                                );
+                                context
+                                    .read<AcademicCalendarMutationBloc>()
+                                    .add(
+                                      AcademicCalendarYearUpdateRequested(
+                                        academicYear: widget.initial!,
+                                        name: name,
+                                        startDate: start,
+                                        endDate: end,
+                                      ),
+                                    );
                               }
                             },
                     ),
@@ -210,8 +218,8 @@ class _AcademicYearFormState extends State<AcademicYearForm> {
                         isDeleting: formState == _FormState.deleting,
                         disable: formState.isProcessing,
                         onConfirmed: () {
-                          context.read<AcademicYearMutationBloc>().add(
-                            AcademicYearMutationDeleteRequested(
+                          context.read<AcademicCalendarMutationBloc>().add(
+                            AcademicCalendarYearDeleteRequested(
                               academicYear: widget.initial!,
                             ),
                           );

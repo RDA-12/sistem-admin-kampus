@@ -8,10 +8,6 @@ class MockAcademicYearsBloc extends Mock implements AcademicYearsBloc;
 @LazySingleton(as: AcademicYearDetailBloc, env: [Environment.test])
 class MockAcademicYearDetailBloc extends Mock implements AcademicYearDetailBloc;
 
-@LazySingleton(as: AcademicYearMutationBloc, env: [Environment.test])
-class MockAcademicYearMutationBloc extends Mock
-    implements AcademicYearMutationBloc;
-
-@LazySingleton(as: AcademicTermMutationBloc, env: [Environment.test])
-class MockAcademicTermMutationBloc extends Mock
-    implements AcademicTermMutationBloc;
+@LazySingleton(as: AcademicCalendarMutationBloc, env: [Environment.test])
+class MockAcademicCalendarMutationBloc extends Mock
+    implements AcademicCalendarMutationBloc;

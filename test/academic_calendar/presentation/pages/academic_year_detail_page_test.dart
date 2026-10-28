@@ -32,18 +32,11 @@ void main() {
     when(academicYearDetailBlocMock.close).thenAnswer((_) async {});
 
     whenListen(
-      getIt<AcademicYearMutationBloc>(),
-      Stream.value(const AcademicYearMutationState()),
-      initialState: const AcademicYearMutationState(),
+      getIt<AcademicCalendarMutationBloc>(),
+      Stream.value(const AcademicCalendarMutationState()),
+      initialState: const AcademicCalendarMutationState(),
     );
-    when(getIt<AcademicYearMutationBloc>().close).thenAnswer((_) async {});
-
-    whenListen(
-      getIt<AcademicTermMutationBloc>(),
-      Stream.value(const AcademicTermMutationState()),
-      initialState: const AcademicTermMutationState(),
-    );
-    when(getIt<AcademicTermMutationBloc>().close).thenAnswer((_) async {});
+    when(getIt<AcademicCalendarMutationBloc>().close).thenAnswer((_) async {});
   });
 
   Future<void> pumpWidget(
@@ -95,20 +88,11 @@ void main() {
         );
       });
 
-      testWidgets('provides AcademicYearMutationBloc', (tester) async {
+      testWidgets('provides AcademicCalendarMutationBloc', (tester) async {
         await pumpWidget(tester);
 
         expect(
-          find.byType(BlocProvider<AcademicYearMutationBloc>),
-          findsOneWidget,
-        );
-      });
-
-      testWidgets('provides AcademicTermMutationBloc', (tester) async {
-        await pumpWidget(tester);
-
-        expect(
-          find.byType(BlocProvider<AcademicTermMutationBloc>),
+          find.byType(BlocProvider<AcademicCalendarMutationBloc>),
           findsOneWidget,
         );
       });

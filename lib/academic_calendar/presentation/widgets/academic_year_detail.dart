@@ -13,8 +13,8 @@ import 'package:sistem_admin/common/common.dart';
 class AcademicYearDetail extends StatelessWidget {
   /// Creates new [AcademicYearDetail]
   ///
-  /// It reacts to [AcademicYearDetailBloc] and mutation blocs state changes.
-  /// So, ensure to provide it with those blocs.
+  /// It reacts to [AcademicYearDetailBloc] and [AcademicCalendarMutationBloc]
+  /// state changes. So, ensure to provide it with those blocs.
   const new({
     this.onRetryPressed,
     this.onAcademicYearDeleted,
@@ -36,7 +36,7 @@ class AcademicYearDetail extends StatelessWidget {
     required AcademicYear academicYear,
     AcademicTerm? term,
   }) {
-    final mutationBloc = context.read<AcademicTermMutationBloc>();
+    final mutationBloc = context.read<AcademicCalendarMutationBloc>();
     unawaited(
       context.showAppDialog<void>(
         title: term == null ? 'Tambah Semester' : 'Ubah Semester',
