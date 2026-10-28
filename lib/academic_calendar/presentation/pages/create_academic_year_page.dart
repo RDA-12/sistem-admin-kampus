@@ -20,7 +20,7 @@ class CreateAcademicYearPage extends StatelessWidget {
         ),
         body: const Padding(
           padding: AppSpacing.pagePadding,
-          child: AcademicYearForm(),
+          child: AcademicCalendarForm(),
         ),
       ),
     );

@@ -13,8 +13,9 @@ import 'package:sistem_admin/common/common.dart';
 class AcademicYearDetail extends StatelessWidget {
   /// Creates new [AcademicYearDetail]
   ///
-  /// It reacts to [AcademicYearDetailBloc] and [AcademicCalendarMutationBloc]
-  /// state changes. So, ensure to provide it with those blocs.
+  /// It reacts to [AcademicYearDetailBloc] and
+  /// [AcademicCalendarMutationBloc] state changes.
+  /// So, ensure to provide it with those blocs.
   const new({
     this.onRetryPressed,
     this.onAcademicYearDeleted,
@@ -43,13 +44,111 @@ class AcademicYearDetail extends StatelessWidget {
         contentBuilder: (dialogContext) {
           return BlocProvider.value(
             value: mutationBloc,
-            child: SingleChildScrollView(
-              child: AcademicTermForm(
-                academicYear: academicYear,
-                initial: term,
-                onSaved: (_) => Navigator.of(dialogContext).pop(),
-                onAcademicTermDeleted: (_) => Navigator.of(dialogContext).pop(),
-              ),
+            child: BlocConsumer<
+              AcademicCalendarMutationBloc,
+              AcademicCalendarMutationState
+            >(
+              listenWhen: (p, c) => p.notice != c.notice,
+              listener: (context, state) async {
+                switch (state.notice) {
+                  case AcademicCalendarMutationFailedNotice(
+                    :final type,
+                    :final target,
+                    :final exception,
+                  ) when target == AcademicCalendarTargetType.term:
+                    late final String title;
+                    switch (type) {
+                      case AcademicCalendarMutationType.create:
+                        title = 'Gagal menyimpan semester baru';
+                      case AcademicCalendarMutationType.update:
+                        title = 'Gagal memperbarui semester';
+                      case AcademicCalendarMutationType.delete:
+                        title = 'Gagal menghapus semester';
+                    }
+                    unawaited(
+                      context.showFailedDialog(
+                        title: title,
+                        message: exception.code.message,
+                      ),
+                    );
+                  case AcademicTermCreatedNotice(:final created):
+                    await context.showSuccessDialog(
+                      title: 'Semester berhasil disimpan',
+                      message:
+                          'Semester dengan nama "${created.name}" '
+                          'berhasil disimpan',
+                    );
+                    Navigator.of(dialogContext).pop();
+                  case AcademicTermUpdatedNotice(:final before, :final after):
+                    await context.showSuccessDialog(
+                      title: 'Semester "${before.name}" berhasil diperbarui',
+                      message:
+                          'Semester "${before.name}" berhasil diperbarui '
+                          'dengan nama "${after.name}"',
+                    );
+                    Navigator.of(dialogContext).pop();
+                  case AcademicTermDeletedNotice(:final deleted):
+                    await context.showSuccessDialog(
+                      title: 'Semester berhasil dihapus',
+                      message:
+                          'Semester dengan nama "${deleted.name}" '
+                          'berhasil dihapus',
+                    );
+                    Navigator.of(dialogContext).pop();
+                  case _:
+                }
+              },
+              builder: (context, state) {
+                final isProcessing = term == null
+                    ? state.isCreatingTerm
+                    : state.updatingTermIds.contains(term.id) ||
+                        state.deletingTermIds.contains(term.id);
+                final isDeleting =
+                    term != null && state.deletingTermIds.contains(term.id);
+
+                return SingleChildScrollView(
+                  child: AcademicTermForm(
+                    academicYear: academicYear,
+                    initial: term,
+                    isProcessing: isProcessing,
+                    isDeleting: isDeleting,
+                    onSave: ({
+                      required name,
+                      required startDate,
+                      required endDate,
+                    }) {
+                      if (term == null) {
+                        context.read<AcademicCalendarMutationBloc>().add(
+                          AcademicCalendarTermCreateRequested(
+                            academicYearId: academicYear.id,
+                            name: name,
+                            startDate: startDate,
+                            endDate: endDate,
+                          ),
+                        );
+                      } else {
+                        context.read<AcademicCalendarMutationBloc>().add(
+                          AcademicCalendarTermUpdateRequested(
+                            academicTerm: term,
+                            name: name,
+                            startDate: startDate,
+                            endDate: endDate,
+                          ),
+                        );
+                      }
+                    },
+                    onDelete: term == null
+                        ? null
+                        : () {
+                            context.read<AcademicCalendarMutationBloc>().add(
+                              AcademicCalendarTermDeleteRequested(
+                                academicTerm: term,
+                              ),
+                            );
+                          },
+                  ),
+                );
+              },
             ),
           );
         },
@@ -59,62 +158,152 @@ class AcademicYearDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AcademicYearDetailBloc, AcademicYearDetailState>(
-      builder: (context, state) {
-        switch (state) {
-          case AcademicYearDetailInitial():
-          case LoadingAcademicYearDetail():
-            return const Center(
-              child: LoadingIndicator(),
+    return BlocListener<
+      AcademicCalendarMutationBloc,
+      AcademicCalendarMutationState
+    >(
+      listenWhen: (p, c) => p.notice != c.notice,
+      listener: (context, state) async {
+        switch (state.notice) {
+          case AcademicCalendarMutationFailedNotice(
+            :final type,
+            :final target,
+            :final exception,
+          ) when target == AcademicCalendarTargetType.year:
+            late final String title;
+            switch (type) {
+              case AcademicCalendarMutationType.create:
+                title = 'Gagal menyimpan tahun akademik baru';
+              case AcademicCalendarMutationType.update:
+                title = 'Gagal memperbarui tahun akademik';
+              case AcademicCalendarMutationType.delete:
+                title = 'Gagal menghapus tahun akademik';
+            }
+            unawaited(
+              context.showFailedDialog(
+                title: title,
+                message: exception.code.message,
+              ),
             );
-          case AcademicYearDetailLoaded(
-            :final academicYear,
-            :final terms,
-          ):
-            return Column(
-              spacing: 24,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AcademicYearForm(
-                  initial: academicYear,
-                  onAcademicYearDeleted: onAcademicYearDeleted,
-                ),
-                const Divider(),
-                Expanded(
-                  child: AcademicYearTerms(
-                    academicYear: academicYear,
-                    terms: terms,
-                    onAddTermPressed: () {
-                      _showTermDialog(
-                        context,
-                        academicYear: academicYear,
+          case AcademicYearUpdatedNotice(:final before, :final after):
+            unawaited(
+              context.showSuccessDialog(
+                title: 'Tahun akademik "${before.name}" berhasil diperbarui',
+                message:
+                    'Tahun akademik "${before.name}" berhasil diperbarui '
+                    'dengan nama "${after.name}"',
+              ),
+            );
+          case AcademicYearDeletedNotice(:final deleted):
+            await context.showSuccessDialog(
+              title: 'Tahun akademik berhasil dihapus',
+              message:
+                  'Tahun akademik dengan nama "${deleted.name}" '
+                  'berhasil dihapus',
+            );
+            onAcademicYearDeleted?.call(deleted);
+          case _:
+        }
+      },
+      child: BlocBuilder<AcademicYearDetailBloc, AcademicYearDetailState>(
+        builder: (context, state) {
+          switch (state) {
+            case AcademicYearDetailInitial():
+            case LoadingAcademicYearDetail():
+              return const Center(
+                child: LoadingIndicator(),
+              );
+            case AcademicYearDetailLoaded(
+              :final academicYear,
+              :final terms,
+            ):
+              return Column(
+                spacing: 24,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  BlocSelector<
+                    AcademicCalendarMutationBloc,
+                    AcademicCalendarMutationState,
+                    ({bool isProcessing, bool isDeleting})
+                  >(
+                    selector: (mutationState) => (
+                      isProcessing:
+                          mutationState.updatingYearIds.contains(
+                            academicYear.id,
+                          ) ||
+                          mutationState.deletingYearIds.contains(
+                            academicYear.id,
+                          ),
+                      isDeleting: mutationState.deletingYearIds.contains(
+                        academicYear.id,
+                      ),
+                    ),
+                    builder: (context, mutationStatus) {
+                      return AcademicYearForm(
+                        initial: academicYear,
+                        isProcessing: mutationStatus.isProcessing,
+                        isDeleting: mutationStatus.isDeleting,
+                        onSave: ({
+                          required name,
+                          required startDate,
+                          required endDate,
+                        }) {
+                          context.read<AcademicCalendarMutationBloc>().add(
+                            AcademicCalendarYearUpdateRequested(
+                              academicYear: academicYear,
+                              name: name,
+                              startDate: startDate,
+                              endDate: endDate,
+                            ),
+                          );
+                        },
+                        onDelete: () {
+                          context.read<AcademicCalendarMutationBloc>().add(
+                            AcademicCalendarYearDeleteRequested(
+                              academicYear: academicYear,
+                            ),
+                          );
+                        },
                       );
                     },
-                    onTermPressed: (term) {
-                      if (onTermPressed != null) {
-                        onTermPressed!(term);
-                      } else {
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: AcademicYearTerms(
+                      academicYear: academicYear,
+                      terms: terms,
+                      onAddTermPressed: () {
                         _showTermDialog(
                           context,
                           academicYear: academicYear,
-                          term: term,
                         );
-                      }
-                    },
+                      },
+                      onTermPressed: (term) {
+                        if (onTermPressed != null) {
+                          onTermPressed!(term);
+                        } else {
+                          _showTermDialog(
+                            context,
+                            academicYear: academicYear,
+                            term: term,
+                          );
+                        }
+                      },
+                    ),
                   ),
+                ],
+              );
+            case AcademicYearDetailLoadFailed(:final exception):
+              return Center(
+                child: AppExceptionBox(
+                  title: 'Gagal mengambil data tahun akademik',
+                  exception: exception,
+                  onRetryPressed: onRetryPressed,
                 ),
-              ],
-            );
-          case AcademicYearDetailLoadFailed(:final exception):
-            return Center(
-              child: AppExceptionBox(
-                title: 'Gagal mengambil data tahun akademik',
-                exception: exception,
-                onRetryPressed: onRetryPressed,
-              ),
-            );
-        }
-      },
+              );
+          }
+        },
+      ),
     );
   }
 }

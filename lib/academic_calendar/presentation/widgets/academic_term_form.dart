@@ -1,32 +1,18 @@
-import 'dart:async';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/academic_calendar/domain/domain.dart';
-import 'package:sistem_admin/academic_calendar/presentation/bloc/bloc.dart';
 import 'package:sistem_admin/academic_calendar/presentation/widgets/delete_academic_term_button.dart';
 import 'package:sistem_admin/common/common.dart';
-
-enum _FormState {
-  idle,
-  creating,
-  updating,
-  deleting;
-
-  bool get isProcessing => this != _FormState.idle;
-}
 
 /// Form to create/update an [AcademicTerm]
 class AcademicTermForm extends StatefulWidget {
   /// Creates new [AcademicTermForm]
-  ///
-  /// It reacts to [AcademicCalendarMutationBloc]'s state changes.
-  /// So, make sure to provide that bloc in the widget tree.
   const new({
     required this.academicYear,
+    required this.onSave,
     this.initial,
-    this.onAcademicTermDeleted,
-    this.onSaved,
+    this.onDelete,
+    this.isProcessing = false,
+    this.isDeleting = false,
     super.key,
   });
 
@@ -36,11 +22,21 @@ class AcademicTermForm extends StatefulWidget {
   /// Initial academic term data that will be shown
   final AcademicTerm? initial;
 
-  /// Invoked when [initial] academic term data is deleted successfully
-  final void Function(AcademicTerm)? onAcademicTermDeleted;
+  /// Whether form is currently processing a save or delete operation
+  final bool isProcessing;
 
-  /// Invoked when academic term is saved successfully
-  final void Function(AcademicTerm)? onSaved;
+  /// Whether form is currently deleting [initial]
+  final bool isDeleting;
+
+  /// Invoked when form is submitted with valid data
+  final void Function({
+    required String name,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) onSave;
+
+  /// Invoked when user confirms deletion of [initial]
+  final void Function()? onDelete;
 
   @override
   State<AcademicTermForm> createState() => _AcademicTermFormState();
@@ -66,6 +62,16 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
   }
 
   @override
+  void didUpdateWidget(covariant AcademicTermForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initial != widget.initial) {
+      _nameController.text = widget.initial?.name ?? '';
+      _startDateController.value = widget.initial?.startDate;
+      _endDateController.value = widget.initial?.endDate;
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _startDateController.dispose();
@@ -73,170 +79,68 @@ class _AcademicTermFormState extends State<AcademicTermForm> {
     super.dispose();
   }
 
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+    final start = _startDateController.value;
+    final end = _endDateController.value;
+    if (start == null || end == null) return;
+    final name = _nameController.text.trim();
+    widget.onSave(
+      name: name,
+      startDate: start,
+      endDate: end,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<
-      AcademicCalendarMutationBloc,
-      AcademicCalendarMutationState
-    >(
-      listenWhen: (p, c) => p.notice != c.notice,
-      listener: (context, state) async {
-        switch (state.notice) {
-          case AcademicCalendarMutationFailedNotice(
-            :final type,
-            :final target,
-            :final exception,
-          ) when target == AcademicCalendarTargetType.term:
-            late final String title;
-            switch (type) {
-              case AcademicCalendarMutationType.create:
-                title = 'Gagal menyimpan semester baru';
-              case AcademicCalendarMutationType.update:
-                title = 'Gagal memperbarui semester';
-              case AcademicCalendarMutationType.delete:
-                title = 'Gagal menghapus semester';
-            }
-            unawaited(
-              context.showFailedDialog(
-                title: title,
-                message: exception.code.message,
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppFormField(
+            controller: _nameController,
+            label: 'Nama Semester',
+          ),
+          AppDateFormField(
+            controller: _startDateController,
+            label: 'Tanggal Mulai',
+          ),
+          AppDateFormField(
+            controller: _endDateController,
+            label: 'Tanggal Selesai',
+            validator: (end) {
+              final start = _startDateController.value;
+              if (start != null && end.isBefore(start)) {
+                return 'Tanggal selesai harus setelah tanggal mulai';
+              }
+              return null;
+            },
+          ),
+          Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppButton(
+                leadingIcon: widget.isProcessing && !widget.isDeleting
+                    ? const LoadingIndicator()
+                    : const Icon(Icons.save_rounded),
+                label: 'Simpan',
+                onPressed: widget.isProcessing ? null : _submit,
               ),
-            );
-          case AcademicTermUpdatedNotice(:final before, :final after):
-            await context.showSuccessDialog(
-              title: 'Semester "${before.name}" berhasil diperbarui',
-              message:
-                  'Semester "${before.name}" berhasil diperbarui '
-                  'dengan nama "${after.name}"',
-            );
-            widget.onSaved?.call(after);
-          case AcademicTermCreatedNotice(:final created):
-            await context.showSuccessDialog(
-              title: 'Semester berhasil disimpan',
-              message:
-                  'Semester dengan nama "${created.name}" berhasil disimpan',
-            );
-            _nameController.clear();
-            _startDateController.clear();
-            _endDateController.clear();
-            widget.onSaved?.call(created);
-          case AcademicTermDeletedNotice(:final deleted):
-            await context.showSuccessDialog(
-              title: 'Semester berhasil dihapus',
-              message:
-                  'Semester dengan nama "${deleted.name}" berhasil dihapus',
-            );
-            widget.onAcademicTermDeleted?.call(deleted);
-          case _:
-        }
-      },
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 16,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AppFormField(
-              controller: _nameController,
-              label: 'Nama Semester',
-            ),
-            AppDateFormField(
-              controller: _startDateController,
-              label: 'Tanggal Mulai',
-            ),
-            AppDateFormField(
-              controller: _endDateController,
-              label: 'Tanggal Selesai',
-              validator: (end) {
-                final start = _startDateController.value;
-                if (start != null && end.isBefore(start)) {
-                  return 'Tanggal selesai harus setelah tanggal mulai';
-                }
-                return null;
-              },
-            ),
-            BlocSelector<
-              AcademicCalendarMutationBloc,
-              AcademicCalendarMutationState,
-              _FormState
-            >(
-              selector: (state) {
-                if (state.isCreatingTerm) {
-                  return _FormState.creating;
-                } else if (state.updatingTermIds.contains(widget.initial?.id)) {
-                  return _FormState.updating;
-                } else if (state.deletingTermIds.contains(widget.initial?.id)) {
-                  return _FormState.deleting;
-                }
-                return _FormState.idle;
-              },
-              builder: (context, formState) {
-                return Column(
-                  spacing: 8,
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    AppButton(
-                      leadingIcon:
-                          [
-                            _FormState.creating,
-                            _FormState.updating,
-                          ].contains(formState)
-                          ? const LoadingIndicator()
-                          : const Icon(Icons.save_rounded),
-                      label: 'Simpan',
-                      onPressed: formState.isProcessing
-                          ? null
-                          : () {
-                              if (!_formKey.currentState!.validate()) return;
-                              final start = _startDateController.value;
-                              final end = _endDateController.value;
-                              if (start == null || end == null) return;
-                              final name = _nameController.text.trim();
-                              if (widget.initial == null) {
-                                context
-                                    .read<AcademicCalendarMutationBloc>()
-                                    .add(
-                                      AcademicCalendarTermCreateRequested(
-                                        academicYearId: widget.academicYear.id,
-                                        name: name,
-                                        startDate: start,
-                                        endDate: end,
-                                      ),
-                                    );
-                              } else {
-                                context
-                                    .read<AcademicCalendarMutationBloc>()
-                                    .add(
-                                      AcademicCalendarTermUpdateRequested(
-                                        academicTerm: widget.initial!,
-                                        name: name,
-                                        startDate: start,
-                                        endDate: end,
-                                      ),
-                                    );
-                              }
-                            },
-                    ),
-                    if (widget.initial != null)
-                      DeleteAcademicTermButton(
-                        academicTerm: widget.initial!,
-                        isDeleting: formState == _FormState.deleting,
-                        disable: formState.isProcessing,
-                        onConfirmed: () {
-                          context.read<AcademicCalendarMutationBloc>().add(
-                            AcademicCalendarTermDeleteRequested(
-                              academicTerm: widget.initial!,
-                            ),
-                          );
-                        },
-                      ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
+              if (widget.initial != null && widget.onDelete != null)
+                DeleteAcademicTermButton(
+                  academicTerm: widget.initial!,
+                  isDeleting: widget.isDeleting,
+                  disable: widget.isProcessing,
+                  onConfirmed: widget.onDelete,
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

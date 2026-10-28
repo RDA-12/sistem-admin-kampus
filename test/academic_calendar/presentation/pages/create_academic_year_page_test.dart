@@ -36,6 +36,12 @@ void main() {
         expect(find.text('Buat Tahun Akademik Baru'), findsOneWidget);
       });
 
+      testWidgets('shows AcademicCalendarForm', (tester) async {
+        await pumpWidget(tester);
+
+        expect(find.byType(AcademicCalendarForm), findsOneWidget);
+      });
+
       testWidgets('shows AcademicYearForm', (tester) async {
         await pumpWidget(tester);
 

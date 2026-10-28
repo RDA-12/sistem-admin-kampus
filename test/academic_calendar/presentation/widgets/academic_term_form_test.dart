@@ -1,55 +1,43 @@
-import 'dart:async';
-
-import 'package:bloc_test/bloc_test.dart';
 import 'package:clock/clock.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
-import 'package:sistem_admin/core/core.dart';
 
-import '../../../common/di_mocks.dart';
 import '../../../common/helper.dart';
 import '../../domain/mocks.dart';
 
 void main() {
   final year = academicYearMock;
   final term = academicTermMock;
-  late AcademicCalendarMutationBloc academicCalendarMutationBlocMock;
 
   group('AcademicTermForm', () {
-    setUpAll(initializeMockDependencies);
-
-    setUp(() {
-      academicCalendarMutationBlocMock = getIt<AcademicCalendarMutationBloc>();
-      whenListen(
-        academicCalendarMutationBlocMock,
-        Stream.value(const AcademicCalendarMutationState()),
-        initialState: const AcademicCalendarMutationState(),
-      );
-    });
-
     Future<void> pumpWidget(
       WidgetTester tester, {
       AcademicTerm? initial,
-      void Function(AcademicTerm)? onAcademicTermDeleted,
-      void Function(AcademicTerm)? onSaved,
+      void Function({
+        required String name,
+        required DateTime startDate,
+        required DateTime endDate,
+      })? onSave,
+      void Function()? onDelete,
+      bool isProcessing = false,
+      bool isDeleting = false,
     }) {
       return tester.pumpWidgetForTest(
         (context) => AcademicTermForm(
           academicYear: year,
           initial: initial,
-          onAcademicTermDeleted: onAcademicTermDeleted,
-          onSaved: onSaved,
+          onSave: onSave ??
+              ({
+                required name,
+                required startDate,
+                required endDate,
+              }) {},
+          onDelete: onDelete,
+          isProcessing: isProcessing,
+          isDeleting: isDeleting,
         ),
-        providerBuilder: (context, child) {
-          return BlocProvider.value(
-            value: academicCalendarMutationBlocMock,
-            child: child,
-          );
-        },
       );
     }
 
@@ -87,10 +75,6 @@ void main() {
       matching: find.byType(AppButton),
     );
 
-    tearDown(() {
-      reset(academicCalendarMutationBlocMock);
-    });
-
     group('Render', () {
       testWidgets('shows all fields and save button', (tester) async {
         await pumpWidget(tester);
@@ -102,104 +86,52 @@ void main() {
         expect(deleteButtonFinder, findsNothing);
       });
 
-      testWidgets('shows delete button when initial is provided', (
+      testWidgets(
+        'shows delete button when initial and onDelete are provided',
+        (tester) async {
+          await pumpWidget(
+            tester,
+            initial: term,
+            onDelete: () {},
+          );
+
+          expect(deleteButtonFinder, findsOneWidget);
+        },
+      );
+
+      testWidgets('shows loading indicator on save button when isProcessing', (
         tester,
       ) async {
-        await pumpWidget(tester, initial: term);
+        await pumpWidget(tester, isProcessing: true);
 
-        expect(deleteButtonFinder, findsOneWidget);
+        expect(
+          find.descendant(
+            of: saveButtonFinder,
+            matching: find.byType(LoadingIndicator),
+          ),
+          findsOneWidget,
+        );
       });
     });
 
     group('Interactions', () {
-      testWidgets(
-        'adds AcademicCalendarTermCreateRequested when initial is null',
-        (tester) async {
-          await pumpWidget(tester);
+      testWidgets('calls onSave with valid data when submitted', (
+        tester,
+      ) async {
+        String? savedName;
+        DateTime? savedStart;
+        DateTime? savedEnd;
 
-          await tester.enterText(nameFieldFinder, 'Ganjil');
-          await selectDate(tester, startDateFieldFinder, DateTime(2025, 9));
-          await selectDate(tester, endDateFieldFinder, DateTime(2026, 1, 31));
-
-          await tester.tap(saveButtonFinder);
-          await tester.pumpAndSettle();
-
-          verify(
-            () => academicCalendarMutationBlocMock.add(
-              AcademicCalendarTermCreateRequested(
-                academicYearId: year.id,
-                name: 'Ganjil',
-                startDate: DateTime(2025, 9),
-                endDate: DateTime(2026, 1, 31),
-              ),
-            ),
-          ).called(1);
-        },
-      );
-
-      testWidgets(
-        'adds AcademicCalendarTermUpdateRequested when initial is provided',
-        (tester) async {
-          await pumpWidget(tester, initial: term);
-
-          await tester.enterText(nameFieldFinder, 'Genap');
-          await tester.tap(saveButtonFinder);
-          await tester.pumpAndSettle();
-
-          verify(
-            () => academicCalendarMutationBlocMock.add(
-              AcademicCalendarTermUpdateRequested(
-                academicTerm: term,
-                name: 'Genap',
-                startDate: term.startDate,
-                endDate: term.endDate,
-              ),
-            ),
-          ).called(1);
-        },
-      );
-
-      testWidgets(
-        'adds AcademicCalendarTermDeleteRequested when delete confirmed',
-        (tester) async {
-          await pumpWidget(tester, initial: term);
-
-          await tester.tap(deleteButtonFinder);
-          await tester.pumpAndSettle();
-
-          final confirmFinder = find.ancestor(
-            of: find.text('OK'),
-            matching: find.byType(AppButton),
-          );
-
-          await tester.tap(confirmFinder);
-          await tester.pumpAndSettle();
-
-          verify(
-            () => academicCalendarMutationBlocMock.add(
-              AcademicCalendarTermDeleteRequested(academicTerm: term),
-            ),
-          ).called(1);
-        },
-      );
-    });
-
-    group('Side Effects', () {
-      testWidgets('calls onSaved when create success', (tester) async {
-        final controller = StreamController<AcademicCalendarMutationState>();
-        addTearDown(controller.close);
-
-        whenListen(
-          academicCalendarMutationBlocMock,
-          controller.stream,
-          initialState: const AcademicCalendarMutationState(),
-        );
-
-        AcademicTerm? savedTerm;
         await pumpWidget(
           tester,
-          onSaved: (t) {
-            savedTerm = t;
+          onSave: ({
+            required name,
+            required startDate,
+            required endDate,
+          }) {
+            savedName = name;
+            savedStart = startDate;
+            savedEnd = endDate;
           },
         );
 
@@ -207,124 +139,68 @@ void main() {
         await selectDate(tester, startDateFieldFinder, DateTime(2025, 9));
         await selectDate(tester, endDateFieldFinder, DateTime(2026, 1, 31));
 
-        controller.add(
-          AcademicCalendarMutationState(
-            notice: AcademicTermCreatedNotice(term),
-          ),
-        );
+        await tester.tap(saveButtonFinder);
         await tester.pumpAndSettle();
 
-        final okFinder = find.ancestor(
-          of: find.text('OK'),
-          matching: find.byType(AppButton),
-        );
-        await tester.tap(okFinder);
-        await tester.pumpAndSettle();
-
-        expect(savedTerm, equals(term));
+        expect(savedName, 'Ganjil');
+        expect(savedStart, DateTime(2025, 9));
+        expect(savedEnd, DateTime(2026, 1, 31));
       });
 
-      testWidgets('calls onSaved when update success', (tester) async {
-        final controller = StreamController<AcademicCalendarMutationState>();
-        addTearDown(controller.close);
+      testWidgets(
+        'shows validation error when end date is before start date',
+        (tester) async {
+          var onSaveCalled = false;
+          await pumpWidget(
+            tester,
+            onSave: ({
+              required name,
+              required startDate,
+              required endDate,
+            }) {
+              onSaveCalled = true;
+            },
+          );
 
-        whenListen(
-          academicCalendarMutationBlocMock,
-          controller.stream,
-          initialState: const AcademicCalendarMutationState(),
-        );
+          await tester.enterText(nameFieldFinder, 'Ganjil');
+          await selectDate(tester, startDateFieldFinder, DateTime(2026, 9));
+          await selectDate(tester, endDateFieldFinder, DateTime(2025, 8, 31));
 
-        AcademicTerm? savedTerm;
-        await pumpWidget(
-          tester,
-          initial: term,
-          onSaved: (t) {
-            savedTerm = t;
-          },
-        );
+          await tester.tap(saveButtonFinder);
+          await tester.pumpAndSettle();
 
-        controller.add(
-          AcademicCalendarMutationState(
-            notice: AcademicTermUpdatedNotice(
-              before: term,
-              after: term,
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
+          expect(
+            find.text('Tanggal selesai harus setelah tanggal mulai'),
+            findsOneWidget,
+          );
+          expect(onSaveCalled, isFalse);
+        },
+      );
 
-        final okFinder = find.ancestor(
-          of: find.text('OK'),
-          matching: find.byType(AppButton),
-        );
-        await tester.tap(okFinder);
-        await tester.pumpAndSettle();
-
-        expect(savedTerm, equals(term));
-      });
-
-      testWidgets('shows failed dialog when mutation fails', (tester) async {
-        final controller = StreamController<AcademicCalendarMutationState>();
-        addTearDown(controller.close);
-
-        whenListen(
-          academicCalendarMutationBlocMock,
-          controller.stream,
-          initialState: const AcademicCalendarMutationState(),
-        );
-
-        await pumpWidget(tester);
-
-        controller.add(
-          AcademicCalendarMutationState(
-            notice: AcademicCalendarMutationFailedNotice(
-              type: AcademicCalendarMutationType.create,
-              target: AcademicCalendarTargetType.term,
-              exception: AppException.test(),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('Gagal menyimpan semester baru'), findsOneWidget);
-      });
-
-      testWidgets('calls onAcademicTermDeleted when delete success', (
+      testWidgets('calls onDelete when delete button is confirmed', (
         tester,
       ) async {
-        final controller = StreamController<AcademicCalendarMutationState>();
-        addTearDown(controller.close);
-
-        whenListen(
-          academicCalendarMutationBlocMock,
-          controller.stream,
-          initialState: const AcademicCalendarMutationState(),
-        );
-
-        AcademicTerm? deletedTerm;
+        var deleteCalled = false;
         await pumpWidget(
           tester,
           initial: term,
-          onAcademicTermDeleted: (t) {
-            deletedTerm = t;
+          onDelete: () {
+            deleteCalled = true;
           },
         );
 
-        controller.add(
-          AcademicCalendarMutationState(
-            notice: AcademicTermDeletedNotice(term),
-          ),
-        );
+        await tester.tap(deleteButtonFinder);
         await tester.pumpAndSettle();
 
-        final okFinder = find.ancestor(
+        final confirmFinder = find.ancestor(
           of: find.text('OK'),
           matching: find.byType(AppButton),
         );
-        await tester.tap(okFinder);
+
+        await tester.tap(confirmFinder);
         await tester.pumpAndSettle();
 
-        expect(deletedTerm, equals(term));
+        expect(deleteCalled, isTrue);
       });
     });
   });

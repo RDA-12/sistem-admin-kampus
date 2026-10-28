@@ -1,3 +1,8 @@
+// Test descriptions in widget tests require descriptive length.
+// ignore_for_file: lines_longer_than_80_chars
+
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -187,13 +192,66 @@ void main() {
           expect(find.byType(AcademicTermForm), findsOneWidget);
         },
       );
+
+      testWidgets(
+        'dispatches AcademicCalendarYearUpdateRequested when AcademicYearForm saves',
+        (tester) async {
+          await pumpWidget(tester);
+
+          final formFinder = find.byType(AcademicYearForm);
+          final form = tester.widget<AcademicYearForm>(formFinder);
+          form.onSave(
+            name: '2026/2027',
+            startDate: year.startDate,
+            endDate: year.endDate,
+          );
+
+          verify(
+            () => academicCalendarMutationBlocMock.add(
+              AcademicCalendarYearUpdateRequested(
+                academicYear: year,
+                name: '2026/2027',
+                startDate: year.startDate,
+                endDate: year.endDate,
+              ),
+            ),
+          ).called(1);
+        },
+      );
+
+      testWidgets(
+        'dispatches AcademicCalendarYearDeleteRequested when AcademicYearForm deletes',
+        (tester) async {
+          await pumpWidget(tester);
+
+          final formFinder = find.byType(AcademicYearForm);
+          final form = tester.widget<AcademicYearForm>(formFinder);
+          form.onDelete?.call();
+
+          verify(
+            () => academicCalendarMutationBlocMock.add(
+              AcademicCalendarYearDeleteRequested(
+                academicYear: year,
+              ),
+            ),
+          ).called(1);
+        },
+      );
     });
 
     group('Side Effects', () {
       testWidgets(
-        'calls onAcademicYearDeleted '
-        'when AcademicYearForm fires onAcademicYearDeleted callback',
+        'calls onAcademicYearDeleted when AcademicYearDeletedNotice is emitted',
         (tester) async {
+          final controller = StreamController<AcademicCalendarMutationState>();
+          addTearDown(controller.close);
+
+          whenListen(
+            academicCalendarMutationBlocMock,
+            controller.stream,
+            initialState: const AcademicCalendarMutationState(),
+          );
+
           AcademicYear? deleted;
           await pumpWidget(
             tester,
@@ -202,10 +260,19 @@ void main() {
             },
           );
 
-          final finder = find.byType(AcademicYearForm);
-          expect(finder, findsOneWidget);
-          final widget = tester.widget<AcademicYearForm>(finder);
-          widget.onAcademicYearDeleted!(year);
+          controller.add(
+            AcademicCalendarMutationState(
+              notice: AcademicYearDeletedNotice(year),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final okFinder = find.ancestor(
+            of: find.text('OK'),
+            matching: find.byType(AppButton),
+          );
+          await tester.tap(okFinder);
+          await tester.pumpAndSettle();
 
           expect(deleted, year);
         },
@@ -271,21 +338,38 @@ void main() {
       );
 
       testWidgets(
-        'pops term dialog when AcademicTermForm fires onSaved callback',
+        'pops term dialog when AcademicTermCreatedNotice is emitted',
         (tester) async {
+          final controller = StreamController<AcademicCalendarMutationState>();
+          addTearDown(controller.close);
+
+          whenListen(
+            academicCalendarMutationBlocMock,
+            controller.stream,
+            initialState: const AcademicCalendarMutationState(),
+          );
+
           await pumpWidget(tester);
 
           final finder = find.byType(AcademicYearTerms);
-          expect(finder, findsOneWidget);
           final widget = tester.widget<AcademicYearTerms>(finder);
           widget.onAddTermPressed!();
           await tester.pumpAndSettle();
 
           expect(find.byType(AcademicTermForm), findsOneWidget);
 
-          final formFinder = find.byType(AcademicTermForm);
-          final formWidget = tester.widget<AcademicTermForm>(formFinder);
-          formWidget.onSaved!(terms.first);
+          controller.add(
+            AcademicCalendarMutationState(
+              notice: AcademicTermCreatedNotice(terms.first),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final okFinder = find.ancestor(
+            of: find.text('OK'),
+            matching: find.byType(AppButton),
+          );
+          await tester.tap(okFinder);
           await tester.pumpAndSettle();
 
           expect(find.byType(AcademicTermForm), findsNothing);
@@ -293,21 +377,38 @@ void main() {
       );
 
       testWidgets(
-        'pops term dialog when AcademicTermForm fires onAcademicTermDeleted',
+        'pops term dialog when AcademicTermDeletedNotice is emitted',
         (tester) async {
+          final controller = StreamController<AcademicCalendarMutationState>();
+          addTearDown(controller.close);
+
+          whenListen(
+            academicCalendarMutationBlocMock,
+            controller.stream,
+            initialState: const AcademicCalendarMutationState(),
+          );
+
           await pumpWidget(tester);
 
           final finder = find.byType(AcademicYearTerms);
-          expect(finder, findsOneWidget);
           final widget = tester.widget<AcademicYearTerms>(finder);
           widget.onAddTermPressed!();
           await tester.pumpAndSettle();
 
           expect(find.byType(AcademicTermForm), findsOneWidget);
 
-          final formFinder = find.byType(AcademicTermForm);
-          final formWidget = tester.widget<AcademicTermForm>(formFinder);
-          formWidget.onAcademicTermDeleted!(terms.first);
+          controller.add(
+            AcademicCalendarMutationState(
+              notice: AcademicTermDeletedNotice(terms.first),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final okFinder = find.ancestor(
+            of: find.text('OK'),
+            matching: find.byType(AppButton),
+          );
+          await tester.tap(okFinder);
           await tester.pumpAndSettle();
 
           expect(find.byType(AcademicTermForm), findsNothing);
