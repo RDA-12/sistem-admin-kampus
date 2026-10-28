@@ -22,7 +22,8 @@ void main() {
         required String name,
         required DateTime startDate,
         required DateTime endDate,
-      })? onSave,
+      })?
+      onSave,
       void Function()? onDelete,
       bool isProcessing = false,
       bool isDeleting = false,
@@ -30,7 +31,8 @@ void main() {
       return tester.pumpWidgetForTest(
         (context) => AcademicYearForm(
           initial: initial,
-          onSave: onSave ??
+          onSave:
+              onSave ??
               ({
                 required name,
                 required startDate,
@@ -126,15 +128,16 @@ void main() {
 
         await pumpWidget(
           tester,
-          onSave: ({
-            required name,
-            required startDate,
-            required endDate,
-          }) {
-            savedName = name;
-            savedStart = startDate;
-            savedEnd = endDate;
-          },
+          onSave:
+              ({
+                required name,
+                required startDate,
+                required endDate,
+              }) {
+                savedName = name;
+                savedStart = startDate;
+                savedEnd = endDate;
+              },
         );
 
         await tester.enterText(nameFieldFinder, '2025/2026');
@@ -155,13 +158,14 @@ void main() {
           var onSaveCalled = false;
           await pumpWidget(
             tester,
-            onSave: ({
-              required name,
-              required startDate,
-              required endDate,
-            }) {
-              onSaveCalled = true;
-            },
+            onSave:
+                ({
+                  required name,
+                  required startDate,
+                  required endDate,
+                }) {
+                  onSaveCalled = true;
+                },
           );
 
           await tester.enterText(nameFieldFinder, '2025/2026');

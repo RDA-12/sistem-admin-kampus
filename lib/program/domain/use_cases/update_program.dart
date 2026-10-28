@@ -22,7 +22,8 @@ final class UpdateProgramParams extends Equatable {
 
 /// Use case for updating a [Program]
 @LazySingleton(env: [Environment.prod])
-class UpdateProgramUseCase with AppLoggerMixin
+class UpdateProgramUseCase
+    with AppLoggerMixin
     implements FutureBaseUseCase<UpdateProgramParams, Program> {
   /// Creates new [UpdateProgramUseCase]
   new({required this._programRepository});
@@ -35,8 +36,10 @@ class UpdateProgramUseCase with AppLoggerMixin
       'start updating program',
       extra: {'id': params.program.id, 'name': params.name},
     );
-    final result =
-        await _programRepository.update(params.program.id, args: params);
+    final result = await _programRepository.update(
+      params.program.id,
+      args: params,
+    );
     switch (result) {
       case AppSuccess(:final data):
         logDebug('program updated');

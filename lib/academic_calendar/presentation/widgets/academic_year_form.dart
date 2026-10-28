@@ -29,7 +29,8 @@ class AcademicYearForm extends StatefulWidget {
     required String name,
     required DateTime startDate,
     required DateTime endDate,
-  }) onSave;
+  })
+  onSave;
 
   /// Invoked when user confirms deletion of [initial]
   final void Function()? onDelete;

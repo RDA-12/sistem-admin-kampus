@@ -6,7 +6,8 @@ import 'package:sistem_admin/faculty/domain/repository.dart';
 
 /// Use case for watching single [Faculty] data changes
 @LazySingleton(env: [Environment.prod])
-class WatchSingleFacultyUseCase with AppLoggerMixin
+class WatchSingleFacultyUseCase
+    with AppLoggerMixin
     implements StreamBaseUseCase<String, Faculty> {
   /// Creates new [WatchSingleFacultyUseCase]
   new({required this._facultyRepository});

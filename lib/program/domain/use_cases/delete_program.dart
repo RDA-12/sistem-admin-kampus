@@ -6,7 +6,8 @@ import 'package:sistem_admin/program/domain/repository.dart';
 
 /// Use case for deleting a Program
 @LazySingleton(env: [Environment.prod])
-class DeleteProgramUseCase with AppLoggerMixin
+class DeleteProgramUseCase
+    with AppLoggerMixin
     implements FutureBaseUseCase<Program, Null> {
   /// Creates new [DeleteProgramUseCase]
   new({required this._programRepository});

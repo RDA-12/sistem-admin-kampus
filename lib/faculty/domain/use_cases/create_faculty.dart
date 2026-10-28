@@ -19,7 +19,8 @@ final class CreateFacultyParams extends Equatable {
 
 /// Use case for creating new [Faculty]
 @LazySingleton(env: [Environment.prod])
-class CreateFacultyUseCase with AppLoggerMixin
+class CreateFacultyUseCase
+    with AppLoggerMixin
     implements FutureBaseUseCase<CreateFacultyParams, Faculty> {
   /// Creates new [CreateFacultyUseCase]
   new({required this._facultyRepository});

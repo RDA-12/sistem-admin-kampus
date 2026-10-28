@@ -6,7 +6,8 @@ import 'package:sistem_admin/faculty/domain/repository.dart';
 
 /// Use case for deleting a Faculty
 @LazySingleton(env: [Environment.prod])
-class DeleteFacultyUseCase with AppLoggerMixin
+class DeleteFacultyUseCase
+    with AppLoggerMixin
     implements FutureBaseUseCase<Faculty, Null> {
   /// Creates new [DeleteFacultyUseCase]
   new({required this._facultyRepository});

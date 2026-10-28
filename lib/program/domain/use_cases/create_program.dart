@@ -22,7 +22,8 @@ final class CreateProgramParams extends Equatable {
 
 /// Use case for creating new [Program]
 @LazySingleton(env: [Environment.prod])
-class CreateProgramUseCase with AppLoggerMixin
+class CreateProgramUseCase
+    with AppLoggerMixin
     implements FutureBaseUseCase<CreateProgramParams, Program> {
   /// Creates new [CreateProgramUseCase]
   new({required this._programRepository});
