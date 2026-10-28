@@ -1,6 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/widgets/app_form_field.dart';
 
@@ -345,12 +346,16 @@ void main() {
   group('AppDateFormFieldController', () {
     final testDate = DateTime(2026, 10, 20);
 
+    setUpAll(() async {
+      await initializeDateFormatting('id_ID');
+    });
+
     test('initial value configures text and value', () {
       final controller = AppDateFormFieldController(initial: testDate);
       addTearDown(controller.dispose);
 
       expect(controller.value, testDate);
-      expect(controller.textEditingController.text, '2026-10-20');
+      expect(controller.textEditingController.text, '20 Oktober 2026');
     });
 
     test('defaults value to null and empty text when initial is null', () {
@@ -366,7 +371,7 @@ void main() {
       addTearDown(controller.dispose);
 
       expect(controller.value, testDate);
-      expect(controller.textEditingController.text, '2026-10-20');
+      expect(controller.textEditingController.text, '20 Oktober 2026');
     });
 
     test('parses valid date when text changes', () {
@@ -504,7 +509,7 @@ void main() {
             await tester.pumpAndSettle();
 
             expect(controller.value, testDate);
-            expect(controller.textEditingController.text, '2026-10-20');
+            expect(controller.textEditingController.text, '20 Oktober 2026');
           });
         },
       );

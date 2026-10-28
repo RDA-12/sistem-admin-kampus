@@ -3,6 +3,7 @@ export 'app_logger.dart';
 export 'data/data.dart';
 export 'di.dart';
 export 'exception_message.dart';
+export 'formatter.dart';
 export 'router/router.dart';
 export 'shell/shell.dart';
 export 'theme/theme.dart';

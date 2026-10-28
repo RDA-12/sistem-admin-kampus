@@ -1,7 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:sistem_admin/common/theme/theme.dart';
+import 'package:sistem_admin/common/common.dart';
 
 /// Styled [TextFormField] based on this app
 class AppFormField extends StatelessWidget {
@@ -211,10 +211,7 @@ class AppNumberFormField extends StatelessWidget {
 }
 
 String _formatDate(DateTime date) {
-  final y = date.year.toString().padLeft(4, '0');
-  final m = date.month.toString().padLeft(2, '0');
-  final d = date.day.toString().padLeft(2, '0');
-  return '$y-$m-$d';
+  return date.dateFormat();
 }
 
 /// Controls [AppDateFormField] value
