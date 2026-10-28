@@ -1,9 +1,11 @@
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sistem_admin/common/common.dart';
 
-void main() {
+void main() async {
   initializeDependencies();
+  await initializeDateFormatting('id_ID');
   AppLogger.initialize();
   runApp(const MainApp());
 }
