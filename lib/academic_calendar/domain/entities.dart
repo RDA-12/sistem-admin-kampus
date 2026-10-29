@@ -157,12 +157,13 @@ class AcademicCalendarEvent extends Equatable {
   ];
 }
 
-/// Represent an academic calendar for [year] and its [terms]
+/// Represent an academic calendar for [year], its [terms], and its [events]
 class AcademicCalendar extends Equatable {
   /// Creates new [AcademicCalendar]
   const new({
     required this.year,
-    required this.terms,
+    this.terms = const [],
+    this.events = const [],
   });
 
   /// Year for this calendar
@@ -170,6 +171,9 @@ class AcademicCalendar extends Equatable {
 
   /// Terms within [year]
   final List<AcademicTerm> terms;
+
+  /// Events within [year]
+  final List<AcademicCalendarEvent> events;
 
   /// Whether new term can be added to this calendar based on
   /// [startDate] and [endDate]
@@ -237,6 +241,40 @@ class AcademicCalendar extends Equatable {
     return AppResult.success(null);
   }
 
+  /// Whether new event can be added to this calendar based on
+  /// [startDate] and [endDate]
+  AppResult<Null> canAddEvent({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) {
+    if (!year.includes(startDate) || !year.includes(endDate)) {
+      return AppResult.failure(
+        const AppException(
+          'event date is outside academic year',
+          code: .academicCalendarEventOutsideYear,
+        ),
+      );
+    }
+    return AppResult.success(null);
+  }
+
+  /// Whether an existing event can be updated in this calendar based on
+  /// [startDate] and [endDate]
+  AppResult<Null> canUpdateEvent({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) {
+    if (!year.includes(startDate) || !year.includes(endDate)) {
+      return AppResult.failure(
+        const AppException(
+          'event date is outside academic year',
+          code: .academicCalendarEventOutsideYear,
+        ),
+      );
+    }
+    return AppResult.success(null);
+  }
+
   @override
-  List<Object?> get props => [year, terms];
+  List<Object?> get props => [year, terms, events];
 }

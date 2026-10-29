@@ -58,6 +58,34 @@ class MockUpdateAcademicTermUseCase extends Mock
 class MockDeleteAcademicTermUseCase extends Mock
     implements DeleteAcademicTermUseCase;
 
+@LazySingleton(
+  as: WatchAcademicCalendarEventsByYearUseCase,
+  env: [Environment.test],
+)
+class MockWatchAcademicCalendarEventsByYearUseCase extends Mock
+    implements WatchAcademicCalendarEventsByYearUseCase;
+
+@LazySingleton(
+  as: CreateAcademicCalendarEventUseCase,
+  env: [Environment.test],
+)
+class MockCreateAcademicCalendarEventUseCase extends Mock
+    implements CreateAcademicCalendarEventUseCase;
+
+@LazySingleton(
+  as: UpdateAcademicCalendarEventUseCase,
+  env: [Environment.test],
+)
+class MockUpdateAcademicCalendarEventUseCase extends Mock
+    implements UpdateAcademicCalendarEventUseCase;
+
+@LazySingleton(
+  as: DeleteAcademicCalendarEventUseCase,
+  env: [Environment.test],
+)
+class MockDeleteAcademicCalendarEventUseCase extends Mock
+    implements DeleteAcademicCalendarEventUseCase;
+
 final academicYearsMock = List<AcademicYear>.generate(
   5,
   (index) => AcademicYear(

@@ -29,6 +29,8 @@ void main() {
     .academicTermOutsideYear: 'Semester berada di luar rentang tahun akademik',
     .academicCalendarEventNotFound:
         'Kegiatan kalender akademik tidak dapat ditemukan',
+    .academicCalendarEventOutsideYear:
+        'Kegiatan kalender akademik berada di luar rentang tahun akademik',
     .cohortNotFound: 'Angkatan tidak dapat ditemukan',
     .cohortAlreadyExists: 'Angkatan dengan nama tersebut sudah ada',
   };
