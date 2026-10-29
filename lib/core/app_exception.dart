@@ -57,6 +57,9 @@ enum AppExceptionCode {
   /// Code caused by academic term date outside the academic year
   academicTermOutsideYear,
 
+  /// Code caused by requested academic calendar event not found in db
+  academicCalendarEventNotFound,
+
   /// Code caused by requested cohort not found in db
   cohortNotFound,
 

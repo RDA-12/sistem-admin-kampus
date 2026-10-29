@@ -1,7 +1,9 @@
+export 'create_academic_calendar_event.dart';
 export 'create_academic_term.dart';
 export 'create_academic_year.dart';
 export 'delete_academic_term.dart';
 export 'delete_academic_year.dart';
+export 'update_academic_calendar_event.dart';
 export 'update_academic_term.dart';
 export 'update_academic_year.dart';
 export 'watch_academic_terms.dart';

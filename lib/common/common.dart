@@ -7,5 +7,6 @@ export 'formatter.dart';
 export 'router/router.dart';
 export 'shell/shell.dart';
 export 'theme/theme.dart';
+export 'time.dart';
 export 'uid_generator.dart';
 export 'widgets/widgets.dart';

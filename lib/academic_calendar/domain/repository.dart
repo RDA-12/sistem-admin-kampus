@@ -25,3 +25,18 @@ abstract interface class IAcademicTermRepository
     String academicYearId,
   );
 }
+
+/// Manage data on [AcademicCalendarEvent]
+abstract interface class IAcademicCalendarEventRepository
+    extends
+        BaseRepository<
+          AcademicCalendarEvent,
+          CreateAcademicCalendarEventParams,
+          UpdateAcademicCalendarEventParams
+        > {
+  /// Watch for [AcademicCalendarEvent] data changes for specific
+  /// [academicYearId]
+  Stream<AppResult<List<AcademicCalendarEvent>>> watchByAcademicYear(
+    String academicYearId,
+  );
+}

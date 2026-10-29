@@ -35,6 +35,8 @@ extension ExceptionMessageX on AppExceptionCode {
       'Semester tumpang tindih dengan yang lain',
     AppExceptionCode.academicTermOutsideYear =>
       'Semester berada di luar rentang tahun akademik',
+    AppExceptionCode.academicCalendarEventNotFound =>
+      'Kegiatan kalender akademik tidak dapat ditemukan',
     AppExceptionCode.cohortAlreadyExists =>
       'Angkatan dengan nama tersebut sudah ada',
   };

@@ -23,6 +23,7 @@ part 'app_drift_database.g.dart';
     RoomsDrift,
     AcademicYearsDrift,
     AcademicTermsDrift,
+    AcademicCalendarEventsDrift,
     CohortsDrift,
   ],
 )

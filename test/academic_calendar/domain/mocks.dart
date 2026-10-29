@@ -10,6 +10,10 @@ class MockAcademicYearRepository extends Mock
 class MockAcademicTermRepository extends Mock
     implements IAcademicTermRepository;
 
+@LazySingleton(as: IAcademicCalendarEventRepository, env: [Environment.test])
+class MockAcademicCalendarEventRepository extends Mock
+    implements IAcademicCalendarEventRepository;
+
 @LazySingleton(as: WatchAcademicYearsUseCase, env: [Environment.test])
 class MockWatchAcademicYearsUseCase extends Mock
     implements WatchAcademicYearsUseCase;

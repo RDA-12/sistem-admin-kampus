@@ -1,6 +1,23 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:sistem_admin/academic_calendar/domain/domain.dart';
 import 'package:sistem_admin/common/common.dart';
+
+/// Converts [List<String>] to JSON string for SQLite storage
+class StringListConverter extends TypeConverter<List<String>, String> {
+  /// Creates new [StringListConverter]
+  const new();
+
+  @override
+  List<String> fromSql(String fromDb) {
+    if (fromDb.isEmpty) return const [];
+    return (json.decode(fromDb) as List<dynamic>).cast<String>();
+  }
+
+  @override
+  String toSql(List<String> value) => json.encode(value);
+}
 
 /// Drift database model for [AcademicYear]
 @DataClassName('AcademicYearDb')
@@ -125,4 +142,108 @@ extension AcademicTermToCompanionX on UpdateAcademicTermParams {
     startDate: startDate == null ? const Value.absent() : Value(startDate!),
     endDate: endDate == null ? const Value.absent() : Value(endDate!),
   );
+}
+
+/// Drift database model for [AcademicCalendarEvent]
+@DataClassName('AcademicCalendarEventDb')
+class AcademicCalendarEventsDrift extends Table with AppClockMixin {
+  @override
+  String? get tableName => 'academic_calendar_events';
+
+  /// ID of the academic calendar event
+  TextColumn get id => text()();
+
+  /// ID of the parent academic year
+  TextColumn get academicYearId => text().references(
+    AcademicYearsDrift,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
+  /// Name of the academic calendar event
+  TextColumn get name => text()();
+
+  /// Type of the academic calendar event
+  TextColumn get type => textEnum<AcademicCalendarEventType>()();
+
+  /// Start date of the academic calendar event
+  DateTimeColumn get startDate => dateTime()();
+
+  /// Start hour of the academic calendar event
+  IntColumn get startHour => integer()();
+
+  /// Start minute of the academic calendar event
+  IntColumn get startMinute => integer()();
+
+  /// End date of the academic calendar event
+  DateTimeColumn get endDate => dateTime()();
+
+  /// End hour of the academic calendar event
+  IntColumn get endHour => integer()();
+
+  /// End minute of the academic calendar event
+  IntColumn get endMinute => integer()();
+
+  /// Recurrence rules (RFC5545)
+  TextColumn get recurrence =>
+      text().map(const StringListConverter()).clientDefault(() => '[]')();
+
+  /// When this academic calendar event created
+  DateTimeColumn get createdAt =>
+      dateTime().clientDefault(getCurrentDateTime)();
+
+  /// When the last time this academic calendar event updated
+  DateTimeColumn get updatedAt =>
+      dateTime().clientDefault(getCurrentDateTime)();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {id};
+}
+
+/// Helper to convert [AcademicCalendarEventDb] to [AcademicCalendarEvent]
+extension AcademicCalendarEventToDomainX on AcademicCalendarEventDb {
+  /// Returns [AcademicCalendarEvent] of this [AcademicCalendarEventDb]
+  AcademicCalendarEvent toDomain() => AcademicCalendarEvent(
+    id: id,
+    academicYearId: academicYearId,
+    name: name,
+    type: type,
+    start: EventDateTime(
+      date: startDate,
+      time: Time(hour: startHour, minute: startMinute),
+    ),
+    end: EventDateTime(
+      date: endDate,
+      time: Time(hour: endHour, minute: endMinute),
+    ),
+    recurrence: recurrence,
+  );
+}
+
+/// Helper to convert [UpdateAcademicCalendarEventParams] to
+/// [AcademicCalendarEventsDriftCompanion]
+extension AcademicCalendarEventToCompanionX
+    on UpdateAcademicCalendarEventParams {
+  /// Returns [AcademicCalendarEventsDriftCompanion] of this
+  /// [UpdateAcademicCalendarEventParams]
+  AcademicCalendarEventsDriftCompanion toCompanion() =>
+      AcademicCalendarEventsDriftCompanion(
+        academicYearId: academicYearId == null
+            ? const Value.absent()
+            : Value(academicYearId!),
+        name: name == null ? const Value.absent() : Value(name!),
+        type: type == null ? const Value.absent() : Value(type!),
+        startDate:
+            start == null ? const Value.absent() : Value(start!.date),
+        startHour:
+            start == null ? const Value.absent() : Value(start!.time.hour),
+        startMinute:
+            start == null ? const Value.absent() : Value(start!.time.minute),
+        endDate: end == null ? const Value.absent() : Value(end!.date),
+        endHour: end == null ? const Value.absent() : Value(end!.time.hour),
+        endMinute:
+            end == null ? const Value.absent() : Value(end!.time.minute),
+        recurrence:
+            recurrence == null ? const Value.absent() : Value(recurrence!),
+      );
 }

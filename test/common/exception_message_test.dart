@@ -27,6 +27,8 @@ void main() {
         'Semester dengan nama tersebut sudah ada pada tahun akademik ini',
     .academicTermOverlapped: 'Semester tumpang tindih dengan yang lain',
     .academicTermOutsideYear: 'Semester berada di luar rentang tahun akademik',
+    .academicCalendarEventNotFound:
+        'Kegiatan kalender akademik tidak dapat ditemukan',
     .cohortNotFound: 'Angkatan tidak dapat ditemukan',
     .cohortAlreadyExists: 'Angkatan dengan nama tersebut sudah ada',
   };

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 
 /// Represent single Academic Year data
@@ -86,6 +87,73 @@ class AcademicTerm extends Equatable {
     name,
     startDate,
     endDate,
+  ];
+}
+
+/// Types of [AcademicCalendarEvent]
+enum AcademicCalendarEventType {
+  /// Type for holiday event
+  holiday,
+
+  /// Type for mid term test
+  midTermTest,
+
+  /// Type for final test
+  finalTest,
+
+  /// Type for general event
+  general,
+
+  /// Type for lecturing event
+  lectures,
+}
+
+/// Representing single event on AcademicCalendar
+class AcademicCalendarEvent extends Equatable {
+  /// Creates new [AcademicCalendarEvent]
+  const new({
+    required this.id,
+    required this.academicYearId,
+    required this.name,
+    required this.type,
+    required this.start,
+    required this.end,
+    this.recurrence = const [],
+  });
+
+  /// ID of the event
+  final String id;
+
+  /// Academic year this event belong to
+  final String academicYearId;
+
+  /// Name of the event
+  final String name;
+
+  /// Type of the event
+  final AcademicCalendarEventType type;
+
+  /// When the event start
+  final EventDateTime start;
+
+  /// When the event end
+  final EventDateTime end;
+
+  /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event,
+  /// as specified in RFC5545.
+  ///
+  /// It will omit DTSTART and DTEND as it will use [start] and [end]
+  final List<String> recurrence;
+
+  @override
+  List<Object?> get props => [
+    id,
+    academicYearId,
+    name,
+    type,
+    start,
+    end,
+    recurrence,
   ];
 }
 
