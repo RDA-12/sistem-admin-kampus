@@ -9,7 +9,8 @@ import 'package:sistem_admin/core/core.dart';
 part 'academic_calendar_mutation_event.dart';
 part 'academic_calendar_mutation_state.dart';
 
-/// Bloc for mutating Academic Calendar ([AcademicYear] & [AcademicTerm]) data
+/// Bloc for mutating Academic Calendar ([AcademicYear], [AcademicTerm],
+/// and [AcademicCalendarEvent]) data
 @injectable
 class AcademicCalendarMutationBloc
     extends Bloc<AcademicCalendarMutationEvent, AcademicCalendarMutationState>
@@ -22,6 +23,9 @@ class AcademicCalendarMutationBloc
     required this._createAcademicTerm,
     required this._updateAcademicTerm,
     required this._deleteAcademicTerm,
+    required this._createAcademicCalendarEvent,
+    required this._updateAcademicCalendarEvent,
+    required this._deleteAcademicCalendarEvent,
   }) : super(const AcademicCalendarMutationState()) {
     on<AcademicCalendarYearCreateRequested>(
       _onAcademicCalendarYearCreateRequested,
@@ -43,6 +47,16 @@ class AcademicCalendarMutationBloc
     on<AcademicCalendarTermDeleteRequested>(
       _onAcademicCalendarTermDeleteRequested,
     );
+    on<AcademicCalendarEventCreateRequested>(
+      _onAcademicCalendarEventCreateRequested,
+      transformer: sequential(),
+    );
+    on<AcademicCalendarEventUpdateRequested>(
+      _onAcademicCalendarEventUpdateRequested,
+    );
+    on<AcademicCalendarEventDeleteRequested>(
+      _onAcademicCalendarEventDeleteRequested,
+    );
   }
 
   final CreateAcademicYearUseCase _createAcademicYear;
@@ -51,6 +65,9 @@ class AcademicCalendarMutationBloc
   final CreateAcademicTermUseCase _createAcademicTerm;
   final UpdateAcademicTermUseCase _updateAcademicTerm;
   final DeleteAcademicTermUseCase _deleteAcademicTerm;
+  final CreateAcademicCalendarEventUseCase _createAcademicCalendarEvent;
+  final UpdateAcademicCalendarEventUseCase _updateAcademicCalendarEvent;
+  final DeleteAcademicCalendarEventUseCase _deleteAcademicCalendarEvent;
 
   Future<void> _onAcademicCalendarYearCreateRequested(
     AcademicCalendarYearCreateRequested event,
@@ -331,6 +348,164 @@ class AcademicCalendarMutationBloc
           notice: notice,
           deletingTermIds: {...state.deletingTermIds}
             ..remove(event.academicTerm.id),
+        ),
+      );
+    });
+  }
+
+  Future<void> _onAcademicCalendarEventCreateRequested(
+    AcademicCalendarEventCreateRequested event,
+    Emitter<AcademicCalendarMutationState> emit,
+  ) async {
+    await AppLogger.runWithLogger(() async {
+      logDebug(
+        'start creating academic calendar event. emit isCreatingEvent true',
+        extra: {
+          'academicYearId': event.academicYearId,
+          'name': event.name,
+          'type': event.type,
+          'start': event.start,
+          'end': event.end,
+          'recurrence': event.recurrence,
+        },
+      );
+      emit(state.copyWith(isCreatingEvent: true));
+
+      final result = await _createAcademicCalendarEvent(
+        CreateAcademicCalendarEventParams(
+          academicYearId: event.academicYearId,
+          name: event.name,
+          type: event.type,
+          start: event.start,
+          end: event.end,
+          recurrence: event.recurrence,
+        ),
+      );
+
+      final notice = switch (result) {
+        AppSuccess(:final data) => () {
+          logDebug('academic calendar event created. emit created notice');
+          return AcademicCalendarEventCreatedNotice(data);
+        }(),
+        AppFailure(:final exception) => () {
+          logDebug(
+            'create academic calendar event failed. emit failed notice',
+          );
+          return AcademicCalendarMutationFailedNotice(
+            type: .create,
+            target: .event,
+            exception: exception,
+          );
+        }(),
+      };
+      emit(state.copyWith(isCreatingEvent: false, notice: notice));
+    });
+  }
+
+  Future<void> _onAcademicCalendarEventUpdateRequested(
+    AcademicCalendarEventUpdateRequested event,
+    Emitter<AcademicCalendarMutationState> emit,
+  ) async {
+    await AppLogger.runWithLogger(() async {
+      logDebug(
+        'start updating academic calendar event. emit updatingEventIds',
+        extra: {
+          'id': event.event.id,
+          'academicYearId': event.academicYearId,
+          'name': event.name,
+          'type': event.type,
+          'start': event.start,
+          'end': event.end,
+          'recurrence': event.recurrence,
+        },
+      );
+      emit(
+        state.copyWith(
+          updatingEventIds: {...state.updatingEventIds, event.event.id},
+        ),
+      );
+
+      final result = await _updateAcademicCalendarEvent(
+        UpdateAcademicCalendarEventParams(
+          event.event,
+          academicYearId: event.academicYearId,
+          name: event.name,
+          type: event.type,
+          start: event.start,
+          end: event.end,
+          recurrence: event.recurrence,
+        ),
+      );
+
+      final notice = switch (result) {
+        AppSuccess(:final data) => () {
+          logDebug('academic calendar event updated. emit updated notice');
+          return AcademicCalendarEventUpdatedNotice(
+            before: event.event,
+            after: data,
+          );
+        }(),
+        AppFailure(:final exception) => () {
+          logDebug(
+            'update academic calendar event failed. emit failed notice',
+          );
+          return AcademicCalendarMutationFailedNotice(
+            type: .update,
+            target: .event,
+            exception: exception,
+            academicCalendarEvent: event.event,
+          );
+        }(),
+      };
+      emit(
+        state.copyWith(
+          notice: notice,
+          updatingEventIds: {...state.updatingEventIds}
+            ..remove(event.event.id),
+        ),
+      );
+    });
+  }
+
+  Future<void> _onAcademicCalendarEventDeleteRequested(
+    AcademicCalendarEventDeleteRequested event,
+    Emitter<AcademicCalendarMutationState> emit,
+  ) async {
+    await AppLogger.runWithLogger(() async {
+      logDebug(
+        'start deleting academic calendar event. emit deletingEventIds',
+        extra: {'id': event.event.id},
+      );
+      emit(
+        state.copyWith(
+          deletingEventIds: {...state.deletingEventIds, event.event.id},
+        ),
+      );
+
+      final result = await _deleteAcademicCalendarEvent(event.event);
+
+      final notice = switch (result) {
+        AppSuccess() => () {
+          logDebug('academic calendar event deleted. emit deleted notice');
+          return AcademicCalendarEventDeletedNotice(event.event);
+        }(),
+        AppFailure(:final exception) => () {
+          logDebug(
+            'delete academic calendar event failed. emit failed notice',
+          );
+          return AcademicCalendarMutationFailedNotice(
+            type: .delete,
+            target: .event,
+            exception: exception,
+            academicCalendarEvent: event.event,
+          );
+        }(),
+      };
+      emit(
+        state.copyWith(
+          notice: notice,
+          deletingEventIds: {...state.deletingEventIds}
+            ..remove(event.event.id),
         ),
       );
     });

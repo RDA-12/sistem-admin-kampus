@@ -24,6 +24,22 @@ void main() {
     startDate: DateTime(2025, 9),
     endDate: DateTime(2026, 1, 31),
   );
+  final startEvent = EventDateTime(
+    date: DateTime(2025, 9),
+    time: const Time(hour: 8, minute: 0),
+  );
+  final endEvent = EventDateTime(
+    date: DateTime(2025, 9, 3),
+    time: const Time(hour: 17, minute: 0),
+  );
+  final event = AcademicCalendarEvent(
+    id: 'event_id',
+    academicYearId: 'id',
+    name: 'Orientation',
+    type: AcademicCalendarEventType.holiday,
+    start: startEvent,
+    end: endEvent,
+  );
 
   late CreateAcademicYearUseCase createAcademicYearMock;
   late UpdateAcademicYearUseCase updateAcademicYearMock;
@@ -31,6 +47,9 @@ void main() {
   late CreateAcademicTermUseCase createAcademicTermMock;
   late UpdateAcademicTermUseCase updateAcademicTermMock;
   late DeleteAcademicTermUseCase deleteAcademicTermMock;
+  late CreateAcademicCalendarEventUseCase createAcademicCalendarEventMock;
+  late UpdateAcademicCalendarEventUseCase updateAcademicCalendarEventMock;
+  late DeleteAcademicCalendarEventUseCase deleteAcademicCalendarEventMock;
 
   group('AcademicCalendarMutationBloc', () {
     setUpAll(initializeMockDependencies);
@@ -42,6 +61,12 @@ void main() {
       createAcademicTermMock = getIt<CreateAcademicTermUseCase>();
       updateAcademicTermMock = getIt<UpdateAcademicTermUseCase>();
       deleteAcademicTermMock = getIt<DeleteAcademicTermUseCase>();
+      createAcademicCalendarEventMock =
+          getIt<CreateAcademicCalendarEventUseCase>();
+      updateAcademicCalendarEventMock =
+          getIt<UpdateAcademicCalendarEventUseCase>();
+      deleteAcademicCalendarEventMock =
+          getIt<DeleteAcademicCalendarEventUseCase>();
     });
 
     AcademicCalendarMutationBloc buildBloc() {
@@ -52,6 +77,9 @@ void main() {
         createAcademicTerm: createAcademicTermMock,
         updateAcademicTerm: updateAcademicTermMock,
         deleteAcademicTerm: deleteAcademicTermMock,
+        createAcademicCalendarEvent: createAcademicCalendarEventMock,
+        updateAcademicCalendarEvent: updateAcademicCalendarEventMock,
+        deleteAcademicCalendarEvent: deleteAcademicCalendarEventMock,
       );
     }
 
@@ -510,6 +538,250 @@ void main() {
         ],
         verify: (_) {
           verify(() => deleteAcademicTermMock(term)).called(1);
+        },
+      );
+    });
+
+    group('AcademicCalendarEventCreateRequested', () {
+      final params = CreateAcademicCalendarEventParams(
+        academicYearId: 'id',
+        name: 'Orientation',
+        type: AcademicCalendarEventType.holiday,
+        start: startEvent,
+        end: endEvent,
+      );
+
+      setUpAll(() {
+        registerFallbackValue(params);
+      });
+
+      setUp(() {
+        when(() => createAcademicCalendarEventMock(params))
+            .thenAnswer((_) async => AppResult.success(event));
+      });
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [isCreatingEvent true, created notice and isCreatingEvent false] '
+        'when AcademicCalendarEventCreateRequested is added '
+        'and CreateAcademicCalendarEventUseCase success',
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventCreateRequested(
+            academicYearId: params.academicYearId,
+            name: params.name,
+            type: params.type,
+            start: params.start,
+            end: params.end,
+          ),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(isCreatingEvent: true),
+          AcademicCalendarMutationState(
+            isCreatingEvent: false,
+            notice: AcademicCalendarEventCreatedNotice(event),
+          ),
+        ],
+        verify: (_) {
+          verify(() => createAcademicCalendarEventMock(params)).called(1);
+        },
+      );
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [isCreatingEvent true, failure notice and isCreatingEvent false] '
+        'when AcademicCalendarEventCreateRequested is added '
+        'and CreateAcademicCalendarEventUseCase fails',
+        setUp: () {
+          when(() => createAcademicCalendarEventMock(params)).thenAnswer(
+            (_) async => AppResult.failure(AppException.test()),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventCreateRequested(
+            academicYearId: params.academicYearId,
+            name: params.name,
+            type: params.type,
+            start: params.start,
+            end: params.end,
+          ),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(isCreatingEvent: true),
+          AcademicCalendarMutationState(
+            isCreatingEvent: false,
+            notice: AcademicCalendarMutationFailedNotice(
+              type: AcademicCalendarMutationType.create,
+              target: AcademicCalendarTargetType.event,
+              exception: AppException.test(),
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => createAcademicCalendarEventMock(params)).called(1);
+        },
+      );
+    });
+
+    group('AcademicCalendarEventUpdateRequested', () {
+      final updatedStart = EventDateTime(
+        date: DateTime(2025, 9),
+        time: const Time(hour: 9, minute: 0),
+      );
+      final updatedEnd = EventDateTime(
+        date: DateTime(2025, 9, 4),
+        time: const Time(hour: 18, minute: 0),
+      );
+      final updatedEvent = AcademicCalendarEvent(
+        id: 'event_id',
+        academicYearId: 'id',
+        name: 'Updated Orientation',
+        type: AcademicCalendarEventType.holiday,
+        start: updatedStart,
+        end: updatedEnd,
+      );
+      final params = UpdateAcademicCalendarEventParams(
+        event,
+        academicYearId: 'id',
+        name: 'Updated Orientation',
+        type: AcademicCalendarEventType.holiday,
+        start: updatedStart,
+        end: updatedEnd,
+      );
+
+      setUpAll(() {
+        registerFallbackValue(params);
+      });
+
+      setUp(() {
+        when(() => updateAcademicCalendarEventMock(params))
+            .thenAnswer((_) async => AppResult.success(updatedEvent));
+      });
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [updatingEventIds with id, updated notice and empty updatingEventIds] '
+        'when AcademicCalendarEventUpdateRequested is added '
+        'and UpdateAcademicCalendarEventUseCase success',
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventUpdateRequested(
+            event: event,
+            academicYearId: 'id',
+            name: 'Updated Orientation',
+            type: AcademicCalendarEventType.holiday,
+            start: updatedStart,
+            end: updatedEnd,
+          ),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(updatingEventIds: {'event_id'}),
+          AcademicCalendarMutationState(
+            updatingEventIds: const {},
+            notice: AcademicCalendarEventUpdatedNotice(
+              before: event,
+              after: updatedEvent,
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => updateAcademicCalendarEventMock(params)).called(1);
+        },
+      );
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [updatingEventIds with id, failure notice and empty updatingEventIds] '
+        'when AcademicCalendarEventUpdateRequested is added '
+        'and UpdateAcademicCalendarEventUseCase fails',
+        setUp: () {
+          when(() => updateAcademicCalendarEventMock(params)).thenAnswer(
+            (_) async => AppResult.failure(AppException.test()),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventUpdateRequested(
+            event: event,
+            academicYearId: 'id',
+            name: 'Updated Orientation',
+            type: AcademicCalendarEventType.holiday,
+            start: updatedStart,
+            end: updatedEnd,
+          ),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(updatingEventIds: {'event_id'}),
+          AcademicCalendarMutationState(
+            updatingEventIds: const {},
+            notice: AcademicCalendarMutationFailedNotice(
+              type: AcademicCalendarMutationType.update,
+              target: AcademicCalendarTargetType.event,
+              exception: AppException.test(),
+              academicCalendarEvent: event,
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => updateAcademicCalendarEventMock(params)).called(1);
+        },
+      );
+    });
+
+    group('AcademicCalendarEventDeleteRequested', () {
+      setUpAll(() {
+        registerFallbackValue(event);
+      });
+
+      setUp(() {
+        when(() => deleteAcademicCalendarEventMock(event))
+            .thenAnswer((_) async => AppResult.success(null));
+      });
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [deletingEventIds with id, deleted notice and empty deletingEventIds] '
+        'when AcademicCalendarEventDeleteRequested is added '
+        'and DeleteAcademicCalendarEventUseCase success',
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventDeleteRequested(event: event),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(deletingEventIds: {'event_id'}),
+          AcademicCalendarMutationState(
+            deletingEventIds: const {},
+            notice: AcademicCalendarEventDeletedNotice(event),
+          ),
+        ],
+        verify: (_) {
+          verify(() => deleteAcademicCalendarEventMock(event)).called(1);
+        },
+      );
+
+      blocTest<AcademicCalendarMutationBloc, AcademicCalendarMutationState>(
+        'emits [deletingEventIds with id, failure notice and empty deletingEventIds] '
+        'when AcademicCalendarEventDeleteRequested is added '
+        'and DeleteAcademicCalendarEventUseCase fails',
+        setUp: () {
+          when(() => deleteAcademicCalendarEventMock(event)).thenAnswer(
+            (_) async => AppResult.failure(AppException.test()),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          AcademicCalendarEventDeleteRequested(event: event),
+        ),
+        expect: () => <AcademicCalendarMutationState>[
+          const AcademicCalendarMutationState(deletingEventIds: {'event_id'}),
+          AcademicCalendarMutationState(
+            deletingEventIds: const {},
+            notice: AcademicCalendarMutationFailedNotice(
+              type: AcademicCalendarMutationType.delete,
+              target: AcademicCalendarTargetType.event,
+              exception: AppException.test(),
+              academicCalendarEvent: event,
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => deleteAcademicCalendarEventMock(event)).called(1);
         },
       );
     });

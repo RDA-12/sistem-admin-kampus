@@ -19,6 +19,9 @@ enum AcademicCalendarTargetType {
 
   /// Academic Term target
   term,
+
+  /// Academic Calendar Event target
+  event,
 }
 
 /// Notice data for [AcademicCalendarMutationState]
@@ -106,6 +109,49 @@ final class AcademicTermCreatedNotice extends AcademicCalendarMutationNotice {
   List<Object?> get props => [created];
 }
 
+/// Notice when an [AcademicCalendarEvent] has been updated from [before] to
+/// [after]
+final class AcademicCalendarEventUpdatedNotice
+    extends AcademicCalendarMutationNotice {
+  /// Creates new [AcademicCalendarEventUpdatedNotice]
+  const new({required this.before, required this.after});
+
+  /// [AcademicCalendarEvent] data before update
+  final AcademicCalendarEvent before;
+
+  /// [AcademicCalendarEvent] data after update
+  final AcademicCalendarEvent after;
+
+  @override
+  List<Object?> get props => [before, after];
+}
+
+/// Notice when an [AcademicCalendarEvent] has been deleted
+final class AcademicCalendarEventDeletedNotice
+    extends AcademicCalendarMutationNotice {
+  /// Creates new [AcademicCalendarEventDeletedNotice] for [deleted]
+  const new(this.deleted);
+
+  /// Deleted [AcademicCalendarEvent]
+  final AcademicCalendarEvent deleted;
+
+  @override
+  List<Object?> get props => [deleted];
+}
+
+/// Notice when an [AcademicCalendarEvent] has been created
+final class AcademicCalendarEventCreatedNotice
+    extends AcademicCalendarMutationNotice {
+  /// Creates new [AcademicCalendarEventCreatedNotice] for [created]
+  const new(this.created);
+
+  /// Created [AcademicCalendarEvent]
+  final AcademicCalendarEvent created;
+
+  @override
+  List<Object?> get props => [created];
+}
+
 /// Notice when academic calendar mutation process failed
 final class AcademicCalendarMutationFailedNotice
     extends AcademicCalendarMutationNotice {
@@ -116,6 +162,7 @@ final class AcademicCalendarMutationFailedNotice
     required this.target,
     this.academicYear,
     this.academicTerm,
+    this.academicCalendarEvent,
   });
 
   /// Type of failed mutation
@@ -130,6 +177,9 @@ final class AcademicCalendarMutationFailedNotice
   /// Academic term that was included, if target is term
   final AcademicTerm? academicTerm;
 
+  /// Academic calendar event that was included, if target is event
+  final AcademicCalendarEvent? academicCalendarEvent;
+
   /// Exception thrown by failed mutation
   final AppException exception;
 
@@ -139,6 +189,7 @@ final class AcademicCalendarMutationFailedNotice
     target,
     academicYear,
     academicTerm,
+    academicCalendarEvent,
     exception,
   ];
 }
@@ -149,11 +200,14 @@ class AcademicCalendarMutationState extends Equatable {
   const new({
     this.isCreatingYear = false,
     this.isCreatingTerm = false,
+    this.isCreatingEvent = false,
     this.notice,
     this.deletingYearIds = const {},
     this.updatingYearIds = const {},
     this.deletingTermIds = const {},
     this.updatingTermIds = const {},
+    this.deletingEventIds = const {},
+    this.updatingEventIds = const {},
   });
 
   /// Notice for newly completed mutation process
@@ -171,11 +225,20 @@ class AcademicCalendarMutationState extends Equatable {
   /// List of [AcademicTerm] ID for update
   final Set<String> updatingTermIds;
 
+  /// List of [AcademicCalendarEvent] ID for delete
+  final Set<String> deletingEventIds;
+
+  /// List of [AcademicCalendarEvent] ID for update
+  final Set<String> updatingEventIds;
+
   /// Whether creating new [AcademicYear] or not
   final bool isCreatingYear;
 
   /// Whether creating new [AcademicTerm] or not
   final bool isCreatingTerm;
+
+  /// Whether creating new [AcademicCalendarEvent] or not
+  final bool isCreatingEvent;
 
   /// Returns new copy based on provided data
   AcademicCalendarMutationState copyWith({
@@ -184,8 +247,11 @@ class AcademicCalendarMutationState extends Equatable {
     Set<String>? updatingYearIds,
     Set<String>? deletingTermIds,
     Set<String>? updatingTermIds,
+    Set<String>? deletingEventIds,
+    Set<String>? updatingEventIds,
     bool? isCreatingYear,
     bool? isCreatingTerm,
+    bool? isCreatingEvent,
   }) {
     return AcademicCalendarMutationState(
       notice: notice ?? this.notice,
@@ -193,8 +259,11 @@ class AcademicCalendarMutationState extends Equatable {
       updatingYearIds: updatingYearIds ?? this.updatingYearIds,
       deletingTermIds: deletingTermIds ?? this.deletingTermIds,
       updatingTermIds: updatingTermIds ?? this.updatingTermIds,
+      deletingEventIds: deletingEventIds ?? this.deletingEventIds,
+      updatingEventIds: updatingEventIds ?? this.updatingEventIds,
       isCreatingYear: isCreatingYear ?? this.isCreatingYear,
       isCreatingTerm: isCreatingTerm ?? this.isCreatingTerm,
+      isCreatingEvent: isCreatingEvent ?? this.isCreatingEvent,
     );
   }
 
@@ -205,7 +274,10 @@ class AcademicCalendarMutationState extends Equatable {
     updatingYearIds,
     deletingTermIds,
     updatingTermIds,
+    deletingEventIds,
+    updatingEventIds,
     isCreatingYear,
     isCreatingTerm,
+    isCreatingEvent,
   ];
 }
