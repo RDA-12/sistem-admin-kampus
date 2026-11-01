@@ -108,6 +108,18 @@ enum AcademicCalendarEventType {
   lectures,
 }
 
+/// Extensions for [AcademicCalendarEventType]
+extension AcademicCalendarEventTypeX on AcademicCalendarEventType {
+  /// Display label for this event type
+  String get label => switch (this) {
+    AcademicCalendarEventType.holiday => 'Hari Libur',
+    AcademicCalendarEventType.midTermTest => 'Ujian Tengah Semester (UTS)',
+    AcademicCalendarEventType.finalTest => 'Ujian Akhir Semester (UAS)',
+    AcademicCalendarEventType.lectures => 'Perkuliahan',
+    AcademicCalendarEventType.general => 'Kegiatan Umum',
+  };
+}
+
 /// Representing single event on AcademicCalendar
 class AcademicCalendarEvent extends Equatable {
   /// Creates new [AcademicCalendarEvent]
