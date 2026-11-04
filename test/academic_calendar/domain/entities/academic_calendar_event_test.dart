@@ -22,7 +22,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final a = AcademicCalendarEvent(
           id: 'id',
@@ -31,7 +30,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final b = AcademicCalendarEvent(
           id: 'id B',
@@ -40,7 +38,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final c = AcademicCalendarEvent(
           id: 'id',
@@ -49,7 +46,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final d = AcademicCalendarEvent(
           id: 'id',
@@ -58,7 +54,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final e = AcademicCalendarEvent(
           id: 'id',
@@ -67,7 +62,6 @@ void main() {
           type: AcademicCalendarEventType.holiday,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final f = AcademicCalendarEvent(
           id: 'id',
@@ -79,7 +73,6 @@ void main() {
             time: const Time(hour: 8, minute: 0),
           ),
           end: end,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final g = AcademicCalendarEvent(
           id: 'id',
@@ -91,7 +84,6 @@ void main() {
             date: DateTime(2025, 9),
             time: const Time(hour: 12, minute: 0),
           ),
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final h = AcademicCalendarEvent(
           id: 'id',
@@ -100,7 +92,6 @@ void main() {
           type: AcademicCalendarEventType.lectures,
           start: start,
           end: end,
-          recurrence: const ['RRULE:FREQ=MONTHLY'],
         );
 
         expect(testObj, equals(a));
@@ -113,26 +104,5 @@ void main() {
         expect(testObj, isNot(equals(h)));
       },
     );
-
-    test('default recurrence is empty list', () {
-      final start = EventDateTime(
-        date: DateTime(2025, 9),
-        time: const Time(hour: 8, minute: 0),
-      );
-      final end = EventDateTime(
-        date: DateTime(2025, 9),
-        time: const Time(hour: 10, minute: 0),
-      );
-      final event = AcademicCalendarEvent(
-        id: 'id',
-        academicYearId: 'year_1',
-        name: 'Kuliah Perdana',
-        type: AcademicCalendarEventType.lectures,
-        start: start,
-        end: end,
-      );
-
-      expect(event.recurrence, isEmpty);
-    });
   });
 }

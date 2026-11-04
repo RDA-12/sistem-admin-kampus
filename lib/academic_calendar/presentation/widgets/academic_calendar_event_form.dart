@@ -102,7 +102,6 @@ class _AcademicCalendarEventFormState extends State<AcademicCalendarEventForm> {
       type: _type,
       start: EventDateTime(date: startDate, time: startTime),
       end: EventDateTime(date: endDate, time: endTime),
-      recurrence: widget.initial?.recurrence ?? const [],
     );
   }
 

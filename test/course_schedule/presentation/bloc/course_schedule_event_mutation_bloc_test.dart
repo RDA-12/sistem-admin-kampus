@@ -46,7 +46,6 @@ void main() {
         start: event.start,
         end: event.end,
         courseDetail: event.courseDetail,
-        recurrence: event.recurrence,
       );
 
       setUpAll(() {
@@ -136,7 +135,6 @@ void main() {
         start: event.start,
         end: event.end,
         courseDetail: event.courseDetail,
-        recurrence: event.recurrence,
       );
       final params = UpdateCourseScheduleEventParams(
         event,

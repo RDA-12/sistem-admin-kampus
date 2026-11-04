@@ -39,7 +39,6 @@ void main() {
     start: start,
     end: end,
     courseDetail: detail,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   final updatedEvent = CourseScheduleEvent(
@@ -49,7 +48,6 @@ void main() {
     start: start,
     end: end,
     courseDetail: detail,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   final params = UpdateCourseScheduleEventParams(

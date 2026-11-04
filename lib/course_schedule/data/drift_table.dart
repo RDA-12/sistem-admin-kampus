@@ -100,7 +100,6 @@ extension CourseScheduleEventFromDbX on AcademicCalendarEventDb {
       date: endDate,
       time: Time(hour: endHour, minute: endMinute),
     ),
-    recurrence: recurrence,
     courseDetail: detailDb.toDomain(),
   );
 }

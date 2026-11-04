@@ -11,7 +11,6 @@ class CourseScheduleEvent extends AcademicCalendarEvent {
     required super.start,
     required super.end,
     required this.courseDetail,
-    super.recurrence,
   }) : super(type: .lectures);
 
   /// Detail of course for this event

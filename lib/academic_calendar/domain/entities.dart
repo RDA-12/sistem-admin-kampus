@@ -130,7 +130,6 @@ class AcademicCalendarEvent extends Equatable {
     required this.type,
     required this.start,
     required this.end,
-    this.recurrence = const [],
   });
 
   /// ID of the event
@@ -151,12 +150,6 @@ class AcademicCalendarEvent extends Equatable {
   /// When the event end
   final EventDateTime end;
 
-  /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event,
-  /// as specified in RFC5545.
-  ///
-  /// It will omit DTSTART and DTEND as it will use [start] and [end]
-  final List<String> recurrence;
-
   @override
   List<Object?> get props => [
     id,
@@ -165,7 +158,6 @@ class AcademicCalendarEvent extends Equatable {
     type,
     start,
     end,
-    recurrence,
   ];
 }
 

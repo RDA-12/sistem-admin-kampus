@@ -30,7 +30,6 @@ void main() {
     type: AcademicCalendarEventType.lectures,
     start: start,
     end: end,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   final params = UpdateAcademicCalendarEventParams(

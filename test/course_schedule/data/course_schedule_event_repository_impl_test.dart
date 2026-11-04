@@ -1,5 +1,4 @@
 import 'package:clock/clock.dart';
-import 'package:drift/drift.dart' hide isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_exceptions/mock_exceptions.dart';
 import 'package:mocktail/mocktail.dart';
@@ -90,7 +89,6 @@ void main() {
     start: eventStart,
     end: eventEnd,
     courseDetail: detail,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   final seededEvents = List.generate(
@@ -114,7 +112,6 @@ void main() {
         lecturerId: lecturer.id,
         roomId: index == 0 ? room.id : room2.id,
       ),
-      recurrence: const ['RRULE:FREQ=WEEKLY'],
     ),
   );
 
@@ -236,7 +233,6 @@ void main() {
               endDate: e.end.date,
               endHour: e.end.time.hour,
               endMinute: e.end.time.minute,
-              recurrence: Value(e.recurrence),
             ),
           );
       await database
@@ -282,7 +278,6 @@ void main() {
         start: eventStart,
         end: eventEnd,
         courseDetail: detail,
-        recurrence: const ['RRULE:FREQ=WEEKLY'],
       );
 
       test('returns correct new event and saves it in both tables', () async {
@@ -506,7 +501,6 @@ void main() {
           start: seededEvents.first.start,
           end: seededEvents.first.end,
           courseDetail: updatedDetail,
-          recurrence: seededEvents.first.recurrence,
         );
 
         final updated = await repository.update(

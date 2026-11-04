@@ -98,19 +98,6 @@ void main() {
       expect(event.type, AcademicCalendarEventType.lectures);
     });
 
-    test('default recurrence is empty list', () {
-      final event = CourseScheduleEvent(
-        id: 'id',
-        academicYearId: 'year_1',
-        name: 'Kuliah Pemrograman Web',
-        start: start,
-        end: end,
-        courseDetail: detail,
-      );
-
-      expect(event.recurrence, isEmpty);
-    });
-
     test(
       'equal on id, academicYearId, name, start, end, recurrence, '
       'and courseDetail',
@@ -122,7 +109,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final a = CourseScheduleEvent(
           id: 'id',
@@ -131,7 +117,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final b = CourseScheduleEvent(
           id: 'id B',
@@ -140,7 +125,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final c = CourseScheduleEvent(
           id: 'id',
@@ -149,7 +133,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final d = CourseScheduleEvent(
           id: 'id',
@@ -158,7 +141,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final e = CourseScheduleEvent(
           id: 'id',
@@ -170,7 +152,6 @@ void main() {
           ),
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final f = CourseScheduleEvent(
           id: 'id',
@@ -182,7 +163,6 @@ void main() {
             time: const Time(hour: 12, minute: 0),
           ),
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
         final g = CourseScheduleEvent(
           id: 'id',
@@ -191,7 +171,6 @@ void main() {
           start: start,
           end: end,
           courseDetail: detail,
-          recurrence: const ['RRULE:FREQ=MONTHLY'],
         );
         final h = CourseScheduleEvent(
           id: 'id',
@@ -206,7 +185,6 @@ void main() {
             lecturerId: 'lecturer_1',
             roomId: 'room_1',
           ),
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
 
         expect(testObj, equals(a));

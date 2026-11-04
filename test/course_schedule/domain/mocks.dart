@@ -58,7 +58,6 @@ final courseScheduleEventsMock = List<CourseScheduleEvent>.generate(
       lecturerId: 'lecturer_1',
       roomId: 'room_1',
     ),
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   ),
 );
 

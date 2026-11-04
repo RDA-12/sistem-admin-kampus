@@ -33,7 +33,6 @@ void main() {
     type: AcademicCalendarEventType.lectures,
     start: eventStart,
     end: eventEnd,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   final seededEvents = List.generate(
@@ -305,7 +304,6 @@ void main() {
           type: seededEvents.first.type,
           start: seededEvents.first.start,
           end: seededEvents.first.end,
-          recurrence: seededEvents.first.recurrence,
         );
 
         final updated = await repository.update(

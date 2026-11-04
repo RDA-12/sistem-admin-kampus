@@ -169,7 +169,6 @@ void main() {
             date: eventEnd,
             time: const Time(hour: 10, minute: 0),
           ),
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
 
         final result = AcademicCalendarEventDb(
@@ -226,7 +225,6 @@ void main() {
             date: DateTime(2025, 9, 2),
             time: const Time(hour: 10, minute: 0),
           ),
-          recurrence: const ['RRULE:FREQ=WEEKLY'],
         );
 
         final result = UpdateAcademicCalendarEventParams(

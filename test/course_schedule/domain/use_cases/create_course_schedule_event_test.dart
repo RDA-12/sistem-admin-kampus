@@ -48,7 +48,6 @@ void main() {
     start: start,
     end: end,
     courseDetail: detail,
-    recurrence: const ['RRULE:FREQ=WEEKLY'],
   );
 
   late IAcademicYearRepository academicYearRepositoryMock;
