@@ -1,6 +1,6 @@
-part of 'course_schedule_event_mutation_bloc.dart';
+part of 'course_schedule_mutation_bloc.dart';
 
-/// Possible types of course schedule event mutation
+/// Possible types of course schedule mutation
 enum CourseScheduleMutationType {
   /// Create type
   create,
@@ -57,29 +57,29 @@ final class CourseScheduleCreatedNotice extends CourseScheduleMutationNotice {
   List<Object?> get props => [created];
 }
 
-/// Notice when course schedule event mutation process failed
+/// Notice when course schedule mutation process failed
 final class CourseScheduleMutationFailedNotice
     extends CourseScheduleMutationNotice {
   /// Creates new [CourseScheduleMutationFailedNotice]
   const new({
     required this.exception,
     required this.type,
-    required this.event,
+    required this.courseSchedule,
   });
 
   /// Type of failed mutation
   final CourseScheduleMutationType type;
 
-  /// Event that was included
+  /// Course schedule that was included
   ///
   /// It will be null when [type] is [CourseScheduleMutationType.create]
-  final CourseSchedule? event;
+  final CourseSchedule? courseSchedule;
 
   /// Exception thrown by failed mutation
   final AppException exception;
 
   @override
-  List<Object?> get props => [type, event, exception];
+  List<Object?> get props => [type, courseSchedule, exception];
 }
 
 /// State for [CourseScheduleMutationBloc]

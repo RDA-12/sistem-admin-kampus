@@ -10,20 +10,7 @@ void main() {
   final start = DateTime(2025, 9, 8, 8);
   const duration = Duration(minutes: 100);
 
-  final params = CreateCourseScheduleParams(
-    academicYearId: 'year_1',
-    termId: 'term_1',
-    programId: 'program_1',
-    name: 'Kuliah Pemrograman Web',
-    start: start,
-    duration: duration,
-    cohortId: 'cohort_1',
-    courseId: 'course_1',
-    lecturerId: 'lecturer_1',
-    roomId: 'room_1',
-  );
-
-  final event = CourseSchedule(
+  final courseSchedule = CourseSchedule(
     id: 'schedule_1',
     academicYearId: 'year_1',
     termId: 'term_1',
@@ -37,19 +24,41 @@ void main() {
     roomId: 'room_1',
   );
 
+  final updatedSchedule = CourseSchedule(
+    id: 'schedule_1',
+    academicYearId: 'year_1',
+    termId: 'term_1',
+    programId: 'program_1',
+    name: 'Updated Kuliah',
+    start: start,
+    duration: duration,
+    cohortId: 'cohort_1',
+    courseId: 'course_1',
+    lecturerId: 'lecturer_1',
+    roomId: 'room_1',
+  );
+
+  final params = UpdateCourseScheduleParams(
+    courseSchedule,
+    name: 'Updated Kuliah',
+  );
+
   late ICourseScheduleRepository courseScheduleRepositoryMock;
-  late CreateCourseScheduleUseCase useCase;
+  late UpdateCourseScheduleUseCase useCase;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     courseScheduleRepositoryMock = getIt<ICourseScheduleRepository>();
 
-    when(() => courseScheduleRepositoryMock.save(params)).thenAnswer(
-      (_) async => AppResult.success(event),
-    );
+    when(
+      () => courseScheduleRepositoryMock.update(
+        courseSchedule.id,
+        args: params,
+      ),
+    ).thenAnswer((_) async => AppResult.success(updatedSchedule));
 
-    useCase = CreateCourseScheduleUseCase(
+    useCase = UpdateCourseScheduleUseCase(
       courseScheduleRepository: courseScheduleRepositoryMock,
     );
   });
@@ -58,11 +67,16 @@ void main() {
     reset(courseScheduleRepositoryMock);
   });
 
-  group('CreateCourseScheduleUseCase', () {
+  group('UpdateCourseScheduleUseCase', () {
     test(
-      'returns failure when ICourseScheduleRepository.save fails',
+      'returns failure when ICourseScheduleRepository.update fails',
       () async {
-        when(() => courseScheduleRepositoryMock.save(params)).thenAnswer(
+        when(
+          () => courseScheduleRepositoryMock.update(
+            courseSchedule.id,
+            args: params,
+          ),
+        ).thenAnswer(
           (_) async => AppFailure<CourseSchedule>(
             exception: AppException.test(),
           ),
@@ -81,10 +95,10 @@ void main() {
       },
     );
 
-    test('returns correct event when save succeeds', () async {
+    test('returns correct course schedule when update succeeds', () async {
       final result = await useCase(params);
 
-      expect(result, AppResult.success(event));
+      expect(result, AppResult.success(updatedSchedule));
     });
   });
 }

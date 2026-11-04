@@ -11,7 +11,7 @@ import '../../../common/di_mocks.dart';
 import '../../domain/mocks.dart';
 
 void main() {
-  final event = courseScheduleEventMock;
+  final schedule = courseScheduleMock;
   late CreateCourseScheduleUseCase createUseCaseMock;
   late UpdateCourseScheduleUseCase updateUseCaseMock;
   late DeleteCourseScheduleUseCase deleteUseCaseMock;
@@ -41,16 +41,16 @@ void main() {
 
     group('CourseScheduleMutationCreateRequested', () {
       final params = CreateCourseScheduleParams(
-        academicYearId: event.academicYearId,
-        termId: event.termId,
-        programId: event.programId,
-        name: event.name,
-        start: event.start,
-        duration: event.duration,
-        cohortId: event.cohortId,
-        courseId: event.courseId,
-        lecturerId: event.lecturerId,
-        roomId: event.roomId,
+        academicYearId: schedule.academicYearId,
+        termId: schedule.termId,
+        programId: schedule.programId,
+        name: schedule.name,
+        start: schedule.start,
+        duration: schedule.duration,
+        cohortId: schedule.cohortId,
+        courseId: schedule.courseId,
+        lecturerId: schedule.lecturerId,
+        roomId: schedule.roomId,
       );
 
       setUpAll(() {
@@ -59,7 +59,7 @@ void main() {
 
       setUp(() {
         when(() => createUseCaseMock(params))
-            .thenAnswer((_) async => AppResult.success(event));
+            .thenAnswer((_) async => AppResult.success(schedule));
       });
 
       blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
@@ -85,7 +85,7 @@ void main() {
           const CourseScheduleMutationState(isCreating: true),
           CourseScheduleMutationState(
             isCreating: false,
-            notice: CourseScheduleCreatedNotice(event),
+            notice: CourseScheduleCreatedNotice(schedule),
           ),
         ],
         verify: (_) {
@@ -124,7 +124,7 @@ void main() {
             notice: CourseScheduleMutationFailedNotice(
               type: CourseScheduleMutationType.create,
               exception: AppException.test(),
-              event: null,
+              courseSchedule: null,
             ),
           ),
         ],
@@ -135,21 +135,21 @@ void main() {
     });
 
     group('CourseScheduleMutationUpdateRequested', () {
-      final updatedEvent = CourseSchedule(
-        id: event.id,
-        academicYearId: event.academicYearId,
-        termId: event.termId,
-        programId: event.programId,
+      final updatedSchedule = CourseSchedule(
+        id: schedule.id,
+        academicYearId: schedule.academicYearId,
+        termId: schedule.termId,
+        programId: schedule.programId,
         name: 'New Schedule Name',
-        start: event.start,
-        duration: event.duration,
-        cohortId: event.cohortId,
-        courseId: event.courseId,
-        lecturerId: event.lecturerId,
-        roomId: event.roomId,
+        start: schedule.start,
+        duration: schedule.duration,
+        cohortId: schedule.cohortId,
+        courseId: schedule.courseId,
+        lecturerId: schedule.lecturerId,
+        roomId: schedule.roomId,
       );
       final params = UpdateCourseScheduleParams(
-        event,
+        schedule,
         name: 'New Schedule Name',
       );
 
@@ -159,7 +159,7 @@ void main() {
 
       setUp(() {
         when(() => updateUseCaseMock(params))
-            .thenAnswer((_) async => AppResult.success(updatedEvent));
+            .thenAnswer((_) async => AppResult.success(updatedSchedule));
       });
 
       blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
@@ -169,17 +169,17 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(
           CourseScheduleMutationUpdateRequested(
-            event: event,
+            courseSchedule: schedule,
             name: 'New Schedule Name',
           ),
         ),
         expect: () => <CourseScheduleMutationState>[
-          CourseScheduleMutationState(updatingIds: {event.id}),
+          CourseScheduleMutationState(updatingIds: {schedule.id}),
           CourseScheduleMutationState(
             updatingIds: const {},
             notice: CourseScheduleUpdatedNotice(
-              before: event,
-              after: updatedEvent,
+              before: schedule,
+              after: updatedSchedule,
             ),
           ),
         ],
@@ -200,18 +200,18 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(
           CourseScheduleMutationUpdateRequested(
-            event: event,
+            courseSchedule: schedule,
             name: 'New Schedule Name',
           ),
         ),
         expect: () => <CourseScheduleMutationState>[
-          CourseScheduleMutationState(updatingIds: {event.id}),
+          CourseScheduleMutationState(updatingIds: {schedule.id}),
           CourseScheduleMutationState(
             updatingIds: const {},
             notice: CourseScheduleMutationFailedNotice(
               type: CourseScheduleMutationType.update,
               exception: AppException.test(),
-              event: event,
+              courseSchedule: schedule,
             ),
           ),
         ],
@@ -223,11 +223,11 @@ void main() {
 
     group('CourseScheduleMutationDeleteRequested', () {
       setUpAll(() {
-        registerFallbackValue(event);
+        registerFallbackValue(schedule);
       });
 
       setUp(() {
-        when(() => deleteUseCaseMock(event))
+        when(() => deleteUseCaseMock(schedule))
             .thenAnswer((_) async => AppResult.success(null));
       });
 
@@ -237,17 +237,17 @@ void main() {
         'and DeleteCourseScheduleUseCase success',
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleMutationDeleteRequested(event: event),
+          CourseScheduleMutationDeleteRequested(courseSchedule: schedule),
         ),
         expect: () => <CourseScheduleMutationState>[
-          CourseScheduleMutationState(deletingIds: {event.id}),
+          CourseScheduleMutationState(deletingIds: {schedule.id}),
           CourseScheduleMutationState(
             deletingIds: const {},
-            notice: CourseScheduleDeletedNotice(event),
+            notice: CourseScheduleDeletedNotice(schedule),
           ),
         ],
         verify: (_) {
-          verify(() => deleteUseCaseMock(event)).called(1);
+          verify(() => deleteUseCaseMock(schedule)).called(1);
         },
       );
 
@@ -256,27 +256,27 @@ void main() {
         'when CourseScheduleMutationDeleteRequested is added '
         'and DeleteCourseScheduleUseCase fails',
         setUp: () {
-          when(() => deleteUseCaseMock(event)).thenAnswer(
+          when(() => deleteUseCaseMock(schedule)).thenAnswer(
             (_) async => AppResult.failure(AppException.test()),
           );
         },
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleMutationDeleteRequested(event: event),
+          CourseScheduleMutationDeleteRequested(courseSchedule: schedule),
         ),
         expect: () => <CourseScheduleMutationState>[
-          CourseScheduleMutationState(deletingIds: {event.id}),
+          CourseScheduleMutationState(deletingIds: {schedule.id}),
           CourseScheduleMutationState(
             deletingIds: const {},
             notice: CourseScheduleMutationFailedNotice(
               type: CourseScheduleMutationType.delete,
               exception: AppException.test(),
-              event: event,
+              courseSchedule: schedule,
             ),
           ),
         ],
         verify: (_) {
-          verify(() => deleteUseCaseMock(event)).called(1);
+          verify(() => deleteUseCaseMock(schedule)).called(1);
         },
       );
     });

@@ -9,7 +9,7 @@ import 'package:sistem_admin/course_schedule/domain/repository.dart';
 final class UpdateCourseScheduleParams extends Equatable {
   /// Creates new [UpdateCourseScheduleParams]
   const new(
-    this.event, {
+    this.courseSchedule, {
     this.academicYearId,
     this.termId,
     this.programId,
@@ -22,8 +22,8 @@ final class UpdateCourseScheduleParams extends Equatable {
     this.roomId,
   });
 
-  /// Event that will be updated
-  final CourseSchedule event;
+  /// Course schedule that will be updated
+  final CourseSchedule courseSchedule;
 
   /// Updated parent academic year ID
   final String? academicYearId;
@@ -57,7 +57,7 @@ final class UpdateCourseScheduleParams extends Equatable {
 
   @override
   List<Object?> get props => [
-    event,
+    courseSchedule,
     academicYearId,
     termId,
     programId,
@@ -90,14 +90,14 @@ class UpdateCourseScheduleUseCase
     logDebug(
       'start updating course schedule',
       extra: {
-        'id': params.event.id,
+        'id': params.courseSchedule.id,
         'academicYearId': params.academicYearId,
         'termId': params.termId,
         'name': params.name,
       },
     );
     final result = await _courseScheduleRepository.update(
-      params.event.id,
+      params.courseSchedule.id,
       args: params,
     );
     switch (result) {

@@ -17,7 +17,7 @@ class CourseSchedule extends Equatable {
     required this.roomId,
   });
 
-  /// ID of the event
+  /// ID of the course schedule
   final String id;
 
   /// Academic year this schedule belong to
@@ -29,19 +29,19 @@ class CourseSchedule extends Equatable {
   /// ID of the program
   final String programId;
 
-  /// Name of the event
+  /// Name of the course schedule
   final String name;
 
   /// When the schedule start, including its time
   final DateTime start;
 
-  /// Duration of this course in minutes
+  /// Duration of this course schedule
   final Duration duration;
 
-  /// ID of the cohort which this event meant for
+  /// ID of the cohort which this course schedule is meant for
   final String cohortId;
 
-  /// ID of the course for this event
+  /// ID of the course for this course schedule
   final String courseId;
 
   /// ID of the lecturer

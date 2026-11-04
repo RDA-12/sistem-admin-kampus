@@ -16,7 +16,7 @@ void main() {
   setUp(() {
     repositoryMock = getIt<ICourseScheduleRepository>();
     when(repositoryMock.watch).thenAnswer(
-      (_) => Stream.value(AppResult.success(courseScheduleEventsMock)),
+      (_) => Stream.value(AppResult.success(courseSchedulesMock)),
     );
 
     useCase = WatchCourseSchedulesUseCase(
@@ -32,7 +32,7 @@ void main() {
     test('emits correct list of CourseSchedule', () async {
       final stream = useCase(null);
 
-      expect(stream, emits(AppResult.success(courseScheduleEventsMock)));
+      expect(stream, emits(AppResult.success(courseSchedulesMock)));
     });
 
     test('emits failure when repo emits failure', () {

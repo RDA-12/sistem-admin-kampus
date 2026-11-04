@@ -7,7 +7,7 @@ import 'package:sistem_admin/course_schedule/course_schedule.dart';
 import '../../../common/di_mocks.dart';
 
 void main() {
-  final event = CourseSchedule(
+  final courseSchedule = CourseSchedule(
     id: 'schedule_1',
     academicYearId: 'year_1',
     termId: 'term_1',
@@ -28,7 +28,7 @@ void main() {
 
   setUp(() {
     repositoryMock = getIt<ICourseScheduleRepository>();
-    when(() => repositoryMock.delete(event.id))
+    when(() => repositoryMock.delete(courseSchedule.id))
         .thenAnswer((_) async => AppResult.success(null));
 
     useCase = DeleteCourseScheduleUseCase(
@@ -44,13 +44,13 @@ void main() {
     test(
       'returns failure when ICourseScheduleRepository.delete fails',
       () async {
-        when(() => repositoryMock.delete(event.id)).thenAnswer(
+        when(() => repositoryMock.delete(courseSchedule.id)).thenAnswer(
           (_) async => AppResult<Null>.failure(
             AppException.test(),
           ),
         );
 
-        final result = await useCase(event);
+        final result = await useCase(courseSchedule);
 
         expect(
           result,
@@ -64,7 +64,7 @@ void main() {
     );
 
     test('returns correct null when all operations succeed', () async {
-      final result = await useCase(event);
+      final result = await useCase(courseSchedule);
 
       expect(result, AppResult.success(null));
     });

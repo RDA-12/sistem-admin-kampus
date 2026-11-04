@@ -36,13 +36,13 @@ class MockWatchCourseSchedulesByYearUseCase extends Mock
 class MockWatchCourseSchedulesByCohortUseCase extends Mock
     implements WatchCourseSchedulesByCohortUseCase;
 
-final courseScheduleEventsMock = List<CourseSchedule>.generate(
+final courseSchedulesMock = List<CourseSchedule>.generate(
   3,
   (index) => CourseSchedule(
-    id: 'schedule_event_$index',
+    id: 'schedule_$index',
     academicYearId: 'year_1',
     termId: 'term_1',
-    name: 'Schedule Event $index',
+    name: 'Schedule $index',
     start: DateTime(2025, 9, 8 + index, 8 + index),
     duration: const Duration(minutes: 100),
     cohortId: 'cohort_$index',
@@ -53,4 +53,4 @@ final courseScheduleEventsMock = List<CourseSchedule>.generate(
   ),
 );
 
-final CourseSchedule courseScheduleEventMock = courseScheduleEventsMock.first;
+final CourseSchedule courseScheduleMock = courseSchedulesMock.first;

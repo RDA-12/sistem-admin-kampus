@@ -30,7 +30,7 @@ final class CreateCourseScheduleParams extends Equatable {
   /// ID of the program
   final String programId;
 
-  /// Name of the event
+  /// Name of the course schedule
   final String name;
 
   /// When the schedule starts

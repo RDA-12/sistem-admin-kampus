@@ -6,8 +6,8 @@ import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/domain.dart';
 
-part 'course_schedule_event_mutation_event.dart';
-part 'course_schedule_event_mutation_state.dart';
+part 'course_schedule_mutation_event.dart';
+part 'course_schedule_mutation_state.dart';
 
 /// Bloc for mutating [CourseSchedule] data
 @injectable
@@ -76,7 +76,7 @@ class CourseScheduleMutationBloc
           return CourseScheduleMutationFailedNotice(
             type: .create,
             exception: exception,
-            event: null,
+            courseSchedule: null,
           );
         }(),
       };
@@ -92,19 +92,19 @@ class CourseScheduleMutationBloc
       logDebug(
         'start updating course schedule. emit updatingIds',
         extra: {
-          'id': event.event.id,
+          'id': event.courseSchedule.id,
           'name': event.name,
         },
       );
       emit(
         state.copyWith(
-          updatingIds: {...state.updatingIds, event.event.id},
+          updatingIds: {...state.updatingIds, event.courseSchedule.id},
         ),
       );
 
       final result = await _updateCourseSchedule(
         UpdateCourseScheduleParams(
-          event.event,
+          event.courseSchedule,
           academicYearId: event.academicYearId,
           termId: event.termId,
           programId: event.programId,
@@ -122,7 +122,7 @@ class CourseScheduleMutationBloc
         AppSuccess(:final data) => () {
           logDebug('course schedule updated. emit updated notice');
           return CourseScheduleUpdatedNotice(
-            before: event.event,
+            before: event.courseSchedule,
             after: data,
           );
         }(),
@@ -131,14 +131,14 @@ class CourseScheduleMutationBloc
           return CourseScheduleMutationFailedNotice(
             type: .update,
             exception: exception,
-            event: event.event,
+            courseSchedule: event.courseSchedule,
           );
         }(),
       };
       emit(
         state.copyWith(
           notice: notice,
-          updatingIds: {...state.updatingIds}..remove(event.event.id),
+          updatingIds: {...state.updatingIds}..remove(event.courseSchedule.id),
         ),
       );
     });
@@ -151,34 +151,34 @@ class CourseScheduleMutationBloc
     await AppLogger.runWithLogger(() async {
       logDebug(
         'start deleting course schedule. emit deletingIds',
-        extra: {'id': event.event.id},
+        extra: {'id': event.courseSchedule.id},
       );
       emit(
         state.copyWith(
-          deletingIds: {...state.deletingIds, event.event.id},
+          deletingIds: {...state.deletingIds, event.courseSchedule.id},
         ),
       );
 
-      final result = await _deleteCourseSchedule(event.event);
+      final result = await _deleteCourseSchedule(event.courseSchedule);
 
       final notice = switch (result) {
         AppSuccess() => () {
           logDebug('course schedule deleted. emit deleted notice');
-          return CourseScheduleDeletedNotice(event.event);
+          return CourseScheduleDeletedNotice(event.courseSchedule);
         }(),
         AppFailure(:final exception) => () {
           logDebug('delete course schedule failed. emit failed notice');
           return CourseScheduleMutationFailedNotice(
             type: .delete,
             exception: exception,
-            event: event.event,
+            courseSchedule: event.courseSchedule,
           );
         }(),
       };
       emit(
         state.copyWith(
           notice: notice,
-          deletingIds: {...state.deletingIds}..remove(event.event.id),
+          deletingIds: {...state.deletingIds}..remove(event.courseSchedule.id),
         ),
       );
     });

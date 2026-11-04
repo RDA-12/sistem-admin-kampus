@@ -9,17 +9,17 @@ import '../mocks.dart';
 
 void main() {
   late ICourseScheduleRepository repositoryMock;
-  late WatchCourseSchedulesByCohortUseCase useCase;
+  late WatchCourseSchedulesByYearUseCase useCase;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     repositoryMock = getIt<ICourseScheduleRepository>();
-    when(() => repositoryMock.watchByCohort('cohort_0')).thenAnswer(
-      (_) => Stream.value(AppResult.success([courseScheduleEventsMock.first])),
+    when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
+      (_) => Stream.value(AppResult.success(courseSchedulesMock)),
     );
 
-    useCase = WatchCourseSchedulesByCohortUseCase(
+    useCase = WatchCourseSchedulesByYearUseCase(
       courseScheduleRepository: repositoryMock,
     );
   });
@@ -28,21 +28,18 @@ void main() {
     reset(repositoryMock);
   });
 
-  group('WatchCourseSchedulesByCohortUseCase', () {
+  group('WatchCourseSchedulesByYearUseCase', () {
     test(
-      'emits correct list of CourseSchedule for cohort',
+      'emits correct list of CourseSchedule for academic year',
       () async {
-        final stream = useCase('cohort_0');
+        final stream = useCase('year_1');
 
-        expect(
-          stream,
-          emits(AppResult.success([courseScheduleEventsMock.first])),
-        );
+        expect(stream, emits(AppResult.success(courseSchedulesMock)));
       },
     );
 
     test('emits failure when repo emits failure', () {
-      when(() => repositoryMock.watchByCohort('cohort_0')).thenAnswer(
+      when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<CourseSchedule>>(
             exception: AppException.test(),
@@ -50,7 +47,7 @@ void main() {
         ),
       );
 
-      final stream = useCase('cohort_0');
+      final stream = useCase('year_1');
 
       expect(
         stream,

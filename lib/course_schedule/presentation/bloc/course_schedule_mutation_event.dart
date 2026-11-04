@@ -1,4 +1,4 @@
-part of 'course_schedule_event_mutation_bloc.dart';
+part of 'course_schedule_mutation_bloc.dart';
 
 /// Event for [CourseScheduleMutationBloc]
 sealed class CourseScheduleMutationEvent extends Equatable {
@@ -73,7 +73,7 @@ final class CourseScheduleMutationUpdateRequested
     extends CourseScheduleMutationEvent {
   /// Creates new [CourseScheduleMutationUpdateRequested]
   const new({
-    required this.event,
+    required this.courseSchedule,
     this.academicYearId,
     this.termId,
     this.programId,
@@ -87,41 +87,41 @@ final class CourseScheduleMutationUpdateRequested
   });
 
   /// [CourseSchedule] that will be updated
-  final CourseSchedule event;
+  final CourseSchedule courseSchedule;
 
-  /// New academic year ID for [event]
+  /// New academic year ID for [courseSchedule]
   final String? academicYearId;
 
-  /// New term ID for [event]
+  /// New term ID for [courseSchedule]
   final String? termId;
 
-  /// New program ID for [event]
+  /// New program ID for [courseSchedule]
   final String? programId;
 
-  /// New name for [event]
+  /// New name for [courseSchedule]
   final String? name;
 
-  /// New start date and time for [event]
+  /// New start date and time for [courseSchedule]
   final DateTime? start;
 
-  /// New duration for [event]
+  /// New duration for [courseSchedule]
   final Duration? duration;
 
-  /// New cohort ID for [event]
+  /// New cohort ID for [courseSchedule]
   final String? cohortId;
 
-  /// New course ID for [event]
+  /// New course ID for [courseSchedule]
   final String? courseId;
 
-  /// New lecturer ID for [event]
+  /// New lecturer ID for [courseSchedule]
   final String? lecturerId;
 
-  /// New room ID for [event]
+  /// New room ID for [courseSchedule]
   final String? roomId;
 
   @override
   List<Object?> get props => [
-    event,
+    courseSchedule,
     academicYearId,
     termId,
     programId,
@@ -139,11 +139,11 @@ final class CourseScheduleMutationUpdateRequested
 final class CourseScheduleMutationDeleteRequested
     extends CourseScheduleMutationEvent {
   /// Creates new [CourseScheduleMutationDeleteRequested]
-  const new({required this.event});
+  const new({required this.courseSchedule});
 
   /// [CourseSchedule] that will be deleted
-  final CourseSchedule event;
+  final CourseSchedule courseSchedule;
 
   @override
-  List<Object?> get props => [event];
+  List<Object?> get props => [courseSchedule];
 }
