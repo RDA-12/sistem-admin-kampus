@@ -4,23 +4,23 @@ import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
 import 'package:sistem_admin/course_schedule/domain/repository.dart';
 
-/// Use case to watch for [CourseScheduleEvent] data changes for specific
+/// Use case to watch for [CourseSchedule] data changes for specific
 /// academic year
 @LazySingleton(env: [Environment.prod])
-class WatchCourseScheduleEventsByYearUseCase
+class WatchCourseSchedulesByYearUseCase
     with AppLoggerMixin
-    implements StreamBaseUseCase<String, List<CourseScheduleEvent>> {
-  /// Creates new [WatchCourseScheduleEventsByYearUseCase]
-  new({required this._courseScheduleEventRepository});
+    implements StreamBaseUseCase<String, List<CourseSchedule>> {
+  /// Creates new [WatchCourseSchedulesByYearUseCase]
+  new({required this._courseScheduleRepository});
 
-  final ICourseScheduleEventRepository _courseScheduleEventRepository;
+  final ICourseScheduleRepository _courseScheduleRepository;
 
   @override
-  Stream<AppResult<List<CourseScheduleEvent>>> call(String params) {
+  Stream<AppResult<List<CourseSchedule>>> call(String params) {
     logDebug(
-      'start watching course schedule events by academic year',
+      'start watching course schedules by academic year',
       extra: {'academicYearId': params},
     );
-    return _courseScheduleEventRepository.watchByAcademicYear(params);
+    return _courseScheduleRepository.watchByAcademicYear(params);
   }
 }

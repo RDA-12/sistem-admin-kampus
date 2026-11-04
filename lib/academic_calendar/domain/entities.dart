@@ -104,8 +104,8 @@ enum AcademicCalendarEventType {
   /// Type for general event
   general,
 
-  /// Type for lecturing event
-  lectures,
+  /// Type for public lecturing event
+  publicLectures,
 }
 
 /// Extensions for [AcademicCalendarEventType]
@@ -115,12 +115,15 @@ extension AcademicCalendarEventTypeX on AcademicCalendarEventType {
     AcademicCalendarEventType.holiday => 'Hari Libur',
     AcademicCalendarEventType.midTermTest => 'Ujian Tengah Semester (UTS)',
     AcademicCalendarEventType.finalTest => 'Ujian Akhir Semester (UAS)',
-    AcademicCalendarEventType.lectures => 'Perkuliahan',
+    AcademicCalendarEventType.publicLectures => 'Perkuliahan Umum',
     AcademicCalendarEventType.general => 'Kegiatan Umum',
   };
 }
 
 /// Representing single event on AcademicCalendar
+///
+/// This event is meant to be used for global event that will be showed to
+/// all programs.
 class AcademicCalendarEvent extends Equatable {
   /// Creates new [AcademicCalendarEvent]
   const new({
@@ -161,7 +164,8 @@ class AcademicCalendarEvent extends Equatable {
   ];
 }
 
-/// Represent an academic calendar for [year], its [terms], and its [events]
+/// Represent an academic calendar for [year], its [terms],
+/// and its global [events]
 class AcademicCalendar extends Equatable {
   /// Creates new [AcademicCalendar]
   const new({
@@ -176,7 +180,7 @@ class AcademicCalendar extends Equatable {
   /// Terms within [year]
   final List<AcademicTerm> terms;
 
-  /// Events within [year]
+  /// Global events within [year]
   final List<AcademicCalendarEvent> events;
 
   /// Whether new term can be added to this calendar based on
@@ -245,7 +249,7 @@ class AcademicCalendar extends Equatable {
     return AppResult.success(null);
   }
 
-  /// Whether new event can be added to this calendar based on
+  /// Whether new global event can be added to this calendar based on
   /// [startDate] and [endDate]
   AppResult<Null> canAddEvent({
     required DateTime startDate,
@@ -262,7 +266,7 @@ class AcademicCalendar extends Equatable {
     return AppResult.success(null);
   }
 
-  /// Whether an existing event can be updated in this calendar based on
+  /// Whether an existing global event can be updated in this calendar based on
   /// [startDate] and [endDate]
   AppResult<Null> canUpdateEvent({
     required DateTime startDate,

@@ -12,40 +12,45 @@ import '../../domain/mocks.dart';
 
 void main() {
   final event = courseScheduleEventMock;
-  late CreateCourseScheduleEventUseCase createUseCaseMock;
-  late UpdateCourseScheduleEventUseCase updateUseCaseMock;
-  late DeleteCourseScheduleEventUseCase deleteUseCaseMock;
+  late CreateCourseScheduleUseCase createUseCaseMock;
+  late UpdateCourseScheduleUseCase updateUseCaseMock;
+  late DeleteCourseScheduleUseCase deleteUseCaseMock;
 
-  group('CourseScheduleEventMutationBloc', () {
+  group('CourseScheduleMutationBloc', () {
     setUpAll(initializeMockDependencies);
 
     setUp(() {
-      createUseCaseMock = getIt<CreateCourseScheduleEventUseCase>();
-      updateUseCaseMock = getIt<UpdateCourseScheduleEventUseCase>();
-      deleteUseCaseMock = getIt<DeleteCourseScheduleEventUseCase>();
+      createUseCaseMock = getIt<CreateCourseScheduleUseCase>();
+      updateUseCaseMock = getIt<UpdateCourseScheduleUseCase>();
+      deleteUseCaseMock = getIt<DeleteCourseScheduleUseCase>();
     });
 
-    CourseScheduleEventMutationBloc buildBloc() {
-      return CourseScheduleEventMutationBloc(
-        createCourseScheduleEvent: createUseCaseMock,
-        updateCourseScheduleEvent: updateUseCaseMock,
-        deleteCourseScheduleEvent: deleteUseCaseMock,
+    CourseScheduleMutationBloc buildBloc() {
+      return CourseScheduleMutationBloc(
+        createCourseSchedule: createUseCaseMock,
+        updateCourseSchedule: updateUseCaseMock,
+        deleteCourseSchedule: deleteUseCaseMock,
       );
     }
 
     test('has correct initial state', () {
       final bloc = buildBloc();
 
-      expect(bloc.state, const CourseScheduleEventMutationState());
+      expect(bloc.state, const CourseScheduleMutationState());
     });
 
-    group('CourseScheduleEventMutationCreateRequested', () {
-      final params = CreateCourseScheduleEventParams(
+    group('CourseScheduleMutationCreateRequested', () {
+      final params = CreateCourseScheduleParams(
         academicYearId: event.academicYearId,
+        termId: event.termId,
+        programId: event.programId,
         name: event.name,
         start: event.start,
-        end: event.end,
-        courseDetail: event.courseDetail,
+        durationInMinutes: event.durationInMinutes,
+        cohortId: event.cohortId,
+        courseId: event.courseId,
+        lecturerId: event.lecturerId,
+        roomId: event.roomId,
       );
 
       setUpAll(() {
@@ -57,29 +62,30 @@ void main() {
             .thenAnswer((_) async => AppResult.success(event));
       });
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [isCreating true, created notice and isCreating false] '
-        'when CourseScheduleEventMutationCreateRequested is added '
-        'and CreateCourseScheduleEventUseCase success',
+        'when CourseScheduleMutationCreateRequested is added '
+        'and CreateCourseScheduleUseCase success',
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationCreateRequested(
+          CourseScheduleMutationCreateRequested(
             academicYearId: params.academicYearId,
+            termId: params.termId,
+            programId: params.programId,
             name: params.name,
             start: params.start,
-            end: params.end,
-            courseDetail: params.courseDetail,
-            recurrence: params.recurrence,
+            durationInMinutes: params.durationInMinutes,
+            cohortId: params.cohortId,
+            courseId: params.courseId,
+            lecturerId: params.lecturerId,
+            roomId: params.roomId,
           ),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          const CourseScheduleEventMutationState(isCreating: true),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          const CourseScheduleMutationState(isCreating: true),
+          CourseScheduleMutationState(
             isCreating: false,
-            notice: CourseScheduleEventCreatedNotice(event),
+            notice: CourseScheduleCreatedNotice(event),
           ),
         ],
         verify: (_) {
@@ -87,13 +93,10 @@ void main() {
         },
       );
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [isCreating true, failure notice and isCreating false] '
-        'when CourseScheduleEventMutationCreateRequested is added '
-        'and CreateCourseScheduleEventUseCase fails',
+        'when CourseScheduleMutationCreateRequested is added '
+        'and CreateCourseScheduleUseCase fails',
         setUp: () {
           when(() => createUseCaseMock(params)).thenAnswer(
             (_) async => AppResult.failure(AppException.test()),
@@ -101,21 +104,25 @@ void main() {
         },
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationCreateRequested(
+          CourseScheduleMutationCreateRequested(
             academicYearId: params.academicYearId,
+            termId: params.termId,
+            programId: params.programId,
             name: params.name,
             start: params.start,
-            end: params.end,
-            courseDetail: params.courseDetail,
-            recurrence: params.recurrence,
+            durationInMinutes: params.durationInMinutes,
+            cohortId: params.cohortId,
+            courseId: params.courseId,
+            lecturerId: params.lecturerId,
+            roomId: params.roomId,
           ),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          const CourseScheduleEventMutationState(isCreating: true),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          const CourseScheduleMutationState(isCreating: true),
+          CourseScheduleMutationState(
             isCreating: false,
-            notice: CourseScheduleEventMutationFailedNotice(
-              type: CourseScheduleEventMutationType.create,
+            notice: CourseScheduleMutationFailedNotice(
+              type: CourseScheduleMutationType.create,
               exception: AppException.test(),
               event: null,
             ),
@@ -127,16 +134,21 @@ void main() {
       );
     });
 
-    group('CourseScheduleEventMutationUpdateRequested', () {
-      final updatedEvent = CourseScheduleEvent(
+    group('CourseScheduleMutationUpdateRequested', () {
+      final updatedEvent = CourseSchedule(
         id: event.id,
         academicYearId: event.academicYearId,
+        termId: event.termId,
+        programId: event.programId,
         name: 'New Schedule Name',
         start: event.start,
-        end: event.end,
-        courseDetail: event.courseDetail,
+        durationInMinutes: event.durationInMinutes,
+        cohortId: event.cohortId,
+        courseId: event.courseId,
+        lecturerId: event.lecturerId,
+        roomId: event.roomId,
       );
-      final params = UpdateCourseScheduleEventParams(
+      final params = UpdateCourseScheduleParams(
         event,
         name: 'New Schedule Name',
       );
@@ -150,25 +162,22 @@ void main() {
             .thenAnswer((_) async => AppResult.success(updatedEvent));
       });
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [updatingIds with id, updated notice and empty updatingIds] '
-        'when CourseScheduleEventMutationUpdateRequested is added '
-        'and UpdateCourseScheduleEventUseCase success',
+        'when CourseScheduleMutationUpdateRequested is added '
+        'and UpdateCourseScheduleUseCase success',
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationUpdateRequested(
+          CourseScheduleMutationUpdateRequested(
             event: event,
             name: 'New Schedule Name',
           ),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          CourseScheduleEventMutationState(updatingIds: {event.id}),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          CourseScheduleMutationState(updatingIds: {event.id}),
+          CourseScheduleMutationState(
             updatingIds: const {},
-            notice: CourseScheduleEventUpdatedNotice(
+            notice: CourseScheduleUpdatedNotice(
               before: event,
               after: updatedEvent,
             ),
@@ -179,13 +188,10 @@ void main() {
         },
       );
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [updatingIds with id, failure notice and empty updatingIds] '
-        'when CourseScheduleEventMutationUpdateRequested is added '
-        'and UpdateCourseScheduleEventUseCase fails',
+        'when CourseScheduleMutationUpdateRequested is added '
+        'and UpdateCourseScheduleUseCase fails',
         setUp: () {
           when(() => updateUseCaseMock(params)).thenAnswer(
             (_) async => AppResult.failure(AppException.test()),
@@ -193,17 +199,17 @@ void main() {
         },
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationUpdateRequested(
+          CourseScheduleMutationUpdateRequested(
             event: event,
             name: 'New Schedule Name',
           ),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          CourseScheduleEventMutationState(updatingIds: {event.id}),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          CourseScheduleMutationState(updatingIds: {event.id}),
+          CourseScheduleMutationState(
             updatingIds: const {},
-            notice: CourseScheduleEventMutationFailedNotice(
-              type: CourseScheduleEventMutationType.update,
+            notice: CourseScheduleMutationFailedNotice(
+              type: CourseScheduleMutationType.update,
               exception: AppException.test(),
               event: event,
             ),
@@ -215,7 +221,7 @@ void main() {
       );
     });
 
-    group('CourseScheduleEventMutationDeleteRequested', () {
+    group('CourseScheduleMutationDeleteRequested', () {
       setUpAll(() {
         registerFallbackValue(event);
       });
@@ -225,22 +231,19 @@ void main() {
             .thenAnswer((_) async => AppResult.success(null));
       });
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [deletingIds with id, deleted notice and empty deletingIds] '
-        'when CourseScheduleEventMutationDeleteRequested is added '
-        'and DeleteCourseScheduleEventUseCase success',
+        'when CourseScheduleMutationDeleteRequested is added '
+        'and DeleteCourseScheduleUseCase success',
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationDeleteRequested(event: event),
+          CourseScheduleMutationDeleteRequested(event: event),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          CourseScheduleEventMutationState(deletingIds: {event.id}),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          CourseScheduleMutationState(deletingIds: {event.id}),
+          CourseScheduleMutationState(
             deletingIds: const {},
-            notice: CourseScheduleEventDeletedNotice(event),
+            notice: CourseScheduleDeletedNotice(event),
           ),
         ],
         verify: (_) {
@@ -248,13 +251,10 @@ void main() {
         },
       );
 
-      blocTest<
-        CourseScheduleEventMutationBloc,
-        CourseScheduleEventMutationState
-      >(
+      blocTest<CourseScheduleMutationBloc, CourseScheduleMutationState>(
         'emits [deletingIds with id, failure notice and empty deletingIds] '
-        'when CourseScheduleEventMutationDeleteRequested is added '
-        'and DeleteCourseScheduleEventUseCase fails',
+        'when CourseScheduleMutationDeleteRequested is added '
+        'and DeleteCourseScheduleUseCase fails',
         setUp: () {
           when(() => deleteUseCaseMock(event)).thenAnswer(
             (_) async => AppResult.failure(AppException.test()),
@@ -262,14 +262,14 @@ void main() {
         },
         build: buildBloc,
         act: (bloc) => bloc.add(
-          CourseScheduleEventMutationDeleteRequested(event: event),
+          CourseScheduleMutationDeleteRequested(event: event),
         ),
-        expect: () => <CourseScheduleEventMutationState>[
-          CourseScheduleEventMutationState(deletingIds: {event.id}),
-          CourseScheduleEventMutationState(
+        expect: () => <CourseScheduleMutationState>[
+          CourseScheduleMutationState(deletingIds: {event.id}),
+          CourseScheduleMutationState(
             deletingIds: const {},
-            notice: CourseScheduleEventMutationFailedNotice(
-              type: CourseScheduleEventMutationType.delete,
+            notice: CourseScheduleMutationFailedNotice(
+              type: CourseScheduleMutationType.delete,
               exception: AppException.test(),
               event: event,
             ),

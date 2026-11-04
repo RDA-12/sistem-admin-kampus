@@ -1,32 +1,15 @@
 import 'package:equatable/equatable.dart';
-import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 
-/// Event for course schedule
-class CourseScheduleEvent extends AcademicCalendarEvent {
-  /// Creates new [CourseScheduleEvent]
+/// Representing single day course schedule
+class CourseSchedule extends Equatable {
+  /// Creates new [CourseSchedule]
   const new({
-    required super.id,
-    required super.academicYearId,
-    required super.name,
-    required super.start,
-    required super.end,
-    required this.courseDetail,
-  }) : super(type: .lectures);
-
-  /// Detail of course for this event
-  final CourseScheduleEventDetail courseDetail;
-
-  @override
-  List<Object?> get props => [
-    ...super.props,
-    courseDetail,
-  ];
-}
-
-/// Detail of an event for course schedule
-class CourseScheduleEventDetail extends Equatable {
-  /// Creates new [CourseScheduleEventDetail]
-  const new({
+    required this.id,
+    required this.academicYearId,
+    required this.termId,
+    required this.name,
+    required this.start,
+    required this.durationInMinutes,
     required this.cohortId,
     required this.courseId,
     required this.programId,
@@ -34,14 +17,32 @@ class CourseScheduleEventDetail extends Equatable {
     required this.roomId,
   });
 
+  /// ID of the event
+  final String id;
+
+  /// Academic year this schedule belong to
+  final String academicYearId;
+
+  /// Term this schedule belong to
+  final String termId;
+
+  /// ID of the program
+  final String programId;
+
+  /// Name of the event
+  final String name;
+
+  /// When the schedule start, including its time
+  final DateTime start;
+
+  /// Duration of this course in minutes
+  final int durationInMinutes;
+
   /// ID of the cohort which this event meant for
   final String cohortId;
 
   /// ID of the course for this event
   final String courseId;
-
-  /// ID of the program
-  final String programId;
 
   /// ID of the lecturer
   final String lecturerId;
@@ -51,6 +52,12 @@ class CourseScheduleEventDetail extends Equatable {
 
   @override
   List<Object?> get props => [
+    id,
+    academicYearId,
+    termId,
+    name,
+    start,
+    durationInMinutes,
     cohortId,
     courseId,
     programId,

@@ -1,7 +1,7 @@
 part of 'course_schedule_event_mutation_bloc.dart';
 
 /// Possible types of course schedule event mutation
-enum CourseScheduleEventMutationType {
+enum CourseScheduleMutationType {
   /// Create type
   create,
 
@@ -12,58 +12,55 @@ enum CourseScheduleEventMutationType {
   delete,
 }
 
-/// Notice data for [CourseScheduleEventMutationState]
-sealed class CourseScheduleEventMutationNotice extends Equatable {
+/// Notice data for [CourseScheduleMutationState]
+sealed class CourseScheduleMutationNotice extends Equatable {
   const new();
 }
 
-/// Notice when a [CourseScheduleEvent] has been updated from [before] to
+/// Notice when a [CourseSchedule] has been updated from [before] to
 /// [after]
-final class CourseScheduleEventUpdatedNotice
-    extends CourseScheduleEventMutationNotice {
-  /// Creates new [CourseScheduleEventUpdatedNotice]
+final class CourseScheduleUpdatedNotice extends CourseScheduleMutationNotice {
+  /// Creates new [CourseScheduleUpdatedNotice]
   const new({required this.before, required this.after});
 
-  /// [CourseScheduleEvent] data before update
-  final CourseScheduleEvent before;
+  /// [CourseSchedule] data before update
+  final CourseSchedule before;
 
-  /// [CourseScheduleEvent] data after update
-  final CourseScheduleEvent after;
+  /// [CourseSchedule] data after update
+  final CourseSchedule after;
 
   @override
   List<Object?> get props => [before, after];
 }
 
-/// Notice when a [CourseScheduleEvent] has been deleted
-final class CourseScheduleEventDeletedNotice
-    extends CourseScheduleEventMutationNotice {
-  /// Creates new [CourseScheduleEventDeletedNotice] for [deleted]
+/// Notice when a [CourseSchedule] has been deleted
+final class CourseScheduleDeletedNotice extends CourseScheduleMutationNotice {
+  /// Creates new [CourseScheduleDeletedNotice] for [deleted]
   const new(this.deleted);
 
-  /// Deleted [CourseScheduleEvent]
-  final CourseScheduleEvent deleted;
+  /// Deleted [CourseSchedule]
+  final CourseSchedule deleted;
 
   @override
   List<Object?> get props => [deleted];
 }
 
-/// Notice when a [CourseScheduleEvent] has been created
-final class CourseScheduleEventCreatedNotice
-    extends CourseScheduleEventMutationNotice {
-  /// Creates new [CourseScheduleEventCreatedNotice] for [created]
+/// Notice when a [CourseSchedule] has been created
+final class CourseScheduleCreatedNotice extends CourseScheduleMutationNotice {
+  /// Creates new [CourseScheduleCreatedNotice] for [created]
   const new(this.created);
 
-  /// Created [CourseScheduleEvent]
-  final CourseScheduleEvent created;
+  /// Created [CourseSchedule]
+  final CourseSchedule created;
 
   @override
   List<Object?> get props => [created];
 }
 
 /// Notice when course schedule event mutation process failed
-final class CourseScheduleEventMutationFailedNotice
-    extends CourseScheduleEventMutationNotice {
-  /// Creates new [CourseScheduleEventMutationFailedNotice]
+final class CourseScheduleMutationFailedNotice
+    extends CourseScheduleMutationNotice {
+  /// Creates new [CourseScheduleMutationFailedNotice]
   const new({
     required this.exception,
     required this.type,
@@ -71,12 +68,12 @@ final class CourseScheduleEventMutationFailedNotice
   });
 
   /// Type of failed mutation
-  final CourseScheduleEventMutationType type;
+  final CourseScheduleMutationType type;
 
   /// Event that was included
   ///
-  /// It will be null when [type] is [CourseScheduleEventMutationType.create]
-  final CourseScheduleEvent? event;
+  /// It will be null when [type] is [CourseScheduleMutationType.create]
+  final CourseSchedule? event;
 
   /// Exception thrown by failed mutation
   final AppException exception;
@@ -85,9 +82,9 @@ final class CourseScheduleEventMutationFailedNotice
   List<Object?> get props => [type, event, exception];
 }
 
-/// State for [CourseScheduleEventMutationBloc]
-class CourseScheduleEventMutationState extends Equatable {
-  /// Creates new [CourseScheduleEventMutationState]
+/// State for [CourseScheduleMutationBloc]
+class CourseScheduleMutationState extends Equatable {
+  /// Creates new [CourseScheduleMutationState]
   const new({
     this.isCreating = false,
     this.notice,
@@ -96,25 +93,25 @@ class CourseScheduleEventMutationState extends Equatable {
   });
 
   /// Notice for newly completed mutation process
-  final CourseScheduleEventMutationNotice? notice;
+  final CourseScheduleMutationNotice? notice;
 
-  /// List of [CourseScheduleEvent] ID for delete
+  /// List of [CourseSchedule] ID for delete
   final Set<String> deletingIds;
 
-  /// List of [CourseScheduleEvent] ID for update
+  /// List of [CourseSchedule] ID for update
   final Set<String> updatingIds;
 
-  /// Whether creating new [CourseScheduleEvent] or not
+  /// Whether creating new [CourseSchedule] or not
   final bool isCreating;
 
   /// Returns new copy based on provided data
-  CourseScheduleEventMutationState copyWith({
-    CourseScheduleEventMutationNotice? notice,
+  CourseScheduleMutationState copyWith({
+    CourseScheduleMutationNotice? notice,
     Set<String>? deletingIds,
     Set<String>? updatingIds,
     bool? isCreating,
   }) {
-    return CourseScheduleEventMutationState(
+    return CourseScheduleMutationState(
       notice: notice ?? this.notice,
       deletingIds: deletingIds ?? this.deletingIds,
       updatingIds: updatingIds ?? this.updatingIds,

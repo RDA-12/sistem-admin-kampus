@@ -1,126 +1,102 @@
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
 import 'package:sistem_admin/course_schedule/domain/repository.dart';
 
-/// Params for creating a [CourseScheduleEvent]
-final class CreateCourseScheduleEventParams extends Equatable {
-  /// Creates new [CreateCourseScheduleEventParams]
+/// Params for creating a [CourseSchedule]
+final class CreateCourseScheduleParams extends Equatable {
+  /// Creates new [CreateCourseScheduleParams]
   const new({
     required this.academicYearId,
+    required this.termId,
+    required this.programId,
     required this.name,
     required this.start,
-    required this.end,
-    required this.courseDetail,
-    this.recurrence = const [],
+    required this.durationInMinutes,
+    required this.cohortId,
+    required this.courseId,
+    required this.lecturerId,
+    required this.roomId,
   });
 
   /// ID of the parent academic year
   final String academicYearId;
 
+  /// ID of the term
+  final String termId;
+
+  /// ID of the program
+  final String programId;
+
   /// Name of the event
   final String name;
 
-  /// When the event starts
-  final EventDateTime start;
+  /// When the schedule starts
+  final DateTime start;
 
-  /// When the event ends
-  final EventDateTime end;
+  /// Duration in minutes
+  final int durationInMinutes;
 
-  /// Recurrence rules (RFC5545)
-  final List<String> recurrence;
+  /// ID of the cohort
+  final String cohortId;
 
-  /// Detail of course for this event
-  final CourseScheduleEventDetail courseDetail;
+  /// ID of the course
+  final String courseId;
+
+  /// ID of the lecturer
+  final String lecturerId;
+
+  /// ID of the room
+  final String roomId;
 
   @override
   List<Object?> get props => [
     academicYearId,
+    termId,
+    programId,
     name,
     start,
-    end,
-    recurrence,
-    courseDetail,
+    durationInMinutes,
+    cohortId,
+    courseId,
+    lecturerId,
+    roomId,
   ];
 }
 
-/// Use case for creating new [CourseScheduleEvent]
+/// Use case for creating new [CourseSchedule]
 @LazySingleton(env: [Environment.prod])
-class CreateCourseScheduleEventUseCase
+class CreateCourseScheduleUseCase
     with AppLoggerMixin
-    implements
-        FutureBaseUseCase<
-          CreateCourseScheduleEventParams,
-          CourseScheduleEvent
-        > {
-  /// Creates new [CreateCourseScheduleEventUseCase]
+    implements FutureBaseUseCase<CreateCourseScheduleParams, CourseSchedule> {
+  /// Creates new [CreateCourseScheduleUseCase]
   new({
-    required this._courseScheduleEventRepository,
-    required this._academicYearRepository,
+    required this._courseScheduleRepository,
   });
 
-  final IAcademicYearRepository _academicYearRepository;
-  final ICourseScheduleEventRepository _courseScheduleEventRepository;
+  final ICourseScheduleRepository _courseScheduleRepository;
 
   @override
-  Future<AppResult<CourseScheduleEvent>> call(
-    CreateCourseScheduleEventParams params,
+  Future<AppResult<CourseSchedule>> call(
+    CreateCourseScheduleParams params,
   ) async {
     logDebug(
-      'start getting academic year',
-      extra: {'academicYearId': params.academicYearId},
-    );
-    late final AcademicYear year;
-    final academicYearResult = await _academicYearRepository
-        .watchSingle(params.academicYearId)
-        .first;
-    switch (academicYearResult) {
-      case AppFailure<AcademicYear>(:final exception):
-        logDebug('failed to get academic year');
-        return AppResult.failure(exception);
-      case AppSuccess<AcademicYear>(:final data):
-        year = data;
-    }
-
-    logDebug(
-      'start checking whether event can be added',
-      extra: {
-        'startDate': params.start.date,
-        'endDate': params.end.date,
-      },
-    );
-    final calendar = AcademicCalendar(year: year);
-    final allowedResult = calendar.canAddEvent(
-      startDate: params.start.date,
-      endDate: params.end.date,
-    );
-    switch (allowedResult) {
-      case AppFailure<Null>(:final exception):
-        logDebug('failed to add new event: outside academic year');
-        return AppResult.failure(exception);
-      case AppSuccess<Null>():
-    }
-
-    logDebug(
-      'new event allowed. start creating course schedule event',
+      'start creating course schedule',
       extra: {
         'academicYearId': params.academicYearId,
+        'termId': params.termId,
         'name': params.name,
-        'start': params.start,
-        'end': params.end,
-        'courseDetail': params.courseDetail,
       },
     );
-    final result = await _courseScheduleEventRepository.save(params);
+    final result = await _courseScheduleRepository.save(params);
     switch (result) {
       case AppSuccess(:final data):
-        logDebug('course schedule event created');
+        logDebug('course schedule created');
         return AppResult.success(data);
-      case AppFailure<CourseScheduleEvent>(:final exception):
-        logDebug('course schedule event creation failed');
+      case AppFailure<CourseSchedule>(:final exception):
+        logDebug('course schedule creation failed');
         return AppResult.failure(exception);
     }
   }

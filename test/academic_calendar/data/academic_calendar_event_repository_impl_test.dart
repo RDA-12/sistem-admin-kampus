@@ -30,7 +30,7 @@ void main() {
     id: 'uid_event',
     academicYearId: year.id,
     name: 'Kuliah Perdana',
-    type: AcademicCalendarEventType.lectures,
+    type: AcademicCalendarEventType.publicLectures,
     start: eventStart,
     end: eventEnd,
   );
@@ -42,7 +42,7 @@ void main() {
       academicYearId: year.id,
       name: index == 0 ? 'Event 1' : 'Event 2',
       type: index == 0
-          ? AcademicCalendarEventType.lectures
+          ? AcademicCalendarEventType.publicLectures
           : AcademicCalendarEventType.holiday,
       start: EventDateTime(
         date: DateTime(2025, 9, 10 + index),
@@ -111,7 +111,7 @@ void main() {
       final createArgs = CreateAcademicCalendarEventParams(
         academicYearId: year.id,
         name: 'Kuliah Perdana',
-        type: AcademicCalendarEventType.lectures,
+        type: AcademicCalendarEventType.publicLectures,
         start: eventStart,
         end: eventEnd,
         recurrence: const ['RRULE:FREQ=WEEKLY'],

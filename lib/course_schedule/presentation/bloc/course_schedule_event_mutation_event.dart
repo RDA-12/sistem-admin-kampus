@@ -1,89 +1,111 @@
 part of 'course_schedule_event_mutation_bloc.dart';
 
-/// Event for [CourseScheduleEventMutationBloc]
-sealed class CourseScheduleEventMutationEvent extends Equatable {
-  /// Creates new [CourseScheduleEventMutationEvent]
+/// Event for [CourseScheduleMutationBloc]
+sealed class CourseScheduleMutationEvent extends Equatable {
+  /// Creates new [CourseScheduleMutationEvent]
   const new();
 }
 
-/// Event for creating new [CourseScheduleEvent]
-final class CourseScheduleEventMutationCreateRequested
-    extends CourseScheduleEventMutationEvent {
-  /// Creates new [CourseScheduleEventMutationCreateRequested]
+/// Event for creating new [CourseSchedule]
+final class CourseScheduleMutationCreateRequested
+    extends CourseScheduleMutationEvent {
+  /// Creates new [CourseScheduleMutationCreateRequested]
   const new({
     required this.academicYearId,
+    required this.termId,
+    required this.programId,
     required this.name,
     required this.start,
-    required this.end,
-    required this.courseDetail,
-    this.recurrence = const [],
+    required this.durationInMinutes,
+    required this.cohortId,
+    required this.courseId,
+    required this.lecturerId,
+    required this.roomId,
   });
 
-  /// Academic year ID for new [CourseScheduleEvent]
+  /// Academic year ID for new [CourseSchedule]
   final String academicYearId;
 
-  /// Name for new [CourseScheduleEvent]
+  /// Term ID for new [CourseSchedule]
+  final String termId;
+
+  /// Program ID for new [CourseSchedule]
+  final String programId;
+
+  /// Name for new [CourseSchedule]
   final String name;
 
-  /// Start date and time for new [CourseScheduleEvent]
-  final EventDateTime start;
+  /// Start date and time for new [CourseSchedule]
+  final DateTime start;
 
-  /// End date and time for new [CourseScheduleEvent]
-  final EventDateTime end;
+  /// Duration in minutes for new [CourseSchedule]
+  final int durationInMinutes;
 
-  /// Course detail for new [CourseScheduleEvent]
-  final CourseScheduleEventDetail courseDetail;
+  /// Cohort ID for new [CourseSchedule]
+  final String cohortId;
 
-  /// Recurrence rules (RFC5545)
-  final List<String> recurrence;
+  /// Course ID for new [CourseSchedule]
+  final String courseId;
+
+  /// Lecturer ID for new [CourseSchedule]
+  final String lecturerId;
+
+  /// Room ID for new [CourseSchedule]
+  final String roomId;
 
   @override
   List<Object?> get props => [
     academicYearId,
+    termId,
+    programId,
     name,
     start,
-    end,
-    courseDetail,
-    recurrence,
+    durationInMinutes,
+    cohortId,
+    courseId,
+    lecturerId,
+    roomId,
   ];
 }
 
-/// Event for updating a [CourseScheduleEvent]
-final class CourseScheduleEventMutationUpdateRequested
-    extends CourseScheduleEventMutationEvent {
-  /// Creates new [CourseScheduleEventMutationUpdateRequested]
+/// Event for updating a [CourseSchedule]
+final class CourseScheduleMutationUpdateRequested
+    extends CourseScheduleMutationEvent {
+  /// Creates new [CourseScheduleMutationUpdateRequested]
   const new({
     required this.event,
     this.academicYearId,
+    this.termId,
+    this.programId,
     this.name,
     this.start,
-    this.end,
-    this.courseDetail,
+    this.durationInMinutes,
     this.cohortId,
     this.courseId,
-    this.programId,
     this.lecturerId,
     this.roomId,
-    this.recurrence,
   });
 
-  /// [CourseScheduleEvent] that will be updated
-  final CourseScheduleEvent event;
+  /// [CourseSchedule] that will be updated
+  final CourseSchedule event;
 
   /// New academic year ID for [event]
   final String? academicYearId;
+
+  /// New term ID for [event]
+  final String? termId;
+
+  /// New program ID for [event]
+  final String? programId;
 
   /// New name for [event]
   final String? name;
 
   /// New start date and time for [event]
-  final EventDateTime? start;
+  final DateTime? start;
 
-  /// New end date and time for [event]
-  final EventDateTime? end;
-
-  /// New course detail for [event]
-  final CourseScheduleEventDetail? courseDetail;
+  /// New duration in minutes for [event]
+  final int? durationInMinutes;
 
   /// New cohort ID for [event]
   final String? cohortId;
@@ -91,43 +113,36 @@ final class CourseScheduleEventMutationUpdateRequested
   /// New course ID for [event]
   final String? courseId;
 
-  /// New program ID for [event]
-  final String? programId;
-
   /// New lecturer ID for [event]
   final String? lecturerId;
 
   /// New room ID for [event]
   final String? roomId;
 
-  /// New recurrence rules for [event]
-  final List<String>? recurrence;
-
   @override
   List<Object?> get props => [
     event,
     academicYearId,
+    termId,
+    programId,
     name,
     start,
-    end,
-    courseDetail,
+    durationInMinutes,
     cohortId,
     courseId,
-    programId,
     lecturerId,
     roomId,
-    recurrence,
   ];
 }
 
-/// Event for deleting a [CourseScheduleEvent]
-final class CourseScheduleEventMutationDeleteRequested
-    extends CourseScheduleEventMutationEvent {
-  /// Creates new [CourseScheduleEventMutationDeleteRequested]
+/// Event for deleting a [CourseSchedule]
+final class CourseScheduleMutationDeleteRequested
+    extends CourseScheduleMutationEvent {
+  /// Creates new [CourseScheduleMutationDeleteRequested]
   const new({required this.event});
 
-  /// [CourseScheduleEvent] that will be deleted
-  final CourseScheduleEvent event;
+  /// [CourseSchedule] that will be deleted
+  final CourseSchedule event;
 
   @override
   List<Object?> get props => [event];

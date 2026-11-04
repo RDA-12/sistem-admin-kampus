@@ -24,6 +24,22 @@ void main() {
     endDate: DateTime(2026, 8, 31),
   );
 
+  final term = AcademicTerm(
+    id: 'term_1',
+    academicYearId: year.id,
+    name: 'Ganjil',
+    startDate: DateTime(2025, 9),
+    endDate: DateTime(2026, 1, 31),
+  );
+
+  final term2 = AcademicTerm(
+    id: 'term_2',
+    academicYearId: year.id,
+    name: 'Genap',
+    startDate: DateTime(2026, 2),
+    endDate: DateTime(2026, 6, 30),
+  );
+
   const faculty = Faculty(id: 'faculty_1', name: 'Teknik');
   const program = Program(
     id: 'program_1',
@@ -65,57 +81,38 @@ void main() {
     pangkatGolongan: 'III/a',
   );
 
-  final eventStart = EventDateTime(
-    date: DateTime(2025, 9, 8),
-    time: const Time(hour: 8, minute: 0),
-  );
-  final eventEnd = EventDateTime(
-    date: DateTime(2025, 9, 8),
-    time: const Time(hour: 10, minute: 0),
-  );
-
-  const detail = CourseScheduleEventDetail(
-    cohortId: 'cohort_1',
-    courseId: 'course_1',
-    programId: 'program_1',
-    lecturerId: 'lecturer_1',
-    roomId: 'room_1',
-  );
-
-  final createdEvent = CourseScheduleEvent(
+  final createdEvent = CourseSchedule(
     id: 'uid_course_event',
     academicYearId: year.id,
+    termId: term.id,
+    programId: program.id,
     name: 'Kuliah Pemrograman Web',
-    start: eventStart,
-    end: eventEnd,
-    courseDetail: detail,
+    start: DateTime(2025, 9, 8, 8),
+    durationInMinutes: 100,
+    cohortId: cohort.id,
+    courseId: course.id,
+    lecturerId: lecturer.id,
+    roomId: room.id,
   );
 
   final seededEvents = List.generate(
     2,
-    (index) => CourseScheduleEvent(
+    (index) => CourseSchedule(
       id: 'schedule_event_$index',
       academicYearId: year.id,
+      termId: term.id,
+      programId: program.id,
       name: 'Schedule Event $index',
-      start: EventDateTime(
-        date: DateTime(2025, 9, 10 + index),
-        time: const Time(hour: 8, minute: 0),
-      ),
-      end: EventDateTime(
-        date: DateTime(2025, 9, 10 + index),
-        time: const Time(hour: 10, minute: 0),
-      ),
-      courseDetail: CourseScheduleEventDetail(
-        cohortId: index == 0 ? cohort.id : cohort2.id,
-        courseId: course.id,
-        programId: program.id,
-        lecturerId: lecturer.id,
-        roomId: index == 0 ? room.id : room2.id,
-      ),
+      start: DateTime(2025, 9, 8 + index, 8 + index),
+      durationInMinutes: 100,
+      cohortId: index == 0 ? cohort.id : cohort2.id,
+      courseId: course.id,
+      lecturerId: lecturer.id,
+      roomId: index == 0 ? room.id : room2.id,
     ),
   );
 
-  late CourseScheduleEventRepository repository;
+  late CourseScheduleRepository repository;
   late UidGenerator uidGeneratorMock;
   late AppDriftDatabase database;
 
@@ -133,6 +130,30 @@ void main() {
             name: year.name,
             startDate: year.startDate,
             endDate: year.endDate,
+          ),
+        );
+
+    // Seed academic terms
+    await database
+        .into(database.academicTermsDrift)
+        .insert(
+          AcademicTermsDriftCompanion.insert(
+            id: term.id,
+            academicYearId: term.academicYearId,
+            name: term.name,
+            startDate: term.startDate,
+            endDate: term.endDate,
+          ),
+        );
+    await database
+        .into(database.academicTermsDrift)
+        .insert(
+          AcademicTermsDriftCompanion.insert(
+            id: term2.id,
+            academicYearId: term2.academicYearId,
+            name: term2.name,
+            startDate: term2.startDate,
+            endDate: term2.endDate,
           ),
         );
 
@@ -220,31 +241,20 @@ void main() {
     // Seed seededEvents
     for (final e in seededEvents) {
       await database
-          .into(database.academicCalendarEventsDrift)
+          .into(database.courseSchedulesDrift)
           .insert(
-            AcademicCalendarEventsDriftCompanion.insert(
+            CourseSchedulesDriftCompanion.insert(
               id: e.id,
               academicYearId: e.academicYearId,
+              termId: e.termId,
+              programId: e.programId,
               name: e.name,
-              type: e.type,
-              startDate: e.start.date,
-              startHour: e.start.time.hour,
-              startMinute: e.start.time.minute,
-              endDate: e.end.date,
-              endHour: e.end.time.hour,
-              endMinute: e.end.time.minute,
-            ),
-          );
-      await database
-          .into(database.courseScheduleEventDetailsDrift)
-          .insert(
-            CourseScheduleEventDetailsDriftCompanion.insert(
-              eventId: e.id,
-              cohortId: e.courseDetail.cohortId,
-              courseId: e.courseDetail.courseId,
-              programId: e.courseDetail.programId,
-              lecturerId: e.courseDetail.lecturerId,
-              roomId: e.courseDetail.roomId,
+              start: e.start,
+              durationInMinutes: e.durationInMinutes,
+              cohortId: e.cohortId,
+              courseId: e.courseId,
+              lecturerId: e.lecturerId,
+              roomId: e.roomId,
             ),
           );
     }
@@ -252,35 +262,40 @@ void main() {
     uidGeneratorMock = getIt<UidGenerator>();
     when(uidGeneratorMock.generate).thenReturn(createdEvent.id);
 
-    repository = CourseScheduleEventRepository(
+    repository = CourseScheduleRepository(
       db: database,
       uidGenerator: uidGeneratorMock,
     );
   });
 
   tearDown(() async {
-    await database.delete(database.courseScheduleEventDetailsDrift).go();
-    await database.delete(database.academicCalendarEventsDrift).go();
+    await database.delete(database.courseSchedulesDrift).go();
     await database.delete(database.cohortsDrift).go();
     await database.delete(database.roomsDrift).go();
     await database.delete(database.lecturersDrift).go();
     await database.delete(database.coursesDrift).go();
     await database.delete(database.programsDrift).go();
     await database.delete(database.facultiesDrift).go();
+    await database.delete(database.academicTermsDrift).go();
     await database.delete(database.academicYearsDrift).go();
   });
 
-  group('CourseScheduleEventRepository', () {
+  group('CourseScheduleRepository', () {
     group('save', () {
-      final createArgs = CreateCourseScheduleEventParams(
+      final createArgs = CreateCourseScheduleParams(
         academicYearId: year.id,
+        termId: term.id,
+        programId: program.id,
         name: 'Kuliah Pemrograman Web',
-        start: eventStart,
-        end: eventEnd,
-        courseDetail: detail,
+        start: DateTime(2025, 9, 8, 8),
+        durationInMinutes: 100,
+        cohortId: cohort.id,
+        courseId: course.id,
+        lecturerId: lecturer.id,
+        roomId: room.id,
       );
 
-      test('returns correct new event and saves it in both tables', () async {
+      test('returns correct new event and saves it in database', () async {
         when(uidGeneratorMock.generate).thenReturn(createdEvent.id);
         final now = DateTime.now();
         await withClock(Clock.fixed(now), () async {
@@ -288,36 +303,23 @@ void main() {
 
           expect(result, AppResult.success(createdEvent));
 
-          final baseQuery = database.select(
-            database.academicCalendarEventsDrift,
+          final query = database.select(
+            database.courseSchedulesDrift,
           )..where((tbl) => tbl.id.equals(createdEvent.id));
-          final baseInDb = await baseQuery.getSingleOrNull();
-          expect(baseInDb, isNotNull);
-          expect(baseInDb!.name, createArgs.name);
-          expect(baseInDb.academicYearId, createArgs.academicYearId);
-          expect(baseInDb.type, AcademicCalendarEventType.lectures);
-          expect(baseInDb.startDate, createArgs.start.date);
-          expect(baseInDb.startHour, createArgs.start.time.hour);
-          expect(baseInDb.startMinute, createArgs.start.time.minute);
-          expect(baseInDb.endDate, createArgs.end.date);
-          expect(baseInDb.endHour, createArgs.end.time.hour);
-          expect(baseInDb.endMinute, createArgs.end.time.minute);
-          expect(baseInDb.recurrence, createArgs.recurrence);
-          expect(baseInDb.createdAt, now);
-          expect(baseInDb.updatedAt, now);
-
-          final detailQuery = database.select(
-            database.courseScheduleEventDetailsDrift,
-          )..where((tbl) => tbl.eventId.equals(createdEvent.id));
-          final detailInDb = await detailQuery.getSingleOrNull();
-          expect(detailInDb, isNotNull);
-          expect(detailInDb!.cohortId, detail.cohortId);
-          expect(detailInDb.courseId, detail.courseId);
-          expect(detailInDb.programId, detail.programId);
-          expect(detailInDb.lecturerId, detail.lecturerId);
-          expect(detailInDb.roomId, detail.roomId);
-          expect(detailInDb.createdAt, now);
-          expect(detailInDb.updatedAt, now);
+          final inDb = await query.getSingleOrNull();
+          expect(inDb, isNotNull);
+          expect(inDb!.name, createArgs.name);
+          expect(inDb.academicYearId, createArgs.academicYearId);
+          expect(inDb.termId, createArgs.termId);
+          expect(inDb.programId, createArgs.programId);
+          expect(inDb.start, createArgs.start);
+          expect(inDb.durationInMinutes, createArgs.durationInMinutes);
+          expect(inDb.cohortId, createArgs.cohortId);
+          expect(inDb.courseId, createArgs.courseId);
+          expect(inDb.lecturerId, createArgs.lecturerId);
+          expect(inDb.roomId, createArgs.roomId);
+          expect(inDb.createdAt, now);
+          expect(inDb.updatedAt, now);
         });
       });
 
@@ -336,25 +338,18 @@ void main() {
     });
 
     group('delete', () {
-      test('returns success and deletes requested event and detail', () async {
-        final baseQuery = database.select(database.academicCalendarEventsDrift);
-        final detailQuery = database.select(
-          database.courseScheduleEventDetailsDrift,
-        );
+      test('returns success and deletes requested event', () async {
+        final query = database.select(database.courseSchedulesDrift);
 
-        expect((await baseQuery.get()).length, 2);
-        expect((await detailQuery.get()).length, 2);
+        expect((await query.get()).length, 2);
 
         final result = await repository.delete(seededEvents.first.id);
 
         expect(result, AppResult.success(null));
 
-        final remainingBases = await baseQuery.get();
-        final remainingDetails = await detailQuery.get();
-        expect(remainingBases.length, 1);
-        expect(remainingBases.first.id, seededEvents[1].id);
-        expect(remainingDetails.length, 1);
-        expect(remainingDetails.first.eventId, seededEvents[1].id);
+        final remaining = await query.get();
+        expect(remaining.length, 1);
+        expect(remaining.first.id, seededEvents[1].id);
       });
 
       test('returns success when deleting non-existent event', () async {
@@ -394,7 +389,7 @@ void main() {
         expect(
           stream,
           emits(
-            isA<AppFailure<List<CourseScheduleEvent>>>().having(
+            isA<AppFailure<List<CourseSchedule>>>().having(
               (e) => e.exception.code,
               'exception.code',
               AppExceptionCode.internal,
@@ -421,7 +416,7 @@ void main() {
         expect(
           stream,
           emits(
-            isA<AppFailure<List<CourseScheduleEvent>>>().having(
+            isA<AppFailure<List<CourseSchedule>>>().having(
               (e) => e.exception.code,
               'exception.code',
               AppExceptionCode.internal,
@@ -448,7 +443,7 @@ void main() {
         expect(
           stream,
           emits(
-            isA<AppFailure<List<CourseScheduleEvent>>>().having(
+            isA<AppFailure<List<CourseSchedule>>>().having(
               (e) => e.exception.code,
               'exception.code',
               AppExceptionCode.internal,
@@ -466,17 +461,17 @@ void main() {
       });
 
       test(
-        'emits failure with academicCalendarEventNotFound when not exists',
+        'emits failure with courseScheduleNotFound when not exists',
         () {
           final result = repository.watchSingle('not-exists');
 
           expect(
             result,
             emits(
-              isA<AppFailure<CourseScheduleEvent>>().having(
+              isA<AppFailure<CourseSchedule>>().having(
                 (e) => e.exception.code,
                 'exception.code',
-                AppExceptionCode.academicCalendarEventNotFound,
+                AppExceptionCode.courseScheduleNotFound,
               ),
             ),
           );
@@ -486,61 +481,54 @@ void main() {
 
     group('update', () {
       test('returns updated event and saves changes in db', () async {
-        const updatedDetail = CourseScheduleEventDetail(
-          cohortId: 'cohort_2',
-          courseId: 'course_1',
-          programId: 'program_1',
-          lecturerId: 'lecturer_1',
-          roomId: 'room_2',
-        );
-
-        final expectedUpdated = CourseScheduleEvent(
+        final expectedUpdated = CourseSchedule(
           id: seededEvents.first.id,
           academicYearId: seededEvents.first.academicYearId,
+          termId: seededEvents.first.termId,
+          programId: seededEvents.first.programId,
           name: 'Updated Schedule Name',
           start: seededEvents.first.start,
-          end: seededEvents.first.end,
-          courseDetail: updatedDetail,
+          durationInMinutes: seededEvents.first.durationInMinutes,
+          cohortId: 'cohort_2',
+          courseId: seededEvents.first.courseId,
+          lecturerId: seededEvents.first.lecturerId,
+          roomId: 'room_2',
         );
 
         final updated = await repository.update(
           seededEvents.first.id,
-          args: UpdateCourseScheduleEventParams(
+          args: UpdateCourseScheduleParams(
             seededEvents.first,
             name: 'Updated Schedule Name',
-            courseDetail: updatedDetail,
+            cohortId: 'cohort_2',
+            roomId: 'room_2',
           ),
         );
 
         expect(updated, AppResult.success(expectedUpdated));
 
-        final baseInDb = await (database.select(
-          database.academicCalendarEventsDrift,
+        final inDb = await (database.select(
+          database.courseSchedulesDrift,
         )..where((tbl) => tbl.id.equals(seededEvents.first.id))).getSingle();
-        expect(baseInDb.name, 'Updated Schedule Name');
-
-        final detailInDb =
-            await (database.select(database.courseScheduleEventDetailsDrift)
-                  ..where((tbl) => tbl.eventId.equals(seededEvents.first.id)))
-                .getSingle();
-        expect(detailInDb.cohortId, 'cohort_2');
-        expect(detailInDb.roomId, 'room_2');
+        expect(inDb.name, 'Updated Schedule Name');
+        expect(inDb.cohortId, 'cohort_2');
+        expect(inDb.roomId, 'room_2');
       });
 
       test(
-        'returns failure with academicCalendarEventNotFound when '
+        'returns failure with courseScheduleNotFound when '
         'updating non-existent',
         () async {
           final result = await repository.update(
             'not-exists',
-            args: UpdateCourseScheduleEventParams(
+            args: UpdateCourseScheduleParams(
               createdEvent,
               name: 'New Name',
             ),
           );
 
           result.expectFailureWithCode(
-            AppExceptionCode.academicCalendarEventNotFound,
+            AppExceptionCode.courseScheduleNotFound,
           );
         },
       );
@@ -554,7 +542,7 @@ void main() {
 
           final result = await repository.update(
             seededEvents.first.id,
-            args: UpdateCourseScheduleEventParams(
+            args: UpdateCourseScheduleParams(
               seededEvents.first,
               name: 'New Name',
             ),

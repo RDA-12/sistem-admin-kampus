@@ -7,39 +7,32 @@ import 'package:sistem_admin/course_schedule/course_schedule.dart';
 import '../../../common/di_mocks.dart';
 
 void main() {
-  final event = CourseScheduleEvent(
+  final event = CourseSchedule(
     id: 'schedule_1',
     academicYearId: 'year_1',
+    termId: 'term_1',
+    programId: 'program_1',
     name: 'Kuliah Pemrograman Web',
-    start: EventDateTime(
-      date: DateTime(2025, 9),
-      time: const Time(hour: 8, minute: 0),
-    ),
-    end: EventDateTime(
-      date: DateTime(2025, 9),
-      time: const Time(hour: 10, minute: 0),
-    ),
-    courseDetail: const CourseScheduleEventDetail(
-      cohortId: 'cohort_1',
-      courseId: 'course_1',
-      programId: 'program_1',
-      lecturerId: 'lecturer_1',
-      roomId: 'room_1',
-    ),
+    start: DateTime(2025, 9, 8, 8),
+    durationInMinutes: 100,
+    cohortId: 'cohort_1',
+    courseId: 'course_1',
+    lecturerId: 'lecturer_1',
+    roomId: 'room_1',
   );
 
-  late ICourseScheduleEventRepository repositoryMock;
-  late DeleteCourseScheduleEventUseCase useCase;
+  late ICourseScheduleRepository repositoryMock;
+  late DeleteCourseScheduleUseCase useCase;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
-    repositoryMock = getIt<ICourseScheduleEventRepository>();
+    repositoryMock = getIt<ICourseScheduleRepository>();
     when(() => repositoryMock.delete(event.id))
         .thenAnswer((_) async => AppResult.success(null));
 
-    useCase = DeleteCourseScheduleEventUseCase(
-      courseScheduleEventRepository: repositoryMock,
+    useCase = DeleteCourseScheduleUseCase(
+      courseScheduleRepository: repositoryMock,
     );
   });
 
@@ -47,9 +40,9 @@ void main() {
     reset(repositoryMock);
   });
 
-  group('DeleteCourseScheduleEventUseCase', () {
+  group('DeleteCourseScheduleUseCase', () {
     test(
-      'returns failure when ICourseScheduleEventRepository.delete fails',
+      'returns failure when ICourseScheduleRepository.delete fails',
       () async {
         when(() => repositoryMock.delete(event.id)).thenAnswer(
           (_) async => AppResult<Null>.failure(

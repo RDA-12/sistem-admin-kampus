@@ -41,5 +41,7 @@ extension ExceptionMessageX on AppExceptionCode {
       'Kegiatan kalender akademik berada di luar rentang tahun akademik',
     AppExceptionCode.cohortAlreadyExists =>
       'Angkatan dengan nama tersebut sudah ada',
+    AppExceptionCode.courseScheduleNotFound =>
+      'Jadwal kuliah tidak dapat ditemukan',
   };
 }

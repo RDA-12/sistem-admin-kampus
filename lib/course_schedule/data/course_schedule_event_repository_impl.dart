@@ -1,21 +1,19 @@
 import 'dart:async';
 
-import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mock_exceptions/mock_exceptions.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/data/data.dart';
 import 'package:sistem_admin/course_schedule/domain/domain.dart';
 
-/// Implementation of [ICourseScheduleEventRepository]
-@LazySingleton(as: ICourseScheduleEventRepository, env: [Environment.prod])
-class CourseScheduleEventRepository
+/// Implementation of [ICourseScheduleRepository]
+@LazySingleton(as: ICourseScheduleRepository, env: [Environment.prod])
+class CourseScheduleRepository
     with AppLoggerMixin
-    implements ICourseScheduleEventRepository {
-  /// Creates new [CourseScheduleEventRepository]
+    implements ICourseScheduleRepository {
+  /// Creates new [CourseScheduleRepository]
   new({required this._uidGenerator, required this._db});
 
   final UidGenerator _uidGenerator;
@@ -26,19 +24,13 @@ class CourseScheduleEventRepository
     try {
       maybeThrowException(this, Invocation.method(#delete, [id]));
       logDebug(
-        'construct delete course schedule event query',
+        'construct delete course schedule query',
         extra: {'id': id},
       );
-      await _db.transaction(() async {
-        final detailQuery = _db.delete(_db.courseScheduleEventDetailsDrift)
-          ..where((tbl) => tbl.eventId.equals(id));
-        await detailQuery.go();
-
-        final baseQuery = _db.delete(_db.academicCalendarEventsDrift)
-          ..where((tbl) => tbl.id.equals(id));
-        await baseQuery.go();
-      });
-      logDebug('course schedule event deleted');
+      final query = _db.delete(_db.courseSchedulesDrift)
+        ..where((tbl) => tbl.id.equals(id));
+      await query.go();
+      logDebug('course schedule deleted');
       return AppResult.success(null);
     } on Exception catch (e, st) {
       logError('$e', error: e, stackTrace: st);
@@ -47,47 +39,31 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Future<AppResult<CourseScheduleEvent>> save(
-    CreateCourseScheduleEventParams args,
+  Future<AppResult<CourseSchedule>> save(
+    CreateCourseScheduleParams args,
   ) async {
     try {
       maybeThrowException(this, Invocation.method(#save, [args]));
-      logDebug('start inserting course schedule event');
+      logDebug('start inserting course schedule');
       final id = _uidGenerator.generate();
-      final eventInsert = AcademicCalendarEventsDriftCompanion.insert(
+      final insert = CourseSchedulesDriftCompanion.insert(
         id: id,
         academicYearId: args.academicYearId,
+        termId: args.termId,
+        programId: args.programId,
         name: args.name,
-        type: AcademicCalendarEventType.lectures,
-        startDate: args.start.date,
-        startHour: args.start.time.hour,
-        startMinute: args.start.time.minute,
-        endDate: args.end.date,
-        endHour: args.end.time.hour,
-        endMinute: args.end.time.minute,
-        recurrence: Value(args.recurrence),
+        start: args.start,
+        durationInMinutes: args.durationInMinutes,
+        cohortId: args.cohortId,
+        courseId: args.courseId,
+        lecturerId: args.lecturerId,
+        roomId: args.roomId,
       );
-      final detailInsert = CourseScheduleEventDetailsDriftCompanion.insert(
-        eventId: id,
-        cohortId: args.courseDetail.cohortId,
-        courseId: args.courseDetail.courseId,
-        programId: args.courseDetail.programId,
-        lecturerId: args.courseDetail.lecturerId,
-        roomId: args.courseDetail.roomId,
-      );
-
-      final result = await _db.transaction(() async {
-        final baseEventDb = await _db
-            .into(_db.academicCalendarEventsDrift)
-            .insertReturning(eventInsert);
-        final detailDb = await _db
-            .into(_db.courseScheduleEventDetailsDrift)
-            .insertReturning(detailInsert);
-        return baseEventDb.toCourseScheduleDomain(detailDb);
-      });
-
-      logDebug('course schedule event inserted');
-      return AppResult.success(result);
+      final resultDb = await _db
+          .into(_db.courseSchedulesDrift)
+          .insertReturning(insert);
+      logDebug('course schedule inserted');
+      return AppResult.success(resultDb.toDomain());
     } on Exception catch (e, st) {
       logError('$e', error: e, stackTrace: st);
       return AppResult.failure(AppException('$e', code: .internal));
@@ -95,9 +71,9 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Future<AppResult<CourseScheduleEvent>> update(
+  Future<AppResult<CourseSchedule>> update(
     String id, {
-    required UpdateCourseScheduleEventParams args,
+    required UpdateCourseScheduleParams args,
   }) async {
     try {
       maybeThrowException(
@@ -105,51 +81,28 @@ class CourseScheduleEventRepository
         Invocation.method(#update, [id], {#args: args}),
       );
       logDebug(
-        'construct check course schedule event query',
+        'construct check course schedule query',
         extra: {'id': id},
       );
-      final query = _db.select(_db.academicCalendarEventsDrift).join([
-        innerJoin(
-          _db.courseScheduleEventDetailsDrift,
-          _db.courseScheduleEventDetailsDrift.eventId.equalsExp(
-            _db.academicCalendarEventsDrift.id,
-          ),
-        ),
-      ])..where(_db.academicCalendarEventsDrift.id.equals(id));
-
-      logDebug('start checking course schedule event');
+      final query = _db.select(_db.courseSchedulesDrift)
+        ..where((tbl) => tbl.id.equals(id));
+      logDebug('start checking course schedule');
       final row = await query.getSingleOrNull();
       if (row == null) {
-        logDebug('course schedule event not found');
+        logDebug('course schedule not found');
         return AppResult.failure(
           AppException(
-            'course schedule event with id $id not found',
-            code: .academicCalendarEventNotFound,
+            'course schedule with id $id not found',
+            code: .courseScheduleNotFound,
           ),
         );
       }
-      logDebug('course schedule event found. start updating');
-      final result = await _db.transaction(() async {
-        final updateBaseQuery = _db.update(_db.academicCalendarEventsDrift)
-          ..where((tbl) => tbl.id.equals(id));
-        final updatedBaseEvents = await updateBaseQuery.writeReturning(
-          args.toBaseEventCompanion(),
-        );
-        final updatedBaseDb = updatedBaseEvents.first;
-
-        final updateDetailQuery = _db.update(
-          _db.courseScheduleEventDetailsDrift,
-        )..where((tbl) => tbl.eventId.equals(id));
-        final updatedDetails = await updateDetailQuery.writeReturning(
-          args.toDetailCompanion(),
-        );
-        final updatedDetailDb = updatedDetails.first;
-
-        return updatedBaseDb.toCourseScheduleDomain(updatedDetailDb);
-      });
-
-      logDebug('course schedule event updated');
-      return AppResult.success(result);
+      logDebug('course schedule found. start updating');
+      final updateQuery = _db.update(_db.courseSchedulesDrift)
+        ..where((tbl) => tbl.id.equals(id));
+      final updatedRows = await updateQuery.writeReturning(args.toCompanion());
+      logDebug('course schedule updated');
+      return AppResult.success(updatedRows.first.toDomain());
     } on Exception catch (e, st) {
       logError('$e', error: e, stackTrace: st);
       return AppFailure(exception: AppException('$e', code: .internal));
@@ -157,30 +110,17 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Stream<AppResult<List<CourseScheduleEvent>>> watch() {
-    logDebug('construct select course schedule events query');
-    final query = _db.select(_db.academicCalendarEventsDrift).join([
-      innerJoin(
-        _db.courseScheduleEventDetailsDrift,
-        _db.courseScheduleEventDetailsDrift.eventId.equalsExp(
-          _db.academicCalendarEventsDrift.id,
-        ),
-      ),
-    ]);
-    logDebug('start watching course schedule events');
+  Stream<AppResult<List<CourseSchedule>>> watch() {
+    logDebug('construct select course schedules query');
+    final query = _db.select(_db.courseSchedulesDrift);
+    logDebug('start watching course schedules');
     return query
         .watch()
         .map(
           (rows) {
             maybeThrowException(this, Invocation.method(#watch, null));
             return AppResult.success(
-              rows.map((row) {
-                final base = row.readTable(_db.academicCalendarEventsDrift);
-                final detail = row.readTable(
-                  _db.courseScheduleEventDetailsDrift,
-                );
-                return base.toCourseScheduleDomain(detail);
-              }).toList(),
+              rows.map((row) => row.toDomain()).toList(),
             );
           },
         )
@@ -193,26 +133,17 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Stream<AppResult<List<CourseScheduleEvent>>> watchByAcademicYear(
+  Stream<AppResult<List<CourseSchedule>>> watchByAcademicYear(
     String academicYearId,
   ) {
     logDebug(
-      'construct select course schedule events by academic year query',
+      'construct select course schedules by academic year query',
       extra: {'academicYearId': academicYearId},
     );
-    final query =
-        _db.select(_db.academicCalendarEventsDrift).join([
-          innerJoin(
-            _db.courseScheduleEventDetailsDrift,
-            _db.courseScheduleEventDetailsDrift.eventId.equalsExp(
-              _db.academicCalendarEventsDrift.id,
-            ),
-          ),
-        ])..where(
-          _db.academicCalendarEventsDrift.academicYearId.equals(academicYearId),
-        );
+    final query = _db.select(_db.courseSchedulesDrift)
+      ..where((tbl) => tbl.academicYearId.equals(academicYearId));
 
-    logDebug('start watching course schedule events by academic year');
+    logDebug('start watching course schedules by academic year');
     return query
         .watch()
         .map(
@@ -222,13 +153,7 @@ class CourseScheduleEventRepository
               Invocation.method(#watchByAcademicYear, [academicYearId]),
             );
             return AppResult.success(
-              rows.map((row) {
-                final base = row.readTable(_db.academicCalendarEventsDrift);
-                final detail = row.readTable(
-                  _db.courseScheduleEventDetailsDrift,
-                );
-                return base.toCourseScheduleDomain(detail);
-              }).toList(),
+              rows.map((row) => row.toDomain()).toList(),
             );
           },
         )
@@ -241,24 +166,15 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Stream<AppResult<List<CourseScheduleEvent>>> watchByCohort(String cohortId) {
+  Stream<AppResult<List<CourseSchedule>>> watchByCohort(String cohortId) {
     logDebug(
-      'construct select course schedule events by cohort query',
+      'construct select course schedules by cohort query',
       extra: {'cohortId': cohortId},
     );
-    final query =
-        _db.select(_db.academicCalendarEventsDrift).join([
-          innerJoin(
-            _db.courseScheduleEventDetailsDrift,
-            _db.courseScheduleEventDetailsDrift.eventId.equalsExp(
-              _db.academicCalendarEventsDrift.id,
-            ),
-          ),
-        ])..where(
-          _db.courseScheduleEventDetailsDrift.cohortId.equals(cohortId),
-        );
+    final query = _db.select(_db.courseSchedulesDrift)
+      ..where((tbl) => tbl.cohortId.equals(cohortId));
 
-    logDebug('start watching course schedule events by cohort');
+    logDebug('start watching course schedules by cohort');
     return query
         .watch()
         .map(
@@ -268,13 +184,7 @@ class CourseScheduleEventRepository
               Invocation.method(#watchByCohort, [cohortId]),
             );
             return AppResult.success(
-              rows.map((row) {
-                final base = row.readTable(_db.academicCalendarEventsDrift);
-                final detail = row.readTable(
-                  _db.courseScheduleEventDetailsDrift,
-                );
-                return base.toCourseScheduleDomain(detail);
-              }).toList(),
+              rows.map((row) => row.toDomain()).toList(),
             );
           },
         )
@@ -287,41 +197,33 @@ class CourseScheduleEventRepository
   }
 
   @override
-  Stream<AppResult<CourseScheduleEvent>> watchSingle(String id) async* {
+  Stream<AppResult<CourseSchedule>> watchSingle(String id) async* {
     logDebug(
-      'construct select query for single course schedule event',
+      'construct select query for single course schedule',
       extra: {'id': id},
     );
-    final query = _db.select(_db.academicCalendarEventsDrift).join([
-      innerJoin(
-        _db.courseScheduleEventDetailsDrift,
-        _db.courseScheduleEventDetailsDrift.eventId.equalsExp(
-          _db.academicCalendarEventsDrift.id,
-        ),
-      ),
-    ])..where(_db.academicCalendarEventsDrift.id.equals(id));
+    final query = _db.select(_db.courseSchedulesDrift)
+      ..where((tbl) => tbl.id.equals(id));
 
-    logDebug('start checking course schedule event exists or not');
+    logDebug('start checking course schedule exists or not');
     final exists = await query.getSingleOrNull();
     if (exists == null) {
-      logDebug('course schedule event not found');
+      logDebug('course schedule not found');
       yield AppResult.failure(
         AppException(
-          'course schedule event with ID $id not found',
-          code: .academicCalendarEventNotFound,
+          'course schedule with ID $id not found',
+          code: .courseScheduleNotFound,
         ),
       );
     }
     logDebug(
-      'course schedule event found. start watching course schedule event',
+      'course schedule found. start watching course schedule',
     );
     yield* query
         .watchSingle()
         .map((row) {
           maybeThrowException(this, Invocation.method(#watchSingle, [id]));
-          final base = row.readTable(_db.academicCalendarEventsDrift);
-          final detail = row.readTable(_db.courseScheduleEventDetailsDrift);
-          return AppResult.success(base.toCourseScheduleDomain(detail));
+          return AppResult.success(row.toDomain());
         })
         .onErrorReturnWith((error, st) {
           logError('$error', error: error, stackTrace: st);

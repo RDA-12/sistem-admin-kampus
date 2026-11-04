@@ -8,19 +8,19 @@ import '../../../common/di_mocks.dart';
 import '../mocks.dart';
 
 void main() {
-  late ICourseScheduleEventRepository repositoryMock;
-  late WatchCourseScheduleEventsByYearUseCase useCase;
+  late ICourseScheduleRepository repositoryMock;
+  late WatchCourseSchedulesByYearUseCase useCase;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
-    repositoryMock = getIt<ICourseScheduleEventRepository>();
+    repositoryMock = getIt<ICourseScheduleRepository>();
     when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
       (_) => Stream.value(AppResult.success(courseScheduleEventsMock)),
     );
 
-    useCase = WatchCourseScheduleEventsByYearUseCase(
-      courseScheduleEventRepository: repositoryMock,
+    useCase = WatchCourseSchedulesByYearUseCase(
+      courseScheduleRepository: repositoryMock,
     );
   });
 
@@ -28,9 +28,9 @@ void main() {
     reset(repositoryMock);
   });
 
-  group('WatchCourseScheduleEventsByYearUseCase', () {
+  group('WatchCourseSchedulesByYearUseCase', () {
     test(
-      'emits correct list of CourseScheduleEvent for academic year',
+      'emits correct list of CourseSchedule for academic year',
       () async {
         final stream = useCase('year_1');
 
@@ -41,7 +41,7 @@ void main() {
     test('emits failure when repo emits failure', () {
       when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
         (_) => Stream.value(
-          AppFailure<List<CourseScheduleEvent>>(
+          AppFailure<List<CourseSchedule>>(
             exception: AppException.test(),
           ),
         ),
@@ -52,7 +52,7 @@ void main() {
       expect(
         stream,
         emits(
-          AppFailure<List<CourseScheduleEvent>>(
+          AppFailure<List<CourseSchedule>>(
             exception: AppException.test(),
           ),
         ),

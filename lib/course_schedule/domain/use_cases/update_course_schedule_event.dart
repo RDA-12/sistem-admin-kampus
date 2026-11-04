@@ -1,58 +1,53 @@
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
 import 'package:sistem_admin/course_schedule/domain/repository.dart';
 
-/// Params for updating a [CourseScheduleEvent]
-final class UpdateCourseScheduleEventParams extends Equatable {
-  /// Creates new [UpdateCourseScheduleEventParams]
+/// Params for updating a [CourseSchedule]
+final class UpdateCourseScheduleParams extends Equatable {
+  /// Creates new [UpdateCourseScheduleParams]
   const new(
     this.event, {
     this.academicYearId,
+    this.termId,
+    this.programId,
     this.name,
     this.start,
-    this.end,
-    this.recurrence,
-    this.courseDetail,
+    this.durationInMinutes,
     this.cohortId,
     this.courseId,
-    this.programId,
     this.lecturerId,
     this.roomId,
   });
 
   /// Event that will be updated
-  final CourseScheduleEvent event;
+  final CourseSchedule event;
 
   /// Updated parent academic year ID
   final String? academicYearId;
+
+  /// Updated term ID
+  final String? termId;
+
+  /// Updated program ID
+  final String? programId;
 
   /// Updated name
   final String? name;
 
   /// Updated start date and time
-  final EventDateTime? start;
+  final DateTime? start;
 
-  /// Updated end date and time
-  final EventDateTime? end;
-
-  /// Updated recurrence rules
-  final List<String>? recurrence;
-
-  /// Updated course detail
-  final CourseScheduleEventDetail? courseDetail;
+  /// Updated duration in minutes
+  final int? durationInMinutes;
 
   /// Updated cohort ID
   final String? cohortId;
 
   /// Updated course ID
   final String? courseId;
-
-  /// Updated program ID
-  final String? programId;
 
   /// Updated lecturer ID
   final String? lecturerId;
@@ -64,101 +59,53 @@ final class UpdateCourseScheduleEventParams extends Equatable {
   List<Object?> get props => [
     event,
     academicYearId,
+    termId,
+    programId,
     name,
     start,
-    end,
-    recurrence,
-    courseDetail,
+    durationInMinutes,
     cohortId,
     courseId,
-    programId,
     lecturerId,
     roomId,
   ];
 }
 
-/// Use case for updating a [CourseScheduleEvent]
+/// Use case for updating a [CourseSchedule]
 @LazySingleton(env: [Environment.prod])
-class UpdateCourseScheduleEventUseCase
+class UpdateCourseScheduleUseCase
     with AppLoggerMixin
-    implements
-        FutureBaseUseCase<
-          UpdateCourseScheduleEventParams,
-          CourseScheduleEvent
-        > {
-  /// Creates new [UpdateCourseScheduleEventUseCase]
+    implements FutureBaseUseCase<UpdateCourseScheduleParams, CourseSchedule> {
+  /// Creates new [UpdateCourseScheduleUseCase]
   new({
-    required this._courseScheduleEventRepository,
-    required this._academicYearRepository,
+    required this._courseScheduleRepository,
   });
 
-  final IAcademicYearRepository _academicYearRepository;
-  final ICourseScheduleEventRepository _courseScheduleEventRepository;
+  final ICourseScheduleRepository _courseScheduleRepository;
 
   @override
-  Future<AppResult<CourseScheduleEvent>> call(
-    UpdateCourseScheduleEventParams params,
+  Future<AppResult<CourseSchedule>> call(
+    UpdateCourseScheduleParams params,
   ) async {
-    final academicYearId = params.academicYearId ?? params.event.academicYearId;
     logDebug(
-      'start getting academic year',
-      extra: {'academicYearId': academicYearId},
-    );
-    late final AcademicYear year;
-    final academicYearResult = await _academicYearRepository
-        .watchSingle(academicYearId)
-        .first;
-    switch (academicYearResult) {
-      case AppFailure<AcademicYear>(:final exception):
-        logDebug('failed to get academic year');
-        return AppResult.failure(exception);
-      case AppSuccess<AcademicYear>(:final data):
-        year = data;
-    }
-
-    final startDate = params.start?.date ?? params.event.start.date;
-    final endDate = params.end?.date ?? params.event.end.date;
-
-    logDebug(
-      'start checking whether event can be updated',
-      extra: {
-        'startDate': startDate,
-        'endDate': endDate,
-      },
-    );
-    final calendar = AcademicCalendar(year: year);
-    final allowedResult = calendar.canUpdateEvent(
-      startDate: startDate,
-      endDate: endDate,
-    );
-    switch (allowedResult) {
-      case AppFailure<Null>(:final exception):
-        logDebug('failed to update event: outside academic year');
-        return AppResult.failure(exception);
-      case AppSuccess<Null>():
-    }
-
-    logDebug(
-      'event update allowed. start updating course schedule event',
+      'start updating course schedule',
       extra: {
         'id': params.event.id,
         'academicYearId': params.academicYearId,
+        'termId': params.termId,
         'name': params.name,
-        'start': params.start,
-        'end': params.end,
-        'courseDetail': params.courseDetail,
       },
     );
-    final result = await _courseScheduleEventRepository.update(
+    final result = await _courseScheduleRepository.update(
       params.event.id,
       args: params,
     );
     switch (result) {
       case AppSuccess(:final data):
-        logDebug('course schedule event updated');
+        logDebug('course schedule updated');
         return AppResult.success(data);
-      case AppFailure<CourseScheduleEvent>(:final exception):
-        logDebug('course schedule event update failed');
+      case AppFailure<CourseSchedule>(:final exception):
+        logDebug('course schedule update failed');
         return AppResult.failure(exception);
     }
   }

@@ -68,6 +68,9 @@ enum AppExceptionCode {
 
   /// Code caused by new cohort have existing name
   cohortAlreadyExists,
+
+  /// Code caused by requested course schedule not found in db
+  courseScheduleNotFound,
 }
 
 /// Exception class for this app

@@ -5,7 +5,7 @@ import 'package:sistem_admin/common/common.dart';
 void main() {
   group('AcademicCalendarEvent', () {
     test(
-      'equal on id, academicYearId, name, type, start, end, and recurrence',
+      'equal on id, academicYearId, name, type, start, and end',
       () {
         final start = EventDateTime(
           date: DateTime(2025, 9),
@@ -19,7 +19,7 @@ void main() {
           id: 'id',
           academicYearId: 'year_1',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: end,
         );
@@ -27,7 +27,7 @@ void main() {
           id: 'id',
           academicYearId: 'year_1',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: end,
         );
@@ -35,7 +35,7 @@ void main() {
           id: 'id B',
           academicYearId: 'year_1',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: end,
         );
@@ -43,7 +43,7 @@ void main() {
           id: 'id',
           academicYearId: 'year_2',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: end,
         );
@@ -51,7 +51,7 @@ void main() {
           id: 'id',
           academicYearId: 'year_1',
           name: 'Kuliah Pengantar',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: end,
         );
@@ -67,7 +67,7 @@ void main() {
           id: 'id',
           academicYearId: 'year_1',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: EventDateTime(
             date: DateTime(2025, 9, 2),
             time: const Time(hour: 8, minute: 0),
@@ -78,20 +78,12 @@ void main() {
           id: 'id',
           academicYearId: 'year_1',
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: start,
           end: EventDateTime(
             date: DateTime(2025, 9),
             time: const Time(hour: 12, minute: 0),
           ),
-        );
-        final h = AcademicCalendarEvent(
-          id: 'id',
-          academicYearId: 'year_1',
-          name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
-          start: start,
-          end: end,
         );
 
         expect(testObj, equals(a));
@@ -101,7 +93,6 @@ void main() {
         expect(testObj, isNot(equals(e)));
         expect(testObj, isNot(equals(f)));
         expect(testObj, isNot(equals(g)));
-        expect(testObj, isNot(equals(h)));
       },
     );
   });

@@ -32,7 +32,7 @@ void main() {
       id: 'event_1',
       academicYearId: 'year_1',
       name: 'Kuliah Perdana',
-      type: AcademicCalendarEventType.lectures,
+      type: AcademicCalendarEventType.publicLectures,
       start: EventDateTime(
         date: DateTime(2025, 9),
         time: const Time(hour: 8, minute: 0),

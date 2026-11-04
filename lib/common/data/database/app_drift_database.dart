@@ -26,7 +26,7 @@ part 'app_drift_database.g.dart';
     AcademicTermsDrift,
     AcademicCalendarEventsDrift,
     CohortsDrift,
-    CourseScheduleEventDetailsDrift,
+    CourseSchedulesDrift,
   ],
 )
 class AppDriftDatabase extends _$AppDriftDatabase {

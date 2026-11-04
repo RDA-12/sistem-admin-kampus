@@ -26,7 +26,7 @@ void main() {
   final params = CreateAcademicCalendarEventParams(
     academicYearId: year.id,
     name: 'Kuliah Perdana',
-    type: AcademicCalendarEventType.lectures,
+    type: AcademicCalendarEventType.publicLectures,
     start: start,
     end: end,
     recurrence: const ['RRULE:FREQ=WEEKLY'],
@@ -36,7 +36,7 @@ void main() {
     id: 'event_1',
     academicYearId: year.id,
     name: 'Kuliah Perdana',
-    type: AcademicCalendarEventType.lectures,
+    type: AcademicCalendarEventType.publicLectures,
     start: start,
     end: end,
   );
@@ -100,7 +100,7 @@ void main() {
         final outsideParams = CreateAcademicCalendarEventParams(
           academicYearId: year.id,
           name: 'Kuliah Perdana',
-          type: AcademicCalendarEventType.lectures,
+          type: AcademicCalendarEventType.publicLectures,
           start: EventDateTime(
             date: DateTime(2025, 8, 31),
             time: const Time(hour: 8, minute: 0),

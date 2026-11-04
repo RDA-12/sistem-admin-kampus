@@ -13,7 +13,7 @@ void main() {
       id: '$index',
       academicYearId: 'year_1',
       name: 'Event ${index + 1}',
-      type: AcademicCalendarEventType.lectures,
+      type: AcademicCalendarEventType.publicLectures,
       start: EventDateTime(
         date: DateTime(2025, 9, 10 + index),
         time: const Time(hour: 8, minute: 0),

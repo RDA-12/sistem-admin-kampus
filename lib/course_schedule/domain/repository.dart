@@ -3,22 +3,22 @@ import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
 import 'package:sistem_admin/course_schedule/domain/use_cases/use_cases.dart';
 
-/// Manage data on [CourseScheduleEvent]
-abstract interface class ICourseScheduleEventRepository
+/// Manage data on [CourseSchedule]
+abstract interface class ICourseScheduleRepository
     extends
         BaseRepository<
-          CourseScheduleEvent,
-          CreateCourseScheduleEventParams,
-          UpdateCourseScheduleEventParams
+          CourseSchedule,
+          CreateCourseScheduleParams,
+          UpdateCourseScheduleParams
         > {
-  /// Watch for [CourseScheduleEvent] data changes for specific
+  /// Watch for [CourseSchedule] data changes for specific
   /// [academicYearId]
-  Stream<AppResult<List<CourseScheduleEvent>>> watchByAcademicYear(
+  Stream<AppResult<List<CourseSchedule>>> watchByAcademicYear(
     String academicYearId,
   );
 
-  /// Watch for [CourseScheduleEvent] data changes for specific [cohortId]
-  Stream<AppResult<List<CourseScheduleEvent>>> watchByCohort(
+  /// Watch for [CourseSchedule] data changes for specific [cohortId]
+  Stream<AppResult<List<CourseSchedule>>> watchByCohort(
     String cohortId,
   );
 }

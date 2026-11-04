@@ -1,65 +1,56 @@
 import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/course_schedule/course_schedule.dart';
 
-@LazySingleton(as: ICourseScheduleEventRepository, env: [Environment.test])
-class MockCourseScheduleEventRepository extends Mock
-    implements ICourseScheduleEventRepository;
+@LazySingleton(as: ICourseScheduleRepository, env: [Environment.test])
+class MockCourseScheduleRepository extends Mock
+    implements ICourseScheduleRepository;
 
-@LazySingleton(as: CreateCourseScheduleEventUseCase, env: [Environment.test])
-class MockCreateCourseScheduleEventUseCase extends Mock
-    implements CreateCourseScheduleEventUseCase;
+@LazySingleton(as: CreateCourseScheduleUseCase, env: [Environment.test])
+class MockCreateCourseScheduleUseCase extends Mock
+    implements CreateCourseScheduleUseCase;
 
-@LazySingleton(as: UpdateCourseScheduleEventUseCase, env: [Environment.test])
-class MockUpdateCourseScheduleEventUseCase extends Mock
-    implements UpdateCourseScheduleEventUseCase;
+@LazySingleton(as: UpdateCourseScheduleUseCase, env: [Environment.test])
+class MockUpdateCourseScheduleUseCase extends Mock
+    implements UpdateCourseScheduleUseCase;
 
-@LazySingleton(as: DeleteCourseScheduleEventUseCase, env: [Environment.test])
-class MockDeleteCourseScheduleEventUseCase extends Mock
-    implements DeleteCourseScheduleEventUseCase;
+@LazySingleton(as: DeleteCourseScheduleUseCase, env: [Environment.test])
+class MockDeleteCourseScheduleUseCase extends Mock
+    implements DeleteCourseScheduleUseCase;
 
-@LazySingleton(as: WatchCourseScheduleEventsUseCase, env: [Environment.test])
-class MockWatchCourseScheduleEventsUseCase extends Mock
-    implements WatchCourseScheduleEventsUseCase;
-
-@LazySingleton(
-  as: WatchCourseScheduleEventsByYearUseCase,
-  env: [Environment.test],
-)
-class MockWatchCourseScheduleEventsByYearUseCase extends Mock
-    implements WatchCourseScheduleEventsByYearUseCase;
+@LazySingleton(as: WatchCourseSchedulesUseCase, env: [Environment.test])
+class MockWatchCourseSchedulesUseCase extends Mock
+    implements WatchCourseSchedulesUseCase;
 
 @LazySingleton(
-  as: WatchCourseScheduleEventsByCohortUseCase,
+  as: WatchCourseSchedulesByYearUseCase,
   env: [Environment.test],
 )
-class MockWatchCourseScheduleEventsByCohortUseCase extends Mock
-    implements WatchCourseScheduleEventsByCohortUseCase;
+class MockWatchCourseSchedulesByYearUseCase extends Mock
+    implements WatchCourseSchedulesByYearUseCase;
 
-final courseScheduleEventsMock = List<CourseScheduleEvent>.generate(
+@LazySingleton(
+  as: WatchCourseSchedulesByCohortUseCase,
+  env: [Environment.test],
+)
+class MockWatchCourseSchedulesByCohortUseCase extends Mock
+    implements WatchCourseSchedulesByCohortUseCase;
+
+final courseScheduleEventsMock = List<CourseSchedule>.generate(
   3,
-  (index) => CourseScheduleEvent(
+  (index) => CourseSchedule(
     id: 'schedule_event_$index',
     academicYearId: 'year_1',
+    termId: 'term_1',
     name: 'Schedule Event $index',
-    start: EventDateTime(
-      date: DateTime(2025, 9, 10 + index),
-      time: const Time(hour: 8, minute: 0),
-    ),
-    end: EventDateTime(
-      date: DateTime(2025, 9, 10 + index),
-      time: const Time(hour: 10, minute: 0),
-    ),
-    courseDetail: CourseScheduleEventDetail(
-      cohortId: 'cohort_$index',
-      courseId: 'course_1',
-      programId: 'program_1',
-      lecturerId: 'lecturer_1',
-      roomId: 'room_1',
-    ),
+    start: DateTime(2025, 9, 8 + index, 8 + index),
+    durationInMinutes: 100,
+    cohortId: 'cohort_$index',
+    courseId: 'course_1',
+    programId: 'program_1',
+    lecturerId: 'lecturer_1',
+    roomId: 'room_1',
   ),
 );
 
-final CourseScheduleEvent courseScheduleEventMock =
-    courseScheduleEventsMock.first;
+final CourseSchedule courseScheduleEventMock = courseScheduleEventsMock.first;

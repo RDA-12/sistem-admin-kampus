@@ -9,70 +9,71 @@ import 'package:sistem_admin/course_schedule/domain/domain.dart';
 part 'course_schedule_event_mutation_event.dart';
 part 'course_schedule_event_mutation_state.dart';
 
-/// Bloc for mutating [CourseScheduleEvent] data
+/// Bloc for mutating [CourseSchedule] data
 @injectable
-class CourseScheduleEventMutationBloc
-    extends
-        Bloc<CourseScheduleEventMutationEvent, CourseScheduleEventMutationState>
+class CourseScheduleMutationBloc
+    extends Bloc<CourseScheduleMutationEvent, CourseScheduleMutationState>
     with AppLoggerMixin {
-  /// Creates new [CourseScheduleEventMutationBloc]
+  /// Creates new [CourseScheduleMutationBloc]
   new({
-    required this._createCourseScheduleEvent,
-    required this._updateCourseScheduleEvent,
-    required this._deleteCourseScheduleEvent,
-  }) : super(const CourseScheduleEventMutationState()) {
-    on<CourseScheduleEventMutationCreateRequested>(
-      _onCourseScheduleEventMutationCreateRequested,
+    required this._createCourseSchedule,
+    required this._updateCourseSchedule,
+    required this._deleteCourseSchedule,
+  }) : super(const CourseScheduleMutationState()) {
+    on<CourseScheduleMutationCreateRequested>(
+      _onCourseScheduleMutationCreateRequested,
       transformer: sequential(),
     );
-    on<CourseScheduleEventMutationUpdateRequested>(
-      _onCourseScheduleEventMutationUpdateRequested,
+    on<CourseScheduleMutationUpdateRequested>(
+      _onCourseScheduleMutationUpdateRequested,
     );
-    on<CourseScheduleEventMutationDeleteRequested>(
-      _onCourseScheduleEventMutationDeleteRequested,
+    on<CourseScheduleMutationDeleteRequested>(
+      _onCourseScheduleMutationDeleteRequested,
     );
   }
 
-  final CreateCourseScheduleEventUseCase _createCourseScheduleEvent;
-  final UpdateCourseScheduleEventUseCase _updateCourseScheduleEvent;
-  final DeleteCourseScheduleEventUseCase _deleteCourseScheduleEvent;
+  final CreateCourseScheduleUseCase _createCourseSchedule;
+  final UpdateCourseScheduleUseCase _updateCourseSchedule;
+  final DeleteCourseScheduleUseCase _deleteCourseSchedule;
 
-  Future<void> _onCourseScheduleEventMutationCreateRequested(
-    CourseScheduleEventMutationCreateRequested event,
-    Emitter<CourseScheduleEventMutationState> emit,
+  Future<void> _onCourseScheduleMutationCreateRequested(
+    CourseScheduleMutationCreateRequested event,
+    Emitter<CourseScheduleMutationState> emit,
   ) async {
     await AppLogger.runWithLogger(() async {
       logDebug(
-        'start creating course schedule event. emit isCreating true',
+        'start creating course schedule. emit isCreating true',
         extra: {
           'academicYearId': event.academicYearId,
+          'termId': event.termId,
           'name': event.name,
-          'start': event.start,
-          'end': event.end,
-          'courseDetail': event.courseDetail,
         },
       );
       emit(state.copyWith(isCreating: true));
 
-      final result = await _createCourseScheduleEvent(
-        CreateCourseScheduleEventParams(
+      final result = await _createCourseSchedule(
+        CreateCourseScheduleParams(
           academicYearId: event.academicYearId,
+          termId: event.termId,
+          programId: event.programId,
           name: event.name,
           start: event.start,
-          end: event.end,
-          courseDetail: event.courseDetail,
-          recurrence: event.recurrence,
+          durationInMinutes: event.durationInMinutes,
+          cohortId: event.cohortId,
+          courseId: event.courseId,
+          lecturerId: event.lecturerId,
+          roomId: event.roomId,
         ),
       );
 
       final notice = switch (result) {
         AppSuccess(:final data) => () {
-          logDebug('course schedule event created. emit created notice');
-          return CourseScheduleEventCreatedNotice(data);
+          logDebug('course schedule created. emit created notice');
+          return CourseScheduleCreatedNotice(data);
         }(),
         AppFailure(:final exception) => () {
-          logDebug('create course schedule event failed. emit failed notice');
-          return CourseScheduleEventMutationFailedNotice(
+          logDebug('create course schedule failed. emit failed notice');
+          return CourseScheduleMutationFailedNotice(
             type: .create,
             exception: exception,
             event: null,
@@ -83,13 +84,13 @@ class CourseScheduleEventMutationBloc
     });
   }
 
-  Future<void> _onCourseScheduleEventMutationUpdateRequested(
-    CourseScheduleEventMutationUpdateRequested event,
-    Emitter<CourseScheduleEventMutationState> emit,
+  Future<void> _onCourseScheduleMutationUpdateRequested(
+    CourseScheduleMutationUpdateRequested event,
+    Emitter<CourseScheduleMutationState> emit,
   ) async {
     await AppLogger.runWithLogger(() async {
       logDebug(
-        'start updating course schedule event. emit updatingIds',
+        'start updating course schedule. emit updatingIds',
         extra: {
           'id': event.event.id,
           'name': event.name,
@@ -101,34 +102,33 @@ class CourseScheduleEventMutationBloc
         ),
       );
 
-      final result = await _updateCourseScheduleEvent(
-        UpdateCourseScheduleEventParams(
+      final result = await _updateCourseSchedule(
+        UpdateCourseScheduleParams(
           event.event,
           academicYearId: event.academicYearId,
+          termId: event.termId,
+          programId: event.programId,
           name: event.name,
           start: event.start,
-          end: event.end,
-          courseDetail: event.courseDetail,
+          durationInMinutes: event.durationInMinutes,
           cohortId: event.cohortId,
           courseId: event.courseId,
-          programId: event.programId,
           lecturerId: event.lecturerId,
           roomId: event.roomId,
-          recurrence: event.recurrence,
         ),
       );
 
       final notice = switch (result) {
         AppSuccess(:final data) => () {
-          logDebug('course schedule event updated. emit updated notice');
-          return CourseScheduleEventUpdatedNotice(
+          logDebug('course schedule updated. emit updated notice');
+          return CourseScheduleUpdatedNotice(
             before: event.event,
             after: data,
           );
         }(),
         AppFailure(:final exception) => () {
-          logDebug('update course schedule event failed. emit failed notice');
-          return CourseScheduleEventMutationFailedNotice(
+          logDebug('update course schedule failed. emit failed notice');
+          return CourseScheduleMutationFailedNotice(
             type: .update,
             exception: exception,
             event: event.event,
@@ -144,13 +144,13 @@ class CourseScheduleEventMutationBloc
     });
   }
 
-  Future<void> _onCourseScheduleEventMutationDeleteRequested(
-    CourseScheduleEventMutationDeleteRequested event,
-    Emitter<CourseScheduleEventMutationState> emit,
+  Future<void> _onCourseScheduleMutationDeleteRequested(
+    CourseScheduleMutationDeleteRequested event,
+    Emitter<CourseScheduleMutationState> emit,
   ) async {
     await AppLogger.runWithLogger(() async {
       logDebug(
-        'start deleting course schedule event. emit deletingIds',
+        'start deleting course schedule. emit deletingIds',
         extra: {'id': event.event.id},
       );
       emit(
@@ -159,16 +159,16 @@ class CourseScheduleEventMutationBloc
         ),
       );
 
-      final result = await _deleteCourseScheduleEvent(event.event);
+      final result = await _deleteCourseSchedule(event.event);
 
       final notice = switch (result) {
         AppSuccess() => () {
-          logDebug('course schedule event deleted. emit deleted notice');
-          return CourseScheduleEventDeletedNotice(event.event);
+          logDebug('course schedule deleted. emit deleted notice');
+          return CourseScheduleDeletedNotice(event.event);
         }(),
         AppFailure(:final exception) => () {
-          logDebug('delete course schedule event failed. emit failed notice');
-          return CourseScheduleEventMutationFailedNotice(
+          logDebug('delete course schedule failed. emit failed notice');
+          return CourseScheduleMutationFailedNotice(
             type: .delete,
             exception: exception,
             event: event.event,

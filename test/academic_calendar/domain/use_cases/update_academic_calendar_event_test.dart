@@ -27,7 +27,7 @@ void main() {
     id: 'event_1',
     academicYearId: year.id,
     name: 'Kuliah Perdana',
-    type: AcademicCalendarEventType.lectures,
+    type: AcademicCalendarEventType.publicLectures,
     start: start,
     end: end,
   );

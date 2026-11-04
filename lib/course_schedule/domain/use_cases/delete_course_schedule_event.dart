@@ -4,29 +4,29 @@ import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
 import 'package:sistem_admin/course_schedule/domain/repository.dart';
 
-/// Use case for deleting a [CourseScheduleEvent]
+/// Use case for deleting a [CourseSchedule]
 @LazySingleton(env: [Environment.prod])
-class DeleteCourseScheduleEventUseCase
+class DeleteCourseScheduleUseCase
     with AppLoggerMixin
-    implements FutureBaseUseCase<CourseScheduleEvent, Null> {
-  /// Creates new [DeleteCourseScheduleEventUseCase]
-  new({required this._courseScheduleEventRepository});
+    implements FutureBaseUseCase<CourseSchedule, Null> {
+  /// Creates new [DeleteCourseScheduleUseCase]
+  new({required this._courseScheduleRepository});
 
-  final ICourseScheduleEventRepository _courseScheduleEventRepository;
+  final ICourseScheduleRepository _courseScheduleRepository;
 
   @override
-  Future<AppResult<Null>> call(CourseScheduleEvent params) async {
+  Future<AppResult<Null>> call(CourseSchedule params) async {
     logDebug(
-      'start deleting course schedule event',
+      'start deleting course schedule',
       extra: {'id': params.id},
     );
-    final result = await _courseScheduleEventRepository.delete(params.id);
+    final result = await _courseScheduleRepository.delete(params.id);
     switch (result) {
       case AppSuccess():
-        logDebug('course schedule event deleted');
+        logDebug('course schedule deleted');
         return AppResult.success(null);
       case AppFailure<Null>(:final exception):
-        logDebug('course schedule event deletion failed');
+        logDebug('course schedule deletion failed');
         return AppResult.failure(exception);
     }
   }
