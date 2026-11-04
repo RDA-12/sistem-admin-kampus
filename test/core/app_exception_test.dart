@@ -12,4 +12,29 @@ void main() {
       expect(testObj, isNot(equals(b)));
     });
   });
+
+  group('CourseSchduleCollisionException', () {
+    test('equal on details', () {
+      final details = [
+        CourseScheduleCollisionDetail(
+          start: DateTime.now(),
+          duration: Duration.zero,
+          cohortId: 'cohortId',
+          courseId: 'courseId',
+          lecturerId: 'lecturerId',
+          roomId: 'roomId',
+        ),
+      ];
+      final testObj = CourseScheduleCollisionException(
+        details: details,
+      );
+      final a = CourseScheduleCollisionException(
+        details: details,
+      );
+      const b = CourseScheduleCollisionException(details: []);
+
+      expect(testObj, equals(a));
+      expect(testObj, isNot(equals(b)));
+    });
+  });
 }

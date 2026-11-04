@@ -71,6 +71,10 @@ enum AppExceptionCode {
 
   /// Code caused by requested course schedule not found in db
   courseScheduleNotFound,
+
+  /// Code caused by requested course schedule is collide
+  /// with existing schedules
+  courseScheduleCollided,
 }
 
 /// Exception class for this app
@@ -92,4 +96,61 @@ class AppException extends Equatable implements Exception {
 
   @override
   List<Object?> get props => [code];
+}
+
+/// Exception to represent course schedule collision
+class CourseScheduleCollisionException extends AppException {
+  /// Creates new [CourseScheduleCollisionException]
+  const new({required this.details})
+    : super(
+        'Schedule collide with others',
+        code: AppExceptionCode.courseScheduleCollided,
+      );
+
+  /// Details of the collision
+  final List<CourseScheduleCollisionDetail> details;
+
+  @override
+  List<Object?> get props => [details];
+}
+
+/// Representing details of a course schedule collision
+class CourseScheduleCollisionDetail extends Equatable {
+  /// Creates new [CourseScheduleCollisionDetail]
+  const new({
+    required this.start,
+    required this.duration,
+    required this.cohortId,
+    required this.courseId,
+    required this.lecturerId,
+    required this.roomId,
+  });
+
+  /// When the colliding schedule start
+  final DateTime start;
+
+  /// How long the colliding schedule last
+  final Duration duration;
+
+  /// ID of the cohort
+  final String cohortId;
+
+  /// ID of the course
+  final String courseId;
+
+  /// ID of the lecturer
+  final String lecturerId;
+
+  /// ID of the room
+  final String roomId;
+
+  @override
+  List<Object?> get props => [
+    start,
+    duration,
+    cohortId,
+    courseId,
+    lecturerId,
+    roomId,
+  ];
 }

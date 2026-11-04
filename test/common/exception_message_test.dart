@@ -33,6 +33,8 @@ void main() {
         'Kegiatan kalender akademik berada di luar rentang tahun akademik',
     .cohortNotFound: 'Angkatan tidak dapat ditemukan',
     .cohortAlreadyExists: 'Angkatan dengan nama tersebut sudah ada',
+    .courseScheduleNotFound: 'Jadwal kuliah tidak dapat ditemukan',
+    .courseScheduleCollided: 'Jadwal kuliah bentrok dengan yang lain',
   };
 
   group('AppExceptionCode.message', () {

@@ -195,5 +195,126 @@ void main() {
         expect(testObj, isNot(equals(l)));
       },
     );
+
+    group('overlaps', () {
+      test('returns empty list when start is before schedule start', () {
+        final result = testObj.overlaps(
+          start: DateTime(2025, 9, 8, 7, 59),
+          cohortId: testObj.cohortId,
+          courseId: testObj.courseId,
+          lecturerId: testObj.lecturerId,
+          roomId: testObj.roomId,
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list when start is at or after schedule end', () {
+        final resultAtEnd = testObj.overlaps(
+          start: DateTime(2025, 9, 8, 9, 40),
+          cohortId: testObj.cohortId,
+          courseId: testObj.courseId,
+          lecturerId: testObj.lecturerId,
+          roomId: testObj.roomId,
+        );
+        final resultAfterEnd = testObj.overlaps(
+          start: DateTime(2025, 9, 8, 10),
+          cohortId: testObj.cohortId,
+          courseId: testObj.courseId,
+          lecturerId: testObj.lecturerId,
+          roomId: testObj.roomId,
+        );
+
+        expect(resultAtEnd, isEmpty);
+        expect(resultAfterEnd, isEmpty);
+      });
+
+      test('returns empty list when time overlaps but no resources match', () {
+        final result = testObj.overlaps(
+          start: DateTime(2025, 9, 8, 8, 30),
+          cohortId: 'different_cohort',
+          courseId: 'different_course',
+          lecturerId: 'different_lecturer',
+          roomId: 'different_room',
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test(
+        'returns [ruangan] when only roomId matches during time overlap',
+        () {
+          final result = testObj.overlaps(
+            start: start,
+            cohortId: 'different_cohort',
+            courseId: 'different_course',
+            lecturerId: 'different_lecturer',
+            roomId: testObj.roomId,
+          );
+
+          expect(result, ['ruangan']);
+        },
+      );
+
+      test(
+        'returns [mata kuliah] when only courseId matches during time overlap',
+        () {
+          final result = testObj.overlaps(
+            start: DateTime(2025, 9, 8, 8, 30),
+            cohortId: 'different_cohort',
+            courseId: testObj.courseId,
+            lecturerId: 'different_lecturer',
+            roomId: 'different_room',
+          );
+
+          expect(result, ['mata kuliah']);
+        },
+      );
+
+      test(
+        'returns [dosen] when only lecturerId matches during time overlap',
+        () {
+          final result = testObj.overlaps(
+            start: start,
+            cohortId: 'different_cohort',
+            courseId: 'different_course',
+            lecturerId: testObj.lecturerId,
+            roomId: 'different_room',
+          );
+
+          expect(result, ['dosen']);
+        },
+      );
+
+      test(
+        'returns [angkatan] when only cohortId matches during time overlap',
+        () {
+          final result = testObj.overlaps(
+            start: start,
+            cohortId: testObj.cohortId,
+            courseId: 'different_course',
+            lecturerId: 'different_lecturer',
+            roomId: 'different_room',
+          );
+
+          expect(result, ['angkatan']);
+        },
+      );
+
+      test(
+        'returns all collision reasons when all resources match at same start',
+        () {
+          final result = testObj.overlaps(
+            start: start,
+            cohortId: testObj.cohortId,
+            courseId: testObj.courseId,
+            lecturerId: testObj.lecturerId,
+            roomId: testObj.roomId,
+          );
+
+          expect(result, ['ruangan', 'mata kuliah', 'dosen', 'angkatan']);
+        },
+      );
+    });
   });
 }

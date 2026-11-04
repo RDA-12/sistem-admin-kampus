@@ -43,5 +43,7 @@ extension ExceptionMessageX on AppExceptionCode {
       'Angkatan dengan nama tersebut sudah ada',
     AppExceptionCode.courseScheduleNotFound =>
       'Jadwal kuliah tidak dapat ditemukan',
+    AppExceptionCode.courseScheduleCollided =>
+      'Jadwal kuliah bentrok dengan yang lain',
   };
 }

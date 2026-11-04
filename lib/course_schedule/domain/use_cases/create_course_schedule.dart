@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
@@ -73,9 +74,11 @@ class CreateCourseScheduleUseCase
     implements FutureBaseUseCase<CreateCourseScheduleParams, CourseSchedule> {
   /// Creates new [CreateCourseScheduleUseCase]
   new({
+    required this._academicYearRepository,
     required this._courseScheduleRepository,
   });
 
+  final IAcademicYearRepository _academicYearRepository;
   final ICourseScheduleRepository _courseScheduleRepository;
 
   @override
@@ -83,7 +86,67 @@ class CreateCourseScheduleUseCase
     CreateCourseScheduleParams params,
   ) async {
     logDebug(
-      'start creating course schedule',
+      'start getting academic year',
+      extra: {'academicYearId': params.academicYearId},
+    );
+    late final AcademicYear year;
+    final academicYearResult = await _academicYearRepository
+        .watchSingle(params.academicYearId)
+        .first;
+    switch (academicYearResult) {
+      case AppFailure<AcademicYear>(:final exception):
+        logDebug('failed to get academic year');
+        return AppResult.failure(exception);
+      case AppSuccess<AcademicYear>(:final data):
+        year = data;
+    }
+
+    logDebug(
+      'start getting existing schedules from year',
+      extra: {'academicYearId': year.id},
+    );
+    late final List<CourseSchedule> schedules;
+    final schedulesResult = await _courseScheduleRepository
+        .watchByAcademicYear(year.id)
+        .first;
+    switch (schedulesResult) {
+      case AppFailure<List<CourseSchedule>>(:final exception):
+        logDebug('failed to get course schedules');
+        return AppResult.failure(exception);
+      case AppSuccess<List<CourseSchedule>>(:final data):
+        schedules = data;
+    }
+
+    logDebug(
+      'start checking whether course schedule can be added',
+      extra: {
+        'start': params.start,
+        'cohortId': params.cohortId,
+        'courseId': params.courseId,
+        'lecturerId': params.lecturerId,
+        'roomId': params.roomId,
+      },
+    );
+    final calendar = CourseCalendar(
+      academicCalendar: AcademicCalendar(year: year),
+      schedules: schedules,
+    );
+    final allowedResult = calendar.canAddSchedule(
+      start: params.start,
+      cohortId: params.cohortId,
+      courseId: params.courseId,
+      lecturerId: params.lecturerId,
+      roomId: params.roomId,
+    );
+    switch (allowedResult) {
+      case AppFailure<Null>(:final exception):
+        logDebug('failed to add course schedule: collision detected');
+        return AppResult.failure(exception);
+      case AppSuccess<Null>():
+    }
+
+    logDebug(
+      'course schedule allowed. start creating course schedule',
       extra: {
         'academicYearId': params.academicYearId,
         'termId': params.termId,
