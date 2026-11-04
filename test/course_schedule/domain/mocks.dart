@@ -44,7 +44,7 @@ final courseScheduleEventsMock = List<CourseSchedule>.generate(
     termId: 'term_1',
     name: 'Schedule Event $index',
     start: DateTime(2025, 9, 8 + index, 8 + index),
-    durationInMinutes: 100,
+    duration: const Duration(minutes: 100),
     cohortId: 'cohort_$index',
     courseId: 'course_1',
     programId: 'program_1',

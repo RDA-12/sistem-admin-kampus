@@ -14,7 +14,7 @@ final class CreateCourseScheduleParams extends Equatable {
     required this.programId,
     required this.name,
     required this.start,
-    required this.durationInMinutes,
+    required this.duration,
     required this.cohortId,
     required this.courseId,
     required this.lecturerId,
@@ -36,8 +36,8 @@ final class CreateCourseScheduleParams extends Equatable {
   /// When the schedule starts
   final DateTime start;
 
-  /// Duration in minutes
-  final int durationInMinutes;
+  /// Duration of the course
+  final Duration duration;
 
   /// ID of the cohort
   final String cohortId;
@@ -58,7 +58,7 @@ final class CreateCourseScheduleParams extends Equatable {
     programId,
     name,
     start,
-    durationInMinutes,
+    duration,
     cohortId,
     courseId,
     lecturerId,

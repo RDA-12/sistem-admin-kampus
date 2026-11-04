@@ -88,7 +88,7 @@ void main() {
     programId: program.id,
     name: 'Kuliah Pemrograman Web',
     start: DateTime(2025, 9, 8, 8),
-    durationInMinutes: 100,
+    duration: const Duration(minutes: 100),
     cohortId: cohort.id,
     courseId: course.id,
     lecturerId: lecturer.id,
@@ -104,7 +104,7 @@ void main() {
       programId: program.id,
       name: 'Schedule Event $index',
       start: DateTime(2025, 9, 8 + index, 8 + index),
-      durationInMinutes: 100,
+      duration: const Duration(minutes: 100),
       cohortId: index == 0 ? cohort.id : cohort2.id,
       courseId: course.id,
       lecturerId: lecturer.id,
@@ -250,7 +250,7 @@ void main() {
               programId: e.programId,
               name: e.name,
               start: e.start,
-              durationInMinutes: e.durationInMinutes,
+              durationInMinutes: e.duration.inMinutes,
               cohortId: e.cohortId,
               courseId: e.courseId,
               lecturerId: e.lecturerId,
@@ -288,7 +288,7 @@ void main() {
         programId: program.id,
         name: 'Kuliah Pemrograman Web',
         start: DateTime(2025, 9, 8, 8),
-        durationInMinutes: 100,
+        duration: const Duration(minutes: 100),
         cohortId: cohort.id,
         courseId: course.id,
         lecturerId: lecturer.id,
@@ -313,7 +313,7 @@ void main() {
           expect(inDb.termId, createArgs.termId);
           expect(inDb.programId, createArgs.programId);
           expect(inDb.start, createArgs.start);
-          expect(inDb.durationInMinutes, createArgs.durationInMinutes);
+          expect(inDb.durationInMinutes, createArgs.duration.inMinutes);
           expect(inDb.cohortId, createArgs.cohortId);
           expect(inDb.courseId, createArgs.courseId);
           expect(inDb.lecturerId, createArgs.lecturerId);
@@ -488,7 +488,7 @@ void main() {
           programId: seededEvents.first.programId,
           name: 'Updated Schedule Name',
           start: seededEvents.first.start,
-          durationInMinutes: seededEvents.first.durationInMinutes,
+          duration: seededEvents.first.duration,
           cohortId: 'cohort_2',
           courseId: seededEvents.first.courseId,
           lecturerId: seededEvents.first.lecturerId,

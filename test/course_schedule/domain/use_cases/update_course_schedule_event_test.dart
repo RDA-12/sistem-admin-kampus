@@ -8,6 +8,7 @@ import '../../../common/di_mocks.dart';
 
 void main() {
   final start = DateTime(2025, 9, 8, 8);
+  const duration = Duration(minutes: 100);
 
   final event = CourseSchedule(
     id: 'schedule_1',
@@ -16,7 +17,7 @@ void main() {
     programId: 'program_1',
     name: 'Kuliah Pemrograman Web',
     start: start,
-    durationInMinutes: 100,
+    duration: duration,
     cohortId: 'cohort_1',
     courseId: 'course_1',
     lecturerId: 'lecturer_1',
@@ -30,7 +31,7 @@ void main() {
     programId: 'program_1',
     name: 'Updated Kuliah',
     start: start,
-    durationInMinutes: 100,
+    duration: duration,
     cohortId: 'cohort_1',
     courseId: 'course_1',
     lecturerId: 'lecturer_1',

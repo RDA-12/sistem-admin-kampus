@@ -14,7 +14,7 @@ void main() {
     programId: 'program_1',
     name: 'Kuliah Pemrograman Web',
     start: DateTime(2025, 9, 8, 8),
-    durationInMinutes: 100,
+    duration: const Duration(minutes: 100),
     cohortId: 'cohort_1',
     courseId: 'course_1',
     lecturerId: 'lecturer_1',

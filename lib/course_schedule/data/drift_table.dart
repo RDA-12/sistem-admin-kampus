@@ -97,7 +97,7 @@ extension CourseScheduleToDomainX on CourseScheduleDb {
     programId: programId,
     name: name,
     start: start,
-    durationInMinutes: durationInMinutes,
+    duration: Duration(minutes: durationInMinutes),
     cohortId: cohortId,
     courseId: courseId,
     lecturerId: lecturerId,
@@ -117,9 +117,9 @@ extension CourseScheduleToCompanionX on UpdateCourseScheduleParams {
     programId: programId == null ? const Value.absent() : Value(programId!),
     name: name == null ? const Value.absent() : Value(name!),
     start: start == null ? const Value.absent() : Value(start!),
-    durationInMinutes: durationInMinutes == null
+    durationInMinutes: duration == null
         ? const Value.absent()
-        : Value(durationInMinutes!),
+        : Value(duration!.inMinutes),
     cohortId: cohortId == null ? const Value.absent() : Value(cohortId!),
     courseId: courseId == null ? const Value.absent() : Value(courseId!),
     lecturerId: lecturerId == null ? const Value.absent() : Value(lecturerId!),

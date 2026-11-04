@@ -9,7 +9,7 @@ class CourseSchedule extends Equatable {
     required this.termId,
     required this.name,
     required this.start,
-    required this.durationInMinutes,
+    required this.duration,
     required this.cohortId,
     required this.courseId,
     required this.programId,
@@ -36,7 +36,7 @@ class CourseSchedule extends Equatable {
   final DateTime start;
 
   /// Duration of this course in minutes
-  final int durationInMinutes;
+  final Duration duration;
 
   /// ID of the cohort which this event meant for
   final String cohortId;
@@ -50,6 +50,10 @@ class CourseSchedule extends Equatable {
   /// ID of the room
   final String roomId;
 
+  // bool overlappedWith(CourseSchedule other) {
+  //   final end = start.add(duration);
+  // }
+
   @override
   List<Object?> get props => [
     id,
@@ -57,7 +61,7 @@ class CourseSchedule extends Equatable {
     termId,
     name,
     start,
-    durationInMinutes,
+    duration,
     cohortId,
     courseId,
     programId,

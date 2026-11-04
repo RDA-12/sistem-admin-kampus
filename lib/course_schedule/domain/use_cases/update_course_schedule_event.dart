@@ -15,7 +15,7 @@ final class UpdateCourseScheduleParams extends Equatable {
     this.programId,
     this.name,
     this.start,
-    this.durationInMinutes,
+    this.duration,
     this.cohortId,
     this.courseId,
     this.lecturerId,
@@ -40,8 +40,8 @@ final class UpdateCourseScheduleParams extends Equatable {
   /// Updated start date and time
   final DateTime? start;
 
-  /// Updated duration in minutes
-  final int? durationInMinutes;
+  /// Updated duration
+  final Duration? duration;
 
   /// Updated cohort ID
   final String? cohortId;
@@ -63,7 +63,7 @@ final class UpdateCourseScheduleParams extends Equatable {
     programId,
     name,
     start,
-    durationInMinutes,
+    duration,
     cohortId,
     courseId,
     lecturerId,

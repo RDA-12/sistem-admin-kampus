@@ -53,7 +53,7 @@ class CourseScheduleRepository
         programId: args.programId,
         name: args.name,
         start: args.start,
-        durationInMinutes: args.durationInMinutes,
+        durationInMinutes: args.duration.inMinutes,
         cohortId: args.cohortId,
         courseId: args.courseId,
         lecturerId: args.lecturerId,

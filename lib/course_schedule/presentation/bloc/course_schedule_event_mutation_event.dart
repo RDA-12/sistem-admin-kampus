@@ -16,7 +16,7 @@ final class CourseScheduleMutationCreateRequested
     required this.programId,
     required this.name,
     required this.start,
-    required this.durationInMinutes,
+    required this.duration,
     required this.cohortId,
     required this.courseId,
     required this.lecturerId,
@@ -38,8 +38,8 @@ final class CourseScheduleMutationCreateRequested
   /// Start date and time for new [CourseSchedule]
   final DateTime start;
 
-  /// Duration in minutes for new [CourseSchedule]
-  final int durationInMinutes;
+  /// Duration for new [CourseSchedule]
+  final Duration duration;
 
   /// Cohort ID for new [CourseSchedule]
   final String cohortId;
@@ -60,7 +60,7 @@ final class CourseScheduleMutationCreateRequested
     programId,
     name,
     start,
-    durationInMinutes,
+    duration,
     cohortId,
     courseId,
     lecturerId,
@@ -79,7 +79,7 @@ final class CourseScheduleMutationUpdateRequested
     this.programId,
     this.name,
     this.start,
-    this.durationInMinutes,
+    this.duration,
     this.cohortId,
     this.courseId,
     this.lecturerId,
@@ -104,8 +104,8 @@ final class CourseScheduleMutationUpdateRequested
   /// New start date and time for [event]
   final DateTime? start;
 
-  /// New duration in minutes for [event]
-  final int? durationInMinutes;
+  /// New duration for [event]
+  final Duration? duration;
 
   /// New cohort ID for [event]
   final String? cohortId;
@@ -127,7 +127,7 @@ final class CourseScheduleMutationUpdateRequested
     programId,
     name,
     start,
-    durationInMinutes,
+    duration,
     cohortId,
     courseId,
     lecturerId,

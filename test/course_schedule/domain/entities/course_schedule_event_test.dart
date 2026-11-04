@@ -4,6 +4,7 @@ import 'package:sistem_admin/course_schedule/course_schedule.dart';
 void main() {
   group('CourseSchedule', () {
     final start = DateTime(2025, 9, 8, 8);
+    const duration = Duration(minutes: 100);
 
     final testObj = CourseSchedule(
       id: 'id_1',
@@ -11,7 +12,7 @@ void main() {
       termId: 'term_1',
       name: 'Pemrograman Web',
       start: start,
-      durationInMinutes: 100,
+      duration: duration,
       cohortId: 'cohort_1',
       courseId: 'course_1',
       programId: 'program_1',
@@ -20,7 +21,7 @@ void main() {
     );
 
     test(
-      'equal on id, academicYearId, termId, name, start, durationInMinutes, '
+      'equal on id, academicYearId, termId, name, start, duration, '
       'cohortId, courseId, programId, lecturerId, roomId',
       () {
         final a = CourseSchedule(
@@ -29,7 +30,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -42,7 +43,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -55,7 +56,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -68,7 +69,7 @@ void main() {
           termId: 'term_2',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -81,7 +82,7 @@ void main() {
           termId: 'term_1',
           name: 'Basis Data',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -94,7 +95,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: DateTime(2025, 9, 9, 8),
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -107,7 +108,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 150,
+          duration: const Duration(minutes: 150),
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -120,7 +121,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_2',
           courseId: 'course_1',
           programId: 'program_1',
@@ -133,7 +134,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_2',
           programId: 'program_1',
@@ -146,7 +147,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_2',
@@ -159,7 +160,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
@@ -172,7 +173,7 @@ void main() {
           termId: 'term_1',
           name: 'Pemrograman Web',
           start: start,
-          durationInMinutes: 100,
+          duration: duration,
           cohortId: 'cohort_1',
           courseId: 'course_1',
           programId: 'program_1',
