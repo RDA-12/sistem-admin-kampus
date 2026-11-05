@@ -440,6 +440,22 @@ void main() {
 
         expect(stream, emits(AppResult.success([seededSchedules.first])));
       });
+
+      test('emits correct course schedules for term', () async {
+        final stream = repository.watch(
+          CourseScheduleFilter(termId: term.id),
+        );
+
+        expect(stream, emits(AppResult.success(seededSchedules)));
+      });
+
+      test('emits correct course schedules for program', () async {
+        final stream = repository.watch(
+          CourseScheduleFilter(programId: program.id),
+        );
+
+        expect(stream, emits(AppResult.success(seededSchedules)));
+      });
     });
 
     group('watchSingle', () {

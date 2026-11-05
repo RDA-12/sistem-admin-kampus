@@ -14,6 +14,12 @@ extension CourseScheduleFilterX on CourseScheduleFilter {
     if (cohortId != null) {
       query.where((tbl) => tbl.cohortId.equals(cohortId!));
     }
+    if (termId != null) {
+      query.where((tbl) => tbl.termId.equals(termId!));
+    }
+    if (programId != null) {
+      query.where((tbl) => tbl.programId.equals(programId!));
+    }
     return query;
   }
 }
