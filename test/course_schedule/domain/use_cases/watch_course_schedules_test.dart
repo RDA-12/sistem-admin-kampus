@@ -29,8 +29,22 @@ void main() {
   });
 
   group('WatchCourseSchedulesUseCase', () {
-    test('emits correct list of CourseSchedule', () async {
-      final stream = useCase(null);
+    test(
+      'emits correct list of CourseSchedule when no filter provided',
+      () async {
+        final stream = useCase();
+
+        expect(stream, emits(AppResult.success(courseSchedulesMock)));
+      },
+    );
+
+    test('emits correct list of CourseSchedule when filter provided', () async {
+      const filter = CourseScheduleFilter(academicYearId: 'year_1');
+      when(() => repositoryMock.watch(filter)).thenAnswer(
+        (_) => Stream.value(AppResult.success(courseSchedulesMock)),
+      );
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(courseSchedulesMock)));
     });
@@ -44,7 +58,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

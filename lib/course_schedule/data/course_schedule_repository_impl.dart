@@ -110,79 +110,21 @@ class CourseScheduleRepository
   }
 
   @override
-  Stream<AppResult<List<CourseSchedule>>> watch() {
-    logDebug('construct select course schedules query');
+  Stream<AppResult<List<CourseSchedule>>> watch([
+    CourseScheduleFilter? filter,
+  ]) {
+    logDebug(
+      'construct select course schedules query',
+      extra: filter != null ? {'filter': filter} : null,
+    );
     final query = _db.select(_db.courseSchedulesDrift);
+    filter?.apply(query);
     logDebug('start watching course schedules');
     return query
         .watch()
         .map(
           (rows) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(
-              rows.map((row) => row.toDomain()).toList(),
-            );
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<CourseSchedule>>> watchByAcademicYear(
-    String academicYearId,
-  ) {
-    logDebug(
-      'construct select course schedules by academic year query',
-      extra: {'academicYearId': academicYearId},
-    );
-    final query = _db.select(_db.courseSchedulesDrift)
-      ..where((tbl) => tbl.academicYearId.equals(academicYearId));
-
-    logDebug('start watching course schedules by academic year');
-    return query
-        .watch()
-        .map(
-          (rows) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByAcademicYear, [academicYearId]),
-            );
-            return AppResult.success(
-              rows.map((row) => row.toDomain()).toList(),
-            );
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<CourseSchedule>>> watchByCohort(String cohortId) {
-    logDebug(
-      'construct select course schedules by cohort query',
-      extra: {'cohortId': cohortId},
-    );
-    final query = _db.select(_db.courseSchedulesDrift)
-      ..where((tbl) => tbl.cohortId.equals(cohortId));
-
-    logDebug('start watching course schedules by cohort');
-    return query
-        .watch()
-        .map(
-          (rows) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByCohort, [cohortId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(
               rows.map((row) => row.toDomain()).toList(),
             );

@@ -4,6 +4,7 @@ import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/course_schedule/domain/entities.dart';
+import 'package:sistem_admin/course_schedule/domain/filters/course_schedule_filter.dart';
 import 'package:sistem_admin/course_schedule/domain/repository.dart';
 
 /// Params for updating a [CourseSchedule]
@@ -114,7 +115,7 @@ class UpdateCourseScheduleUseCase
     );
     late final List<CourseSchedule> schedules;
     final schedulesResult = await _courseScheduleRepository
-        .watchByAcademicYear(year.id)
+        .watch(CourseScheduleFilter(academicYearId: year.id))
         .first;
     switch (schedulesResult) {
       case AppFailure<List<CourseSchedule>>(:final exception):

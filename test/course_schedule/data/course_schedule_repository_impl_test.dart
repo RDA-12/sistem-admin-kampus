@@ -403,21 +403,23 @@ void main() {
           ),
         );
       });
-    });
 
-    group('watchByAcademicYear', () {
       test('emits correct course schedules for academic year', () async {
-        final stream = repository.watchByAcademicYear(year.id);
+        final stream = repository.watch(
+          CourseScheduleFilter(academicYearId: year.id),
+        );
 
         expect(stream, emits(AppResult.success(seededSchedules)));
       });
 
-      test('emits failure when exception occurs', () async {
-        whenCalling(Invocation.method(#watchByAcademicYear, null))
+      test('emits failure when exception occurs with filter', () async {
+        whenCalling(Invocation.method(#watch, null))
             .on(repository)
             .thenThrow(Exception());
 
-        final stream = repository.watchByAcademicYear(year.id);
+        final stream = repository.watch(
+          CourseScheduleFilter(academicYearId: year.id),
+        );
 
         expect(
           stream,
@@ -430,32 +432,13 @@ void main() {
           ),
         );
       });
-    });
 
-    group('watchByCohort', () {
       test('emits correct course schedules for cohort', () async {
-        final stream = repository.watchByCohort(cohort.id);
+        final stream = repository.watch(
+          CourseScheduleFilter(cohortId: cohort.id),
+        );
 
         expect(stream, emits(AppResult.success([seededSchedules.first])));
-      });
-
-      test('emits failure when exception occurs', () async {
-        whenCalling(Invocation.method(#watchByCohort, null))
-            .on(repository)
-            .thenThrow(Exception());
-
-        final stream = repository.watchByCohort(cohort.id);
-
-        expect(
-          stream,
-          emits(
-            isA<AppFailure<List<CourseSchedule>>>().having(
-              (e) => e.exception.code,
-              'exception.code',
-              AppExceptionCode.internal,
-            ),
-          ),
-        );
       });
     });
 

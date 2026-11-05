@@ -22,20 +22,6 @@ class MockDeleteCourseScheduleUseCase extends Mock
 class MockWatchCourseSchedulesUseCase extends Mock
     implements WatchCourseSchedulesUseCase;
 
-@LazySingleton(
-  as: WatchCourseSchedulesByYearUseCase,
-  env: [Environment.test],
-)
-class MockWatchCourseSchedulesByYearUseCase extends Mock
-    implements WatchCourseSchedulesByYearUseCase;
-
-@LazySingleton(
-  as: WatchCourseSchedulesByCohortUseCase,
-  env: [Environment.test],
-)
-class MockWatchCourseSchedulesByCohortUseCase extends Mock
-    implements WatchCourseSchedulesByCohortUseCase;
-
 final courseSchedulesMock = List<CourseSchedule>.generate(
   3,
   (index) => CourseSchedule(

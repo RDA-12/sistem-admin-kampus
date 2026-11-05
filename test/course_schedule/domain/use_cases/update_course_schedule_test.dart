@@ -10,6 +10,8 @@ import '../../../common/di_mocks.dart';
 void main() {
   final start = DateTime(2025, 9, 8, 8);
   const duration = Duration(minutes: 100);
+  const filterYear1 = CourseScheduleFilter(academicYearId: 'year_1');
+  const filterYear2 = CourseScheduleFilter(academicYearId: 'year_2');
 
   final academicYear = AcademicYear(
     id: 'year_1',
@@ -65,6 +67,7 @@ void main() {
   setUpAll(() {
     initializeMockDependencies();
     registerFallbackValue(params);
+    registerFallbackValue(const CourseScheduleFilter());
   });
 
   setUp(() {
@@ -80,11 +83,11 @@ void main() {
     ).thenAnswer((_) => Stream.value(AppResult.success(academicYear2)));
 
     when(
-      () => courseScheduleRepositoryMock.watchByAcademicYear('year_1'),
+      () => courseScheduleRepositoryMock.watch(filterYear1),
     ).thenAnswer((_) => Stream.value(AppResult.success([courseSchedule])));
 
     when(
-      () => courseScheduleRepositoryMock.watchByAcademicYear('year_2'),
+      () => courseScheduleRepositoryMock.watch(filterYear2),
     ).thenAnswer((_) => Stream.value(AppResult.success(const [])));
 
     when(
@@ -128,7 +131,7 @@ void main() {
           ),
         );
         verifyNever(
-          () => courseScheduleRepositoryMock.watchByAcademicYear(any()),
+          () => courseScheduleRepositoryMock.watch(any()),
         );
         verifyNever(
           () => courseScheduleRepositoryMock.update(
@@ -140,11 +143,10 @@ void main() {
     );
 
     test(
-      'returns failure when '
-      'ICourseScheduleRepository.watchByAcademicYear fails',
+      'returns failure when ICourseScheduleRepository.watch fails',
       () async {
         when(
-          () => courseScheduleRepositoryMock.watchByAcademicYear('year_1'),
+          () => courseScheduleRepositoryMock.watch(filterYear1),
         ).thenAnswer(
           (_) => Stream.value(
             AppFailure<List<CourseSchedule>>(exception: AppException.test()),
@@ -187,7 +189,7 @@ void main() {
           roomId: 'room_2',
         );
         when(
-          () => courseScheduleRepositoryMock.watchByAcademicYear('year_1'),
+          () => courseScheduleRepositoryMock.watch(filterYear1),
         ).thenAnswer(
           (_) => Stream.value(
             AppResult.success([courseSchedule, existingSchedule]),
@@ -251,7 +253,7 @@ void main() {
       expect(result, AppResult.success(updatedSchedule));
       verify(() => academicYearRepositoryMock.watchSingle('year_1')).called(1);
       verify(
-        () => courseScheduleRepositoryMock.watchByAcademicYear('year_1'),
+        () => courseScheduleRepositoryMock.watch(filterYear1),
       ).called(1);
       verify(
         () => courseScheduleRepositoryMock.update(
@@ -283,7 +285,7 @@ void main() {
           () => academicYearRepositoryMock.watchSingle('year_2'),
         ).called(1);
         verify(
-          () => courseScheduleRepositoryMock.watchByAcademicYear('year_2'),
+          () => courseScheduleRepositoryMock.watch(filterYear2),
         ).called(1);
       },
     );
