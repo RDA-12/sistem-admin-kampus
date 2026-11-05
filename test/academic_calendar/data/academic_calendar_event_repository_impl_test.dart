@@ -145,16 +145,18 @@ void main() {
         });
       });
 
-      test('allows saving duplicate event name in same academic year',
-          () async {
-        when(uidGeneratorMock.generate).thenReturn('some_id_1');
-        final first = await repository.save(createArgs);
-        expect(first, isA<AppSuccess<AcademicCalendarEvent>>());
+      test(
+        'allows saving duplicate event name in same academic year',
+        () async {
+          when(uidGeneratorMock.generate).thenReturn('some_id_1');
+          final first = await repository.save(createArgs);
+          expect(first, isA<AppSuccess<AcademicCalendarEvent>>());
 
-        when(uidGeneratorMock.generate).thenReturn('some_id_2');
-        final second = await repository.save(createArgs);
-        expect(second, isA<AppSuccess<AcademicCalendarEvent>>());
-      });
+          when(uidGeneratorMock.generate).thenReturn('some_id_2');
+          final second = await repository.save(createArgs);
+          expect(second, isA<AppSuccess<AcademicCalendarEvent>>());
+        },
+      );
 
       test(
         'returns failure with internal code when exception occurs',
@@ -234,22 +236,26 @@ void main() {
       });
     });
 
-    group('watchByAcademicYear', () {
+    group('watch with filter', () {
       test(
         'emits correct academic calendar events for academic year',
         () async {
-          final stream = repository.watchByAcademicYear(year.id);
+          final stream = repository.watch(
+            AcademicCalendarEventFilter(academicYearId: year.id),
+          );
 
           expect(stream, emits(AppResult.success(seededEvents)));
         },
       );
 
       test('emits failure when exception occurs', () async {
-        whenCalling(Invocation.method(#watchByAcademicYear, null))
+        whenCalling(Invocation.method(#watch, null))
             .on(repository)
             .thenThrow(Exception());
 
-        final stream = repository.watchByAcademicYear(year.id);
+        final stream = repository.watch(
+          AcademicCalendarEventFilter(academicYearId: year.id),
+        );
 
         expect(
           stream,

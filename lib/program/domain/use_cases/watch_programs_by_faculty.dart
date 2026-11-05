@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/program/domain/entities.dart';
+import 'package:sistem_admin/program/domain/filters/program_filter.dart';
 import 'package:sistem_admin/program/domain/repository.dart';
 
 /// Use case to watch for [Program] data changes for specific faculty
@@ -20,6 +21,6 @@ class WatchProgramsByFacultyUseCase
       'start watching programs by faculty',
       extra: {'facultyId': params},
     );
-    return _programRepository.watchByFaculty(params);
+    return _programRepository.watch(ProgramFilter(facultyId: params));
   }
 }

@@ -128,7 +128,7 @@ class FacultyRepository with AppLoggerMixin implements IFacultyRepository {
   }
 
   @override
-  Stream<AppResult<List<Faculty>>> watch() {
+  Stream<AppResult<List<Faculty>>> watch([NoFilter? filter]) {
     logDebug('construct select faculties query');
     final query = _db.select(_db.facultiesDrift);
     logDebug('start watching faculties');
@@ -136,7 +136,7 @@ class FacultyRepository with AppLoggerMixin implements IFacultyRepository {
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

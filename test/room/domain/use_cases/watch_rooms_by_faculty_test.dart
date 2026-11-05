@@ -22,8 +22,11 @@ void main() {
 
   setUp(() {
     roomRepositoryMock = getIt<IRoomRepository>();
-    when(() => roomRepositoryMock.watchByFaculty('faculty_1'))
-        .thenAnswer((_) => Stream.value(AppResult.success(rooms)));
+    when(
+      () => roomRepositoryMock.watch(
+        const RoomFilter(facultyId: 'faculty_1'),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(rooms)));
 
     useCase = WatchRoomsByFacultyUseCase(
       roomRepository: roomRepositoryMock,
@@ -42,7 +45,11 @@ void main() {
     });
 
     test('emits failure when repo emits failure', () {
-      when(() => roomRepositoryMock.watchByFaculty('faculty_1')).thenAnswer(
+      when(
+        () => roomRepositoryMock.watch(
+          const RoomFilter(facultyId: 'faculty_1'),
+        ),
+      ).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<Room>>(exception: AppException.test()),
         ),

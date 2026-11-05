@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/academic_calendar/domain/entities.dart';
+import 'package:sistem_admin/academic_calendar/domain/filters/academic_term_filter.dart';
 import 'package:sistem_admin/academic_calendar/domain/repository.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
@@ -74,9 +75,7 @@ class CreateAcademicTermUseCase
     logDebug('start getting existing terms from year');
     late final List<AcademicTerm> terms;
     final termsResult = await _academicTermRepository
-        .watchByAcademicYear(
-          year.id,
-        )
+        .watch(AcademicTermFilter(academicYearId: year.id))
         .first;
     switch (termsResult) {
       case AppFailure<List<AcademicTerm>>(:final exception):

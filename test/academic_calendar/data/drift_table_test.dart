@@ -247,8 +247,7 @@ void main() {
 
         expect(result, expected);
 
-        final result2 =
-            UpdateAcademicCalendarEventParams(event).toCompanion();
+        final result2 = UpdateAcademicCalendarEventParams(event).toCompanion();
 
         expect(result2, const AcademicCalendarEventsDriftCompanion());
       },

@@ -43,7 +43,8 @@ void main() {
         required EventDateTime start,
         required EventDateTime end,
         List<String> recurrence,
-      })? onSave,
+      })?
+      onSave,
       VoidCallback? onDelete,
       bool isProcessing = false,
       bool isDeleting = false,
@@ -52,7 +53,8 @@ void main() {
         (context) => AcademicCalendarEventForm(
           academicYear: year,
           initial: initial,
-          onSave: onSave ??
+          onSave:
+              onSave ??
               ({
                 required name,
                 required type,
@@ -135,16 +137,20 @@ void main() {
 
           await tester.enterText(nameFieldFinder, 'Test Event');
           final startCtrl = tester
-              .widget<AppDateFormField>(find.widgetWithText(
-                AppDateFormField,
-                'Tanggal Mulai *',
-              ))
+              .widget<AppDateFormField>(
+                find.widgetWithText(
+                  AppDateFormField,
+                  'Tanggal Mulai *',
+                ),
+              )
               .controller;
           final endCtrl = tester
-              .widget<AppDateFormField>(find.widgetWithText(
-                AppDateFormField,
-                'Tanggal Selesai *',
-              ))
+              .widget<AppDateFormField>(
+                find.widgetWithText(
+                  AppDateFormField,
+                  'Tanggal Selesai *',
+                ),
+              )
               .controller;
 
           startCtrl?.value = DateTime(2025, 9, 10);
@@ -173,32 +179,37 @@ void main() {
 
         await pumpWidget(
           tester,
-          onSave: ({
-            required name,
-            required type,
-            required start,
-            required end,
-            recurrence = const [],
-          }) {
-            savedName = name;
-            savedType = type;
-            savedStart = start;
-            savedEnd = end;
-          },
+          onSave:
+              ({
+                required name,
+                required type,
+                required start,
+                required end,
+                recurrence = const [],
+              }) {
+                savedName = name;
+                savedType = type;
+                savedStart = start;
+                savedEnd = end;
+              },
         );
 
         await tester.enterText(nameFieldFinder, 'Masa KRS');
         final startCtrl = tester
-            .widget<AppDateFormField>(find.widgetWithText(
-              AppDateFormField,
-              'Tanggal Mulai *',
-            ))
+            .widget<AppDateFormField>(
+              find.widgetWithText(
+                AppDateFormField,
+                'Tanggal Mulai *',
+              ),
+            )
             .controller;
         final endCtrl = tester
-            .widget<AppDateFormField>(find.widgetWithText(
-              AppDateFormField,
-              'Tanggal Selesai *',
-            ))
+            .widget<AppDateFormField>(
+              find.widgetWithText(
+                AppDateFormField,
+                'Tanggal Selesai *',
+              ),
+            )
             .controller;
 
         startCtrl?.value = DateTime(2025, 9, 2);

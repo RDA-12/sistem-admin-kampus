@@ -73,8 +73,7 @@ class UpdateAcademicCalendarEventUseCase
   Future<AppResult<AcademicCalendarEvent>> call(
     UpdateAcademicCalendarEventParams params,
   ) async {
-    final academicYearId =
-        params.academicYearId ?? params.event.academicYearId;
+    final academicYearId = params.academicYearId ?? params.event.academicYearId;
     logDebug(
       'start getting academic year',
       extra: {'academicYearId': academicYearId},

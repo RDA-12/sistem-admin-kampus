@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/academic_calendar/domain/entities.dart';
+import 'package:sistem_admin/academic_calendar/domain/filters/academic_calendar_event_filter.dart';
 import 'package:sistem_admin/academic_calendar/domain/repository.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
@@ -21,6 +22,8 @@ class WatchAcademicCalendarEventsByYearUseCase
       'start watching academic calendar events by academic year',
       extra: {'academicYearId': params},
     );
-    return _academicCalendarEventRepository.watchByAcademicYear(params);
+    return _academicCalendarEventRepository.watch(
+      AcademicCalendarEventFilter(academicYearId: params),
+    );
   }
 }

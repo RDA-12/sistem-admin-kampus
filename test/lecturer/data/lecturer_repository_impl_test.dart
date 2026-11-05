@@ -205,9 +205,9 @@ void main() {
       );
     });
 
-    group('watchByProgram', () {
+    group('watch with filter', () {
       test('emits correct lecturers for the program', () async {
-        final stream = repository.watchByProgram(program.id);
+        final stream = repository.watch(LecturerFilter(programId: program.id));
 
         expect(stream, emits(AppResult.success(seededLecturers)));
       });
@@ -215,11 +215,13 @@ void main() {
       test(
         'emits failure with internal code when unintended exception occurred',
         () async {
-          whenCalling(Invocation.method(#watchByProgram, null))
+          whenCalling(Invocation.method(#watch, null))
               .on(repository)
               .thenThrow(Exception());
 
-          final stream = repository.watchByProgram(program.id);
+          final stream = repository.watch(
+            LecturerFilter(programId: program.id),
+          );
 
           expect(
             stream,

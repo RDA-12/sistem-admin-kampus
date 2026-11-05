@@ -139,43 +139,18 @@ class ProgramRepository with AppLoggerMixin implements IProgramRepository {
   }
 
   @override
-  Stream<AppResult<List<Program>>> watch() {
-    logDebug('construct select programs query');
-    final query = _db.select(_db.programsDrift);
+  Stream<AppResult<List<Program>>> watch([ProgramFilter? filter]) {
+    logDebug('construct select programs query', extra: {'filter': filter});
+    var query = _db.select(_db.programsDrift);
+    if (filter != null) {
+      query = filter.apply(query);
+    }
     logDebug('start watching programs');
     return query
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(it.map((v) => v.toDomain()).toList());
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<Program>>> watchByFaculty(String facultyId) {
-    logDebug(
-      'construct select programs by faculty query',
-      extra: {'facultyId': facultyId},
-    );
-    final query = _db.select(_db.programsDrift)
-      ..where((tbl) => tbl.facultyId.equals(facultyId));
-    logDebug('start watching programs by faculty');
-    return query
-        .watch()
-        .map(
-          (it) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByFaculty, [facultyId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

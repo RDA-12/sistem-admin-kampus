@@ -146,43 +146,18 @@ class CourseRepository with AppLoggerMixin implements ICourseRepository {
   }
 
   @override
-  Stream<AppResult<List<Course>>> watch() {
-    logDebug('construct select courses query');
-    final query = _db.select(_db.coursesDrift);
+  Stream<AppResult<List<Course>>> watch([CourseFilter? filter]) {
+    logDebug('construct select courses query', extra: {'filter': filter});
+    var query = _db.select(_db.coursesDrift);
+    if (filter != null) {
+      query = filter.apply(query);
+    }
     logDebug('start watching courses');
     return query
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(it.map((v) => v.toDomain()).toList());
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<Course>>> watchByProgram(String programId) {
-    logDebug(
-      'construct select courses by program query',
-      extra: {'programId': programId},
-    );
-    final query = _db.select(_db.coursesDrift)
-      ..where((tbl) => tbl.programId.equals(programId));
-    logDebug('start watching courses by program');
-    return query
-        .watch()
-        .map(
-          (it) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByProgram, [programId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

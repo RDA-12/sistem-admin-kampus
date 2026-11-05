@@ -32,8 +32,11 @@ void main() {
 
   setUp(() {
     repositoryMock = getIt<IAcademicCalendarEventRepository>();
-    when(() => repositoryMock.watchByAcademicYear('year_1'))
-        .thenAnswer((_) => Stream.value(AppResult.success(events)));
+    when(
+      () => repositoryMock.watch(
+        const AcademicCalendarEventFilter(academicYearId: 'year_1'),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(events)));
 
     useCase = WatchAcademicCalendarEventsByYearUseCase(
       academicCalendarEventRepository: repositoryMock,
@@ -55,7 +58,11 @@ void main() {
     );
 
     test('emits failure when repo emits failure', () {
-      when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
+      when(
+        () => repositoryMock.watch(
+          const AcademicCalendarEventFilter(academicYearId: 'year_1'),
+        ),
+      ).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<AcademicCalendarEvent>>(
             exception: AppException.test(),

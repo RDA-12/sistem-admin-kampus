@@ -233,17 +233,18 @@ extension AcademicCalendarEventToCompanionX
             : Value(academicYearId!),
         name: name == null ? const Value.absent() : Value(name!),
         type: type == null ? const Value.absent() : Value(type!),
-        startDate:
-            start == null ? const Value.absent() : Value(start!.date),
-        startHour:
-            start == null ? const Value.absent() : Value(start!.time.hour),
-        startMinute:
-            start == null ? const Value.absent() : Value(start!.time.minute),
+        startDate: start == null ? const Value.absent() : Value(start!.date),
+        startHour: start == null
+            ? const Value.absent()
+            : Value(start!.time.hour),
+        startMinute: start == null
+            ? const Value.absent()
+            : Value(start!.time.minute),
         endDate: end == null ? const Value.absent() : Value(end!.date),
         endHour: end == null ? const Value.absent() : Value(end!.time.hour),
-        endMinute:
-            end == null ? const Value.absent() : Value(end!.time.minute),
-        recurrence:
-            recurrence == null ? const Value.absent() : Value(recurrence!),
+        endMinute: end == null ? const Value.absent() : Value(end!.time.minute),
+        recurrence: recurrence == null
+            ? const Value.absent()
+            : Value(recurrence!),
       );
 }

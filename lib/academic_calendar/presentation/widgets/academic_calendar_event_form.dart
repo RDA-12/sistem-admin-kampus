@@ -34,7 +34,8 @@ class AcademicCalendarEventForm extends StatefulWidget {
     required EventDateTime start,
     required EventDateTime end,
     List<String> recurrence,
-  }) onSave;
+  })
+  onSave;
 
   /// Invoked when user confirms deletion of [initial]
   final VoidCallback? onDelete;
@@ -91,10 +92,10 @@ class _AcademicCalendarEventFormState extends State<AcademicCalendarEventForm> {
     if (startDate == null || endDate == null) return;
     final name = _nameController.text.trim();
 
-    final startTime = widget.initial?.start.time ??
-        const Time(hour: 0, minute: 0);
-    final endTime = widget.initial?.end.time ??
-        const Time(hour: 23, minute: 59);
+    final startTime =
+        widget.initial?.start.time ?? const Time(hour: 0, minute: 0);
+    final endTime =
+        widget.initial?.end.time ?? const Time(hour: 23, minute: 59);
 
     widget.onSave(
       name: name,
@@ -123,12 +124,14 @@ class _AcademicCalendarEventFormState extends State<AcademicCalendarEventForm> {
             decoration: const InputDecoration(
               labelText: 'Jenis Kegiatan *',
             ),
-            items: AcademicCalendarEventType.values.map(
-              (type) => DropdownMenuItem(
-                value: type,
-                child: Text(type.label),
-              ),
-            ).toList(),
+            items: AcademicCalendarEventType.values
+                .map(
+                  (type) => DropdownMenuItem(
+                    value: type,
+                    child: Text(type.label),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {

@@ -135,7 +135,7 @@ class AcademicYearRepository
   }
 
   @override
-  Stream<AppResult<List<AcademicYear>>> watch() {
+  Stream<AppResult<List<AcademicYear>>> watch([NoFilter? filter]) {
     logDebug('construct select academic years query');
     final query = _db.select(_db.academicYearsDrift);
     logDebug('start watching academic years');
@@ -143,7 +143,7 @@ class AcademicYearRepository
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

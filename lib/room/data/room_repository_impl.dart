@@ -138,43 +138,18 @@ class RoomRepository with AppLoggerMixin implements IRoomRepository {
   }
 
   @override
-  Stream<AppResult<List<Room>>> watch() {
-    logDebug('construct select rooms query');
-    final query = _db.select(_db.roomsDrift);
+  Stream<AppResult<List<Room>>> watch([RoomFilter? filter]) {
+    logDebug('construct select rooms query', extra: {'filter': filter});
+    var query = _db.select(_db.roomsDrift);
+    if (filter != null) {
+      query = filter.apply(query);
+    }
     logDebug('start watching rooms');
     return query
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(it.map((v) => v.toDomain()).toList());
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<Room>>> watchByFaculty(String facultyId) {
-    logDebug(
-      'construct select rooms by faculty query',
-      extra: {'facultyId': facultyId},
-    );
-    final query = _db.select(_db.roomsDrift)
-      ..where((tbl) => tbl.facultyId.equals(facultyId));
-    logDebug('start watching rooms by faculty');
-    return query
-        .watch()
-        .map(
-          (it) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByFaculty, [facultyId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

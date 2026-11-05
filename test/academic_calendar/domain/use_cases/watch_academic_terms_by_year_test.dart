@@ -24,8 +24,11 @@ void main() {
 
   setUp(() {
     repositoryMock = getIt<IAcademicTermRepository>();
-    when(() => repositoryMock.watchByAcademicYear('year_1'))
-        .thenAnswer((_) => Stream.value(AppResult.success(terms)));
+    when(
+      () => repositoryMock.watch(
+        const AcademicTermFilter(academicYearId: 'year_1'),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(terms)));
 
     useCase = WatchAcademicTermsByYearUseCase(
       academicTermRepository: repositoryMock,
@@ -44,7 +47,11 @@ void main() {
     });
 
     test('emits failure when repo emits failure', () {
-      when(() => repositoryMock.watchByAcademicYear('year_1')).thenAnswer(
+      when(
+        () => repositoryMock.watch(
+          const AcademicTermFilter(academicYearId: 'year_1'),
+        ),
+      ).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<AcademicTerm>>(exception: AppException.test()),
         ),

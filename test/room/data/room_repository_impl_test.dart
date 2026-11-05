@@ -184,9 +184,9 @@ void main() {
       );
     });
 
-    group('watchByFaculty', () {
+    group('watch with filter', () {
       test('emits correct rooms for the faculty', () async {
-        final stream = repository.watchByFaculty(faculty.id);
+        final stream = repository.watch(RoomFilter(facultyId: faculty.id));
 
         expect(stream, emits(AppResult.success(seededRooms)));
       });
@@ -194,11 +194,11 @@ void main() {
       test(
         'emits failure with internal code when unintended exception occurred',
         () async {
-          whenCalling(Invocation.method(#watchByFaculty, null))
+          whenCalling(Invocation.method(#watch, null))
               .on(repository)
               .thenThrow(Exception());
 
-          final stream = repository.watchByFaculty(faculty.id);
+          final stream = repository.watch(RoomFilter(facultyId: faculty.id));
 
           expect(
             stream,

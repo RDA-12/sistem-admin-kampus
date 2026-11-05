@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 import 'package:sistem_admin/lecturer/domain/entities.dart';
+import 'package:sistem_admin/lecturer/domain/filters/lecturer_filter.dart';
 import 'package:sistem_admin/lecturer/domain/repository.dart';
 
 /// Use case to watch for [Lecturer] data changes for specific program
@@ -20,6 +21,6 @@ class WatchLecturersByProgramUseCase
       'start watching lecturers by program',
       extra: {'programId': params},
     );
-    return _lecturerRepository.watchByProgram(params);
+    return _lecturerRepository.watch(LecturerFilter(programId: params));
   }
 }

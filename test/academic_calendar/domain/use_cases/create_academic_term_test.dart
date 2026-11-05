@@ -34,6 +34,7 @@ void main() {
   setUpAll(() {
     initializeMockDependencies();
     registerFallbackValue(params);
+    registerFallbackValue(const AcademicTermFilter());
   });
 
   setUp(() {
@@ -45,7 +46,9 @@ void main() {
     ).thenAnswer((_) => Stream.value(AppResult.success(academicYear)));
 
     when(
-      () => academicTermRepositoryMock.watchByAcademicYear('year_1'),
+      () => academicTermRepositoryMock.watch(
+        const AcademicTermFilter(academicYearId: 'year_1'),
+      ),
     ).thenAnswer((_) => Stream.value(AppResult.success(const [])));
 
     when(
@@ -86,17 +89,19 @@ void main() {
           ),
         );
         verifyNever(
-          () => academicTermRepositoryMock.watchByAcademicYear(any()),
+          () => academicTermRepositoryMock.watch(any()),
         );
         verifyNever(() => academicTermRepositoryMock.save(any()));
       },
     );
 
     test(
-      'returns failure when IAcademicTermRepository.watchByAcademicYear fails',
+      'returns failure when IAcademicTermRepository.watch fails',
       () async {
         when(
-          () => academicTermRepositoryMock.watchByAcademicYear('year_1'),
+          () => academicTermRepositoryMock.watch(
+            const AcademicTermFilter(academicYearId: 'year_1'),
+          ),
         ).thenAnswer(
           (_) => Stream.value(
             AppFailure<List<AcademicTerm>>(exception: AppException.test()),
@@ -154,7 +159,9 @@ void main() {
           endDate: DateTime(2026, 1, 31),
         );
         when(
-          () => academicTermRepositoryMock.watchByAcademicYear('year_1'),
+          () => academicTermRepositoryMock.watch(
+            const AcademicTermFilter(academicYearId: 'year_1'),
+          ),
         ).thenAnswer((_) => Stream.value(AppResult.success([existingTerm])));
 
         final result = await useCase(params);
@@ -194,7 +201,9 @@ void main() {
       expect(result, AppResult.success(term));
       verify(() => academicYearRepositoryMock.watchSingle('year_1')).called(1);
       verify(
-        () => academicTermRepositoryMock.watchByAcademicYear('year_1'),
+        () => academicTermRepositoryMock.watch(
+          const AcademicTermFilter(academicYearId: 'year_1'),
+        ),
       ).called(1);
       verify(() => academicTermRepositoryMock.save(params)).called(1);
     });

@@ -22,8 +22,11 @@ void main() {
 
   setUp(() {
     programRepositoryMock = getIt<IProgramRepository>();
-    when(() => programRepositoryMock.watchByFaculty('faculty_1'))
-        .thenAnswer((_) => Stream.value(AppResult.success(programs)));
+    when(
+      () => programRepositoryMock.watch(
+        const ProgramFilter(facultyId: 'faculty_1'),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(programs)));
 
     useCase = WatchProgramsByFacultyUseCase(
       programRepository: programRepositoryMock,
@@ -38,7 +41,11 @@ void main() {
     });
 
     test('emits failure when repo emits failure', () {
-      when(() => programRepositoryMock.watchByFaculty('faculty_1')).thenAnswer(
+      when(
+        () => programRepositoryMock.watch(
+          const ProgramFilter(facultyId: 'faculty_1'),
+        ),
+      ).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<Program>>(exception: AppException.test()),
         ),

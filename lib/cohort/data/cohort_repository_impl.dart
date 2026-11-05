@@ -132,7 +132,7 @@ class CohortRepository with AppLoggerMixin implements ICohortRepository {
   }
 
   @override
-  Stream<AppResult<List<Cohort>>> watch() {
+  Stream<AppResult<List<Cohort>>> watch([NoFilter? filter]) {
     logDebug('construct select cohorts query');
     final query = _db.select(_db.cohortsDrift);
     logDebug('start watching cohorts');
@@ -140,7 +140,7 @@ class CohortRepository with AppLoggerMixin implements ICohortRepository {
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

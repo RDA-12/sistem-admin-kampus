@@ -149,45 +149,21 @@ class AcademicTermRepository
   }
 
   @override
-  Stream<AppResult<List<AcademicTerm>>> watch() {
-    logDebug('construct select academic terms query');
-    final query = _db.select(_db.academicTermsDrift);
+  Stream<AppResult<List<AcademicTerm>>> watch([AcademicTermFilter? filter]) {
+    logDebug(
+      'construct select academic terms query',
+      extra: {'filter': filter},
+    );
+    var query = _db.select(_db.academicTermsDrift);
+    if (filter != null) {
+      query = filter.apply(query);
+    }
     logDebug('start watching academic terms');
     return query
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(it.map((v) => v.toDomain()).toList());
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<AcademicTerm>>> watchByAcademicYear(
-    String academicYearId,
-  ) {
-    logDebug(
-      'construct select academic terms by academic year query',
-      extra: {'academicYearId': academicYearId},
-    );
-    final query = _db.select(_db.academicTermsDrift)
-      ..where((tbl) => tbl.academicYearId.equals(academicYearId));
-    logDebug('start watching academic terms by academic year');
-    return query
-        .watch()
-        .map(
-          (it) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByAcademicYear, [academicYearId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

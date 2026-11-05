@@ -460,8 +460,7 @@ class AcademicCalendarMutationBloc
       emit(
         state.copyWith(
           notice: notice,
-          updatingEventIds: {...state.updatingEventIds}
-            ..remove(event.event.id),
+          updatingEventIds: {...state.updatingEventIds}..remove(event.event.id),
         ),
       );
     });
@@ -504,8 +503,7 @@ class AcademicCalendarMutationBloc
       emit(
         state.copyWith(
           notice: notice,
-          deletingEventIds: {...state.deletingEventIds}
-            ..remove(event.event.id),
+          deletingEventIds: {...state.deletingEventIds}..remove(event.event.id),
         ),
       );
     });

@@ -113,45 +113,23 @@ class AcademicCalendarEventRepository
   }
 
   @override
-  Stream<AppResult<List<AcademicCalendarEvent>>> watch() {
-    logDebug('construct select academic calendar events query');
-    final query = _db.select(_db.academicCalendarEventsDrift);
+  Stream<AppResult<List<AcademicCalendarEvent>>> watch([
+    AcademicCalendarEventFilter? filter,
+  ]) {
+    logDebug(
+      'construct select academic calendar events query',
+      extra: {'filter': filter},
+    );
+    var query = _db.select(_db.academicCalendarEventsDrift);
+    if (filter != null) {
+      query = filter.apply(query);
+    }
     logDebug('start watching academic calendar events');
     return query
         .watch()
         .map(
           (it) {
-            maybeThrowException(this, Invocation.method(#watch, null));
-            return AppResult.success(it.map((v) => v.toDomain()).toList());
-          },
-        )
-        .onErrorReturnWith((error, st) {
-          logError('$error', error: error, stackTrace: st);
-          return AppResult.failure(
-            AppException('$error', code: .internal),
-          );
-        });
-  }
-
-  @override
-  Stream<AppResult<List<AcademicCalendarEvent>>> watchByAcademicYear(
-    String academicYearId,
-  ) {
-    logDebug(
-      'construct select academic calendar events by academic year query',
-      extra: {'academicYearId': academicYearId},
-    );
-    final query = _db.select(_db.academicCalendarEventsDrift)
-      ..where((tbl) => tbl.academicYearId.equals(academicYearId));
-    logDebug('start watching academic calendar events by academic year');
-    return query
-        .watch()
-        .map(
-          (it) {
-            maybeThrowException(
-              this,
-              Invocation.method(#watchByAcademicYear, [academicYearId]),
-            );
+            maybeThrowException(this, Invocation.method(#watch, [filter]));
             return AppResult.success(it.map((v) => v.toDomain()).toList());
           },
         )

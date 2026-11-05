@@ -1,7 +1,8 @@
 import 'package:sistem_admin/academic_calendar/domain/entities.dart';
+import 'package:sistem_admin/academic_calendar/domain/filters/academic_calendar_event_filter.dart';
+import 'package:sistem_admin/academic_calendar/domain/filters/academic_term_filter.dart';
 import 'package:sistem_admin/academic_calendar/domain/use_cases/use_cases.dart';
 import 'package:sistem_admin/common/common.dart';
-import 'package:sistem_admin/core/core.dart';
 
 /// Manage data on [AcademicYear]
 abstract interface class IAcademicYearRepository
@@ -9,7 +10,8 @@ abstract interface class IAcademicYearRepository
         BaseRepository<
           AcademicYear,
           CreateAcademicYearParams,
-          UpdateAcademicYearParams
+          UpdateAcademicYearParams,
+          NoFilter
         >;
 
 /// Manage data on [AcademicTerm]
@@ -18,13 +20,9 @@ abstract interface class IAcademicTermRepository
         BaseRepository<
           AcademicTerm,
           CreateAcademicTermParams,
-          UpdateAcademicTermParams
-        > {
-  /// Watch for [AcademicTerm] data changes for specific [academicYearId]
-  Stream<AppResult<List<AcademicTerm>>> watchByAcademicYear(
-    String academicYearId,
-  );
-}
+          UpdateAcademicTermParams,
+          AcademicTermFilter
+        >;
 
 /// Manage data on [AcademicCalendarEvent]
 abstract interface class IAcademicCalendarEventRepository
@@ -32,11 +30,6 @@ abstract interface class IAcademicCalendarEventRepository
         BaseRepository<
           AcademicCalendarEvent,
           CreateAcademicCalendarEventParams,
-          UpdateAcademicCalendarEventParams
-        > {
-  /// Watch for [AcademicCalendarEvent] data changes for specific
-  /// [academicYearId]
-  Stream<AppResult<List<AcademicCalendarEvent>>> watchByAcademicYear(
-    String academicYearId,
-  );
-}
+          UpdateAcademicCalendarEventParams,
+          AcademicCalendarEventFilter
+        >;

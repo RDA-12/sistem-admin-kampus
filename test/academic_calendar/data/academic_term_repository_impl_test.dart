@@ -206,19 +206,23 @@ void main() {
       });
     });
 
-    group('watchByAcademicYear', () {
+    group('watch with filter', () {
       test('emits correct academic terms for academic year', () async {
-        final stream = repository.watchByAcademicYear(year.id);
+        final stream = repository.watch(
+          AcademicTermFilter(academicYearId: year.id),
+        );
 
         expect(stream, emits(AppResult.success(seededTerms)));
       });
 
       test('emits failure when exception occurs', () async {
-        whenCalling(Invocation.method(#watchByAcademicYear, null))
+        whenCalling(Invocation.method(#watch, null))
             .on(repository)
             .thenThrow(Exception());
 
-        final stream = repository.watchByAcademicYear(year.id);
+        final stream = repository.watch(
+          AcademicTermFilter(academicYearId: year.id),
+        );
 
         expect(
           stream,

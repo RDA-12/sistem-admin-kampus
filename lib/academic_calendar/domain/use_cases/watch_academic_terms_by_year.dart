@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:sistem_admin/academic_calendar/domain/entities.dart';
+import 'package:sistem_admin/academic_calendar/domain/filters/academic_term_filter.dart';
 import 'package:sistem_admin/academic_calendar/domain/repository.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
@@ -20,6 +21,8 @@ class WatchAcademicTermsByYearUseCase
       'start watching academic terms by academic year',
       extra: {'academicYearId': params},
     );
-    return _academicTermRepository.watchByAcademicYear(params);
+    return _academicTermRepository.watch(
+      AcademicTermFilter(academicYearId: params),
+    );
   }
 }
