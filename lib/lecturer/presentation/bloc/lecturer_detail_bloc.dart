@@ -43,7 +43,7 @@ class LecturerDetailBloc extends Bloc<LecturerDetailEvent, LecturerDetailState>
       emit(const LoadingLecturerDetail());
 
       final stream = CombineLatestStream.combine2(
-        _watchPrograms(null),
+        _watchPrograms(),
         _watchSingleLecturer(event.id),
         (programsResult, lecturerResult) {
           late final List<Program> programs;

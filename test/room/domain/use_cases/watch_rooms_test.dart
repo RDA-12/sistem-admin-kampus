@@ -35,8 +35,18 @@ void main() {
   });
 
   group('WatchRoomsUseCase', () {
-    test('emits correct list of Room', () async {
-      final stream = useCase(null);
+    test('emits correct list of Room when no filter provided', () async {
+      final stream = useCase();
+
+      expect(stream, emits(AppResult.success(rooms)));
+    });
+
+    test('emits correct list of Room when filter provided', () async {
+      const filter = RoomFilter(facultyId: 'faculty_1');
+      when(() => roomRepositoryMock.watch(filter))
+          .thenAnswer((_) => Stream.value(AppResult.success(rooms)));
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(rooms)));
     });
@@ -48,7 +58,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

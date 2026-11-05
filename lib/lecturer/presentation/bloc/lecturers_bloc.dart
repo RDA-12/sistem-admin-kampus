@@ -39,8 +39,8 @@ class LecturersBloc extends Bloc<LecturersEvent, LecturersState>
       logDebug('starts subscribe to lecturers changes. emits loading');
       emit(const LoadingLecturers());
       final stream = CombineLatestStream.combine2(
-        _watchPrograms(null),
-        _watchLecturers(null),
+        _watchPrograms(),
+        _watchLecturers(),
         (programsResult, lecturersResult) {
           late final List<Program> programs;
           switch (programsResult) {

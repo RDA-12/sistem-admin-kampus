@@ -38,10 +38,6 @@ class MockDeleteAcademicYearUseCase extends Mock
 class MockWatchAcademicTermsUseCase extends Mock
     implements WatchAcademicTermsUseCase;
 
-@LazySingleton(as: WatchAcademicTermsByYearUseCase, env: [Environment.test])
-class MockWatchAcademicTermsByYearUseCase extends Mock
-    implements WatchAcademicTermsByYearUseCase;
-
 @LazySingleton(as: WatchSingleAcademicTermUseCase, env: [Environment.test])
 class MockWatchSingleAcademicTermUseCase extends Mock
     implements WatchSingleAcademicTermUseCase;
@@ -59,11 +55,11 @@ class MockDeleteAcademicTermUseCase extends Mock
     implements DeleteAcademicTermUseCase;
 
 @LazySingleton(
-  as: WatchAcademicCalendarEventsByYearUseCase,
+  as: WatchAcademicCalendarEventsUseCase,
   env: [Environment.test],
 )
-class MockWatchAcademicCalendarEventsByYearUseCase extends Mock
-    implements WatchAcademicCalendarEventsByYearUseCase;
+class MockWatchAcademicCalendarEventsUseCase extends Mock
+    implements WatchAcademicCalendarEventsUseCase;
 
 @LazySingleton(
   as: CreateAcademicCalendarEventUseCase,

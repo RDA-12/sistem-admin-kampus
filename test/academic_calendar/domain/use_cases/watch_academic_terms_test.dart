@@ -37,8 +37,21 @@ void main() {
   });
 
   group('WatchAcademicTermsUseCase', () {
-    test('emits correct list of AcademicTerm', () async {
-      final stream = useCase(null);
+    test(
+      'emits correct list of AcademicTerm when no filter provided',
+      () async {
+        final stream = useCase();
+
+        expect(stream, emits(AppResult.success(terms)));
+      },
+    );
+
+    test('emits correct list of AcademicTerm when filter provided', () async {
+      const filter = AcademicTermFilter(academicYearId: 'year_1');
+      when(() => repositoryMock.watch(filter))
+          .thenAnswer((_) => Stream.value(AppResult.success(terms)));
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(terms)));
     });
@@ -50,7 +63,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

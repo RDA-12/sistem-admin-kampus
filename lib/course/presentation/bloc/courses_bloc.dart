@@ -38,8 +38,8 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> with AppLoggerMixin {
       logDebug('starts subscribe to courses changes. emits loading');
       emit(const LoadingCourses());
       final stream = CombineLatestStream.combine2(
-        _watchPrograms(null),
-        _watchCourses(null),
+        _watchPrograms(),
+        _watchCourses(),
         (programsResult, coursesResult) {
           late final List<Program> programs;
           switch (programsResult) {

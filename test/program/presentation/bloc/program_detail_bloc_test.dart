@@ -27,8 +27,8 @@ void main() {
   );
   late WatchSingleProgramUseCase watchSingleProgramMock;
   late WatchFacultiesUseCase watchFacultiesMock;
-  late WatchLecturersByProgramUseCase watchLecturersByProgramMock;
-  late WatchCoursesByProgramUseCase watchCoursesByProgramMock;
+  late WatchLecturersUseCase watchLecturersMock;
+  late WatchCoursesUseCase watchCoursesMock;
 
   setUpAll(initializeMockDependencies);
 
@@ -41,28 +41,34 @@ void main() {
     when(() => watchFacultiesMock(null))
         .thenAnswer((_) => Stream.value(AppResult.success(facultiesMock)));
 
-    watchLecturersByProgramMock = getIt<WatchLecturersByProgramUseCase>();
-    when(() => watchLecturersByProgramMock(program.id))
-        .thenAnswer((_) => Stream.value(AppResult.success(lecturersMock)));
+    watchLecturersMock = getIt<WatchLecturersUseCase>();
+    when(
+      () => watchLecturersMock(
+        LecturerFilter(programId: program.id),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(lecturersMock)));
 
-    watchCoursesByProgramMock = getIt<WatchCoursesByProgramUseCase>();
-    when(() => watchCoursesByProgramMock(program.id))
-        .thenAnswer((_) => Stream.value(AppResult.success(coursesMock)));
+    watchCoursesMock = getIt<WatchCoursesUseCase>();
+    when(
+      () => watchCoursesMock(
+        CourseFilter(programId: program.id),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(coursesMock)));
   });
 
   tearDown(() {
     reset(watchSingleProgramMock);
     reset(watchFacultiesMock);
-    reset(watchLecturersByProgramMock);
-    reset(watchCoursesByProgramMock);
+    reset(watchLecturersMock);
+    reset(watchCoursesMock);
   });
 
   ProgramDetailBloc buildBloc() {
     return ProgramDetailBloc(
       watchSingleProgram: watchSingleProgramMock,
       watchFaculties: watchFacultiesMock,
-      watchLecturersByProgram: watchLecturersByProgramMock,
-      watchCoursesByProgram: watchCoursesByProgramMock,
+      watchLecturers: watchLecturersMock,
+      watchCourses: watchCoursesMock,
     );
   }
 
@@ -93,8 +99,16 @@ void main() {
         verify: (_) {
           verify(() => watchSingleProgramMock(program.id)).called(1);
           verify(() => watchFacultiesMock(null)).called(1);
-          verify(() => watchLecturersByProgramMock(program.id)).called(1);
-          verify(() => watchCoursesByProgramMock(program.id)).called(1);
+          verify(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).called(1);
+          verify(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).called(1);
         },
       );
 
@@ -118,8 +132,16 @@ void main() {
         verify: (_) {
           verify(() => watchSingleProgramMock(program.id)).called(1);
           verify(() => watchFacultiesMock(null)).called(1);
-          verify(() => watchLecturersByProgramMock(program.id)).called(1);
-          verify(() => watchCoursesByProgramMock(program.id)).called(1);
+          verify(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).called(1);
+          verify(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).called(1);
         },
       );
 
@@ -143,17 +165,29 @@ void main() {
         verify: (_) {
           verify(() => watchSingleProgramMock(program.id)).called(1);
           verify(() => watchFacultiesMock(null)).called(1);
-          verify(() => watchLecturersByProgramMock(program.id)).called(1);
-          verify(() => watchCoursesByProgramMock(program.id)).called(1);
+          verify(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).called(1);
+          verify(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).called(1);
         },
       );
 
       blocTest<ProgramDetailBloc, ProgramDetailState>(
         'emits [LoadingProgramDetail, ProgramDetailLoadFailed] '
         'when ProgramDetailSubscriptionRequested is added and '
-        'WatchLecturersByProgramUseCase emits failure',
+        'WatchLecturersUseCase emits failure',
         setUp: () {
-          when(() => watchLecturersByProgramMock(program.id)).thenAnswer(
+          when(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },
@@ -168,17 +202,29 @@ void main() {
         verify: (_) {
           verify(() => watchSingleProgramMock(program.id)).called(1);
           verify(() => watchFacultiesMock(null)).called(1);
-          verify(() => watchLecturersByProgramMock(program.id)).called(1);
-          verify(() => watchCoursesByProgramMock(program.id)).called(1);
+          verify(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).called(1);
+          verify(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).called(1);
         },
       );
 
       blocTest<ProgramDetailBloc, ProgramDetailState>(
         'emits [LoadingProgramDetail, ProgramDetailLoadFailed] '
         'when ProgramDetailSubscriptionRequested is added and '
-        'WatchCoursesByProgramUseCase emits failure',
+        'WatchCoursesUseCase emits failure',
         setUp: () {
-          when(() => watchCoursesByProgramMock(program.id)).thenAnswer(
+          when(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },
@@ -193,8 +239,16 @@ void main() {
         verify: (_) {
           verify(() => watchSingleProgramMock(program.id)).called(1);
           verify(() => watchFacultiesMock(null)).called(1);
-          verify(() => watchLecturersByProgramMock(program.id)).called(1);
-          verify(() => watchCoursesByProgramMock(program.id)).called(1);
+          verify(
+            () => watchLecturersMock(
+              LecturerFilter(programId: program.id),
+            ),
+          ).called(1);
+          verify(
+            () => watchCoursesMock(
+              CourseFilter(programId: program.id),
+            ),
+          ).called(1);
         },
       );
     });

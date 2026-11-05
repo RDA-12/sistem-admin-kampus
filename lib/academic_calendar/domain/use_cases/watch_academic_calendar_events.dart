@@ -5,25 +5,28 @@ import 'package:sistem_admin/academic_calendar/domain/repository.dart';
 import 'package:sistem_admin/common/common.dart';
 import 'package:sistem_admin/core/core.dart';
 
-/// Use case to watch for [AcademicCalendarEvent] data changes for specific
-/// academic year
+/// Use case to watch for [AcademicCalendarEvent] data changes
 @LazySingleton(env: [Environment.prod])
-class WatchAcademicCalendarEventsByYearUseCase
+class WatchAcademicCalendarEventsUseCase
     with AppLoggerMixin
-    implements StreamBaseUseCase<String, List<AcademicCalendarEvent>> {
-  /// Creates new [WatchAcademicCalendarEventsByYearUseCase]
+    implements
+        StreamBaseUseCase<
+          AcademicCalendarEventFilter?,
+          List<AcademicCalendarEvent>
+        > {
+  /// Creates new [WatchAcademicCalendarEventsUseCase]
   new({required this._academicCalendarEventRepository});
 
   final IAcademicCalendarEventRepository _academicCalendarEventRepository;
 
   @override
-  Stream<AppResult<List<AcademicCalendarEvent>>> call(String params) {
+  Stream<AppResult<List<AcademicCalendarEvent>>> call([
+    AcademicCalendarEventFilter? params,
+  ]) {
     logDebug(
-      'start watching academic calendar events by academic year',
-      extra: {'academicYearId': params},
+      'start watching academic calendar events',
+      extra: params != null ? {'filter': params} : null,
     );
-    return _academicCalendarEventRepository.watch(
-      AcademicCalendarEventFilter(academicYearId: params),
-    );
+    return _academicCalendarEventRepository.watch(params);
   }
 }

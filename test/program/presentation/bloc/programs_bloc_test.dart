@@ -28,7 +28,7 @@ void main() {
 
     setUp(() {
       watchProgramsMock = getIt<WatchProgramsUseCase>();
-      when(() => watchProgramsMock(null)).thenAnswer(
+      when(() => watchProgramsMock()).thenAnswer(
         (_) => Stream.value(
           AppResult.success([
             ...programs,
@@ -67,7 +67,7 @@ void main() {
           ProgramsLoaded(programs),
         ],
         verify: (_) {
-          verify(() => watchProgramsMock(null)).called(1);
+          verify(() => watchProgramsMock()).called(1);
         },
       );
 
@@ -93,7 +93,7 @@ void main() {
         'when ProgramsSubscriptionRequested is added '
         'and WatchProgramsUseCase emits failure',
         setUp: () {
-          when(() => watchProgramsMock(null)).thenAnswer(
+          when(() => watchProgramsMock()).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },

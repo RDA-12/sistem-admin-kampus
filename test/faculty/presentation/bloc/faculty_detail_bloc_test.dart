@@ -12,37 +12,41 @@ import '../../../program/domain/mocks.dart';
 import '../../../room/domain/mocks.dart';
 
 void main() {
-  const faculty = Faculty(id: 'id', name: 'name');
+  const facultyId = 'id';
+  const faculty = Faculty(id: facultyId, name: 'name');
+  const programFilter = ProgramFilter(facultyId: facultyId);
+  const roomFilter = RoomFilter(facultyId: facultyId);
+
   late WatchSingleFacultyUseCase watchSingleFacultyMock;
-  late WatchProgramsByFacultyUseCase watchProgramsByFacultyMock;
-  late WatchRoomsByFacultyUseCase watchRoomsByFacultyMock;
+  late WatchProgramsUseCase watchProgramsMock;
+  late WatchRoomsUseCase watchRoomsMock;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     watchSingleFacultyMock = getIt<WatchSingleFacultyUseCase>();
-    watchProgramsByFacultyMock = getIt<WatchProgramsByFacultyUseCase>();
-    watchRoomsByFacultyMock = getIt<WatchRoomsByFacultyUseCase>();
+    watchProgramsMock = getIt<WatchProgramsUseCase>();
+    watchRoomsMock = getIt<WatchRoomsUseCase>();
 
     when(() => watchSingleFacultyMock(faculty.id))
         .thenAnswer((_) => Stream.value(AppResult.success(faculty)));
-    when(() => watchProgramsByFacultyMock(faculty.id))
+    when(() => watchProgramsMock(programFilter))
         .thenAnswer((_) => Stream.value(AppResult.success(programsMock)));
-    when(() => watchRoomsByFacultyMock(faculty.id))
+    when(() => watchRoomsMock(roomFilter))
         .thenAnswer((_) => Stream.value(AppResult.success(roomsMock)));
   });
 
   tearDown(() {
     reset(watchSingleFacultyMock);
-    reset(watchProgramsByFacultyMock);
-    reset(watchRoomsByFacultyMock);
+    reset(watchProgramsMock);
+    reset(watchRoomsMock);
   });
 
   FacultyDetailBloc buildBloc() {
     return FacultyDetailBloc(
       watchSingleFaculty: watchSingleFacultyMock,
-      watchProgramsByFaculty: watchProgramsByFacultyMock,
-      watchRoomsByFaculty: watchRoomsByFacultyMock,
+      watchPrograms: watchProgramsMock,
+      watchRooms: watchRoomsMock,
     );
   }
 
@@ -72,8 +76,8 @@ void main() {
         ],
         verify: (_) {
           verify(() => watchSingleFacultyMock(faculty.id)).called(1);
-          verify(() => watchProgramsByFacultyMock(faculty.id)).called(1);
-          verify(() => watchRoomsByFacultyMock(faculty.id)).called(1);
+          verify(() => watchProgramsMock(programFilter)).called(1);
+          verify(() => watchRoomsMock(roomFilter)).called(1);
         },
       );
 
@@ -96,17 +100,17 @@ void main() {
         ],
         verify: (_) {
           verify(() => watchSingleFacultyMock(faculty.id)).called(1);
-          verify(() => watchProgramsByFacultyMock(faculty.id)).called(1);
-          verify(() => watchRoomsByFacultyMock(faculty.id)).called(1);
+          verify(() => watchProgramsMock(programFilter)).called(1);
+          verify(() => watchRoomsMock(roomFilter)).called(1);
         },
       );
 
       blocTest<FacultyDetailBloc, FacultyDetailState>(
         'emits [LoadingFacultyDetail, FacultyDetailLoadFailed] '
         'when FacultyDetailSubscriptionRequested is added and '
-        'WatchProgramsByFacultyUseCase emits failure',
+        'WatchProgramsUseCase emits failure',
         setUp: () {
-          when(() => watchProgramsByFacultyMock(faculty.id)).thenAnswer(
+          when(() => watchProgramsMock(programFilter)).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },
@@ -120,17 +124,17 @@ void main() {
         ],
         verify: (_) {
           verify(() => watchSingleFacultyMock(faculty.id)).called(1);
-          verify(() => watchProgramsByFacultyMock(faculty.id)).called(1);
-          verify(() => watchRoomsByFacultyMock(faculty.id)).called(1);
+          verify(() => watchProgramsMock(programFilter)).called(1);
+          verify(() => watchRoomsMock(roomFilter)).called(1);
         },
       );
 
       blocTest<FacultyDetailBloc, FacultyDetailState>(
         'emits [LoadingFacultyDetail, FacultyDetailLoadFailed] '
         'when FacultyDetailSubscriptionRequested is added and '
-        'WatchRoomsByFacultyUseCase emits failure',
+        'WatchRoomsUseCase emits failure',
         setUp: () {
-          when(() => watchRoomsByFacultyMock(faculty.id)).thenAnswer(
+          when(() => watchRoomsMock(roomFilter)).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },
@@ -144,8 +148,8 @@ void main() {
         ],
         verify: (_) {
           verify(() => watchSingleFacultyMock(faculty.id)).called(1);
-          verify(() => watchProgramsByFacultyMock(faculty.id)).called(1);
-          verify(() => watchRoomsByFacultyMock(faculty.id)).called(1);
+          verify(() => watchProgramsMock(programFilter)).called(1);
+          verify(() => watchRoomsMock(roomFilter)).called(1);
         },
       );
     });

@@ -23,8 +23,8 @@ class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState>
   new({
     required this._watchSingleProgram,
     required this._watchFaculties,
-    required this._watchLecturersByProgram,
-    required this._watchCoursesByProgram,
+    required this._watchLecturers,
+    required this._watchCourses,
   }) : super(const ProgramDetailInitial()) {
     on<ProgramDetailSubscriptionRequested>(
       _onProgramDetailSubscriptionRequested,
@@ -34,8 +34,8 @@ class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState>
 
   final WatchSingleProgramUseCase _watchSingleProgram;
   final WatchFacultiesUseCase _watchFaculties;
-  final WatchLecturersByProgramUseCase _watchLecturersByProgram;
-  final WatchCoursesByProgramUseCase _watchCoursesByProgram;
+  final WatchLecturersUseCase _watchLecturers;
+  final WatchCoursesUseCase _watchCourses;
 
   Future<void> _onProgramDetailSubscriptionRequested(
     ProgramDetailSubscriptionRequested event,
@@ -51,8 +51,8 @@ class ProgramDetailBloc extends Bloc<ProgramDetailEvent, ProgramDetailState>
       final stream = CombineLatestStream.combine4(
         _watchFaculties(null),
         _watchSingleProgram(event.id),
-        _watchLecturersByProgram(event.id),
-        _watchCoursesByProgram(event.id),
+        _watchLecturers(LecturerFilter(programId: event.id)),
+        _watchCourses(CourseFilter(programId: event.id)),
         (facultiesResult, programResult, lecturersResult, coursesResult) {
           late final List<Faculty> faculties;
           switch (facultiesResult) {

@@ -40,7 +40,7 @@ class ProgramsBloc extends Bloc<ProgramsEvent, ProgramsState>
       emit(const LoadingPrograms());
       final stream = CombineLatestStream.combine2(
         _watchFaculties(null),
-        _watchPrograms(null),
+        _watchPrograms(),
         (facultiesResult, programsResult) {
           late final List<Faculty> faculties;
           switch (facultiesResult) {

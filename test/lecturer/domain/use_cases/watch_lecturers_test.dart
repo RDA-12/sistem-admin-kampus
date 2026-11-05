@@ -36,8 +36,18 @@ void main() {
   });
 
   group('WatchLecturersUseCase', () {
-    test('emits correct list of Lecturer', () async {
-      final stream = useCase(null);
+    test('emits correct list of Lecturer when no filter provided', () async {
+      final stream = useCase();
+
+      expect(stream, emits(AppResult.success(lecturers)));
+    });
+
+    test('emits correct list of Lecturer when filter provided', () async {
+      const filter = LecturerFilter(programId: 'program_1');
+      when(() => lecturerRepositoryMock.watch(filter))
+          .thenAnswer((_) => Stream.value(AppResult.success(lecturers)));
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(lecturers)));
     });
@@ -49,7 +59,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

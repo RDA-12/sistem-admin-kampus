@@ -12,29 +12,32 @@ void main() {
   final year = academicYearMock;
   final terms = academicTermsMock;
   late WatchSingleAcademicYearUseCase watchSingleAcademicYearMock;
-  late WatchAcademicTermsByYearUseCase watchAcademicTermsByYearMock;
+  late WatchAcademicTermsUseCase watchAcademicTermsMock;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     watchSingleAcademicYearMock = getIt<WatchSingleAcademicYearUseCase>();
-    watchAcademicTermsByYearMock = getIt<WatchAcademicTermsByYearUseCase>();
+    watchAcademicTermsMock = getIt<WatchAcademicTermsUseCase>();
 
     when(() => watchSingleAcademicYearMock(year.id))
         .thenAnswer((_) => Stream.value(AppResult.success(year)));
-    when(() => watchAcademicTermsByYearMock(year.id))
-        .thenAnswer((_) => Stream.value(AppResult.success(terms)));
+    when(
+      () => watchAcademicTermsMock(
+        AcademicTermFilter(academicYearId: year.id),
+      ),
+    ).thenAnswer((_) => Stream.value(AppResult.success(terms)));
   });
 
   tearDown(() {
     reset(watchSingleAcademicYearMock);
-    reset(watchAcademicTermsByYearMock);
+    reset(watchAcademicTermsMock);
   });
 
   AcademicYearDetailBloc buildBloc() {
     return AcademicYearDetailBloc(
       watchSingleAcademicYear: watchSingleAcademicYearMock,
-      watchAcademicTermsByYear: watchAcademicTermsByYearMock,
+      watchAcademicTerms: watchAcademicTermsMock,
     );
   }
 
@@ -63,7 +66,11 @@ void main() {
         ],
         verify: (_) {
           verify(() => watchSingleAcademicYearMock(year.id)).called(1);
-          verify(() => watchAcademicTermsByYearMock(year.id)).called(1);
+          verify(
+            () => watchAcademicTermsMock(
+              AcademicTermFilter(academicYearId: year.id),
+            ),
+          ).called(1);
         },
       );
 
@@ -87,9 +94,13 @@ void main() {
 
       blocTest<AcademicYearDetailBloc, AcademicYearDetailState>(
         'emits [LoadingAcademicYearDetail, AcademicYearDetailLoadFailed] '
-        'when WatchAcademicTermsByYearUseCase emits failure',
+        'when WatchAcademicTermsUseCase emits failure',
         setUp: () {
-          when(() => watchAcademicTermsByYearMock(year.id)).thenAnswer(
+          when(
+            () => watchAcademicTermsMock(
+              AcademicTermFilter(academicYearId: year.id),
+            ),
+          ).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },

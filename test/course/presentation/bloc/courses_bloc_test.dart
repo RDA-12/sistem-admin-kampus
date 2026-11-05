@@ -31,7 +31,7 @@ void main() {
 
     setUp(() {
       watchCoursesMock = getIt<WatchCoursesUseCase>();
-      when(() => watchCoursesMock(null)).thenAnswer(
+      when(() => watchCoursesMock()).thenAnswer(
         (_) => Stream.value(
           AppResult.success([
             ...courses,
@@ -48,7 +48,7 @@ void main() {
       );
 
       watchProgramsMock = getIt<WatchProgramsUseCase>();
-      when(() => watchProgramsMock(null))
+      when(() => watchProgramsMock())
           .thenAnswer((_) => Stream.value(AppResult.success([programMock])));
     });
 
@@ -77,7 +77,7 @@ void main() {
           CoursesLoaded(courses),
         ],
         verify: (_) {
-          verify(() => watchCoursesMock(null)).called(1);
+          verify(() => watchCoursesMock()).called(1);
         },
       );
 
@@ -86,7 +86,7 @@ void main() {
         'when CoursesSubscriptionRequested is added '
         'and WatchProgramsUseCase emits failure',
         setUp: () {
-          when(() => watchProgramsMock(null)).thenAnswer(
+          when(() => watchProgramsMock()).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },
@@ -103,7 +103,7 @@ void main() {
         'when CoursesSubscriptionRequested is added '
         'and WatchCoursesUseCase emits failure',
         setUp: () {
-          when(() => watchCoursesMock(null)).thenAnswer(
+          when(() => watchCoursesMock()).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },

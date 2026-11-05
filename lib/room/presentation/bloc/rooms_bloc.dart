@@ -39,7 +39,7 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> with AppLoggerMixin {
       emit(const LoadingRooms());
       final stream = CombineLatestStream.combine2(
         _watchFaculties(null),
-        _watchRooms(null),
+        _watchRooms(),
         (facultiesResult, roomsResult) {
           late final List<Faculty> faculties;
           switch (facultiesResult) {

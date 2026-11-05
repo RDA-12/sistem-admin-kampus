@@ -19,8 +19,8 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
   /// Creates new [FacultyDetailBloc]
   new({
     required this._watchSingleFaculty,
-    required this._watchProgramsByFaculty,
-    required this._watchRoomsByFaculty,
+    required this._watchPrograms,
+    required this._watchRooms,
   }) : super(const FacultyDetailInitial()) {
     on<FacultyDetailSubscriptionRequested>(
       _onFacultyDetailSubscriptionRequested,
@@ -29,8 +29,8 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
   }
 
   final WatchSingleFacultyUseCase _watchSingleFaculty;
-  final WatchProgramsByFacultyUseCase _watchProgramsByFaculty;
-  final WatchRoomsByFacultyUseCase _watchRoomsByFaculty;
+  final WatchProgramsUseCase _watchPrograms;
+  final WatchRoomsUseCase _watchRooms;
 
   Future<void> _onFacultyDetailSubscriptionRequested(
     FacultyDetailSubscriptionRequested event,
@@ -45,8 +45,8 @@ class FacultyDetailBloc extends Bloc<FacultyDetailEvent, FacultyDetailState>
 
       final stream = CombineLatestStream.combine3(
         _watchSingleFaculty(event.id),
-        _watchProgramsByFaculty(event.id),
-        _watchRoomsByFaculty(event.id),
+        _watchPrograms(ProgramFilter(facultyId: event.id)),
+        _watchRooms(RoomFilter(facultyId: event.id)),
         (facultyResult, programsResult, roomsResult) {
           late final Faculty faculty;
           switch (facultyResult) {

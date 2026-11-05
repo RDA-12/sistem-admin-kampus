@@ -10,10 +10,6 @@ class MockRoomRepository extends Mock implements IRoomRepository;
 @LazySingleton(as: WatchRoomsUseCase, env: [Environment.test])
 class MockWatchRoomsUseCase extends Mock implements WatchRoomsUseCase;
 
-@LazySingleton(as: WatchRoomsByFacultyUseCase, env: [Environment.test])
-class MockWatchRoomsByFacultyUseCase extends Mock
-    implements WatchRoomsByFacultyUseCase;
-
 @LazySingleton(as: WatchSingleRoomUseCase, env: [Environment.test])
 class MockWatchSingleRoomUseCase extends Mock implements WatchSingleRoomUseCase;
 

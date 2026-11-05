@@ -18,7 +18,7 @@ class AcademicYearDetailBloc
   /// Creates new [AcademicYearDetailBloc]
   new({
     required this._watchSingleAcademicYear,
-    required this._watchAcademicTermsByYear,
+    required this._watchAcademicTerms,
   }) : super(const AcademicYearDetailInitial()) {
     on<AcademicYearDetailSubscriptionRequested>(
       _onAcademicYearDetailSubscriptionRequested,
@@ -27,7 +27,7 @@ class AcademicYearDetailBloc
   }
 
   final WatchSingleAcademicYearUseCase _watchSingleAcademicYear;
-  final WatchAcademicTermsByYearUseCase _watchAcademicTermsByYear;
+  final WatchAcademicTermsUseCase _watchAcademicTerms;
 
   Future<void> _onAcademicYearDetailSubscriptionRequested(
     AcademicYearDetailSubscriptionRequested event,
@@ -42,7 +42,7 @@ class AcademicYearDetailBloc
 
       final stream = CombineLatestStream.combine2(
         _watchSingleAcademicYear(event.id),
-        _watchAcademicTermsByYear(event.id),
+        _watchAcademicTerms(AcademicTermFilter(academicYearId: event.id)),
         (yearResult, termsResult) {
           late final AcademicYear academicYear;
           switch (yearResult) {

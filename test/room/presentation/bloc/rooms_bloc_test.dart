@@ -28,7 +28,7 @@ void main() {
 
     setUp(() {
       watchRoomsMock = getIt<WatchRoomsUseCase>();
-      when(() => watchRoomsMock(null)).thenAnswer(
+      when(() => watchRoomsMock()).thenAnswer(
         (_) => Stream.value(
           AppResult.success([
             ...rooms,
@@ -71,7 +71,7 @@ void main() {
           RoomsLoaded(rooms),
         ],
         verify: (_) {
-          verify(() => watchRoomsMock(null)).called(1);
+          verify(() => watchRoomsMock()).called(1);
         },
       );
 
@@ -97,7 +97,7 @@ void main() {
         'when RoomsSubscriptionRequested is added '
         'and WatchRoomsUseCase emits failure',
         setUp: () {
-          when(() => watchRoomsMock(null)).thenAnswer(
+          when(() => watchRoomsMock()).thenAnswer(
             (_) => Stream.value(AppResult.failure(AppException.test())),
           );
         },

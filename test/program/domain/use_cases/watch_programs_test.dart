@@ -31,8 +31,18 @@ void main() {
   });
 
   group('WatchProgramsUseCase', () {
-    test('emits correct list of Program', () async {
-      final stream = useCase(null);
+    test('emits correct list of Program when no filter provided', () async {
+      final stream = useCase();
+
+      expect(stream, emits(AppResult.success(programs)));
+    });
+
+    test('emits correct list of Program when filter provided', () async {
+      const filter = ProgramFilter(facultyId: 'faculty_1');
+      when(() => programRepositoryMock.watch(filter))
+          .thenAnswer((_) => Stream.value(AppResult.success(programs)));
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(programs)));
     });
@@ -44,7 +54,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

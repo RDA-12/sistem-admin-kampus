@@ -38,8 +38,18 @@ void main() {
   });
 
   group('WatchCoursesUseCase', () {
-    test('emits correct list of Course', () async {
-      final stream = useCase(null);
+    test('emits correct list of Course when no filter provided', () async {
+      final stream = useCase();
+
+      expect(stream, emits(AppResult.success(courses)));
+    });
+
+    test('emits correct list of Course when filter provided', () async {
+      const filter = CourseFilter(programId: 'program_1');
+      when(() => courseRepositoryMock.watch(filter))
+          .thenAnswer((_) => Stream.value(AppResult.success(courses)));
+
+      final stream = useCase(filter);
 
       expect(stream, emits(AppResult.success(courses)));
     });
@@ -51,7 +61,7 @@ void main() {
         ),
       );
 
-      final stream = useCase(null);
+      final stream = useCase();
 
       expect(
         stream,

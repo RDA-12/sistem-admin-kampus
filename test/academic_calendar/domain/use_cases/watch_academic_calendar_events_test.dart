@@ -26,19 +26,16 @@ void main() {
   );
 
   late IAcademicCalendarEventRepository repositoryMock;
-  late WatchAcademicCalendarEventsByYearUseCase useCase;
+  late WatchAcademicCalendarEventsUseCase useCase;
 
   setUpAll(initializeMockDependencies);
 
   setUp(() {
     repositoryMock = getIt<IAcademicCalendarEventRepository>();
-    when(
-      () => repositoryMock.watch(
-        const AcademicCalendarEventFilter(academicYearId: 'year_1'),
-      ),
-    ).thenAnswer((_) => Stream.value(AppResult.success(events)));
+    when(repositoryMock.watch)
+        .thenAnswer((_) => Stream.value(AppResult.success(events)));
 
-    useCase = WatchAcademicCalendarEventsByYearUseCase(
+    useCase = WatchAcademicCalendarEventsUseCase(
       academicCalendarEventRepository: repositoryMock,
     );
   });
@@ -47,22 +44,31 @@ void main() {
     reset(repositoryMock);
   });
 
-  group('WatchAcademicCalendarEventsByYearUseCase', () {
+  group('WatchAcademicCalendarEventsUseCase', () {
     test(
-      'emits correct list of AcademicCalendarEvent for academic year',
+      'emits correct list of AcademicCalendarEvent when no filter provided',
       () async {
-        final stream = useCase('year_1');
+        final stream = useCase();
+
+        expect(stream, emits(AppResult.success(events)));
+      },
+    );
+
+    test(
+      'emits correct list of AcademicCalendarEvent when filter provided',
+      () async {
+        const filter = AcademicCalendarEventFilter(academicYearId: 'year_1');
+        when(() => repositoryMock.watch(filter))
+            .thenAnswer((_) => Stream.value(AppResult.success(events)));
+
+        final stream = useCase(filter);
 
         expect(stream, emits(AppResult.success(events)));
       },
     );
 
     test('emits failure when repo emits failure', () {
-      when(
-        () => repositoryMock.watch(
-          const AcademicCalendarEventFilter(academicYearId: 'year_1'),
-        ),
-      ).thenAnswer(
+      when(repositoryMock.watch).thenAnswer(
         (_) => Stream.value(
           AppFailure<List<AcademicCalendarEvent>>(
             exception: AppException.test(),
@@ -70,7 +76,7 @@ void main() {
         ),
       );
 
-      final stream = useCase('year_1');
+      final stream = useCase();
 
       expect(
         stream,
