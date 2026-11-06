@@ -57,8 +57,10 @@ class CourseScheduleCalendarUI extends Equatable {
   /// AcademicCalendar this course calendar part of
   final AcademicCalendar academicCalendar;
 
-  /// List of schedules
-  final List<CourseScheduleUI> schedules;
+  /// Map of schedules
+  ///
+  /// day -> course semester -> schedules
+  final Map<int, Map<int, List<CourseScheduleUI>>> schedules;
 
   @override
   List<Object?> get props => [academicCalendar, schedules];

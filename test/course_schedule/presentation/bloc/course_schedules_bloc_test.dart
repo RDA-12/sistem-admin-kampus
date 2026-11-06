@@ -62,7 +62,13 @@ void main() {
 
   final expectedCalendarUI = CourseScheduleCalendarUI(
     academicCalendar: AcademicCalendar(year: testYear),
-    schedules: expectedScheduleUIs,
+    schedules: {
+      DateTime.monday: {
+        1: [expectedScheduleUIs[0]],
+        2: [expectedScheduleUIs[1]],
+        3: [expectedScheduleUIs[2]],
+      },
+    },
   );
 
   final testFilter = CourseScheduleFilter(
@@ -301,6 +307,164 @@ void main() {
         expect: () => <CourseSchedulesState>[
           const CourseSchedulesLoadData(),
           CourseSchedulesLoaded(expectedCalendarUI),
+        ],
+      );
+
+      blocTest<CourseSchedulesBloc, CourseSchedulesState>(
+        'correctly groups multiple schedules with same day and same semester',
+        setUp: () {
+          final schedule1 = testSchedules[0];
+          final schedule2 = CourseSchedule(
+            id: 'same_day_same_sem',
+            academicYearId: testYear.id,
+            termId: testTermId,
+            name: 'Schedule Same Day Same Sem',
+            start: DateTime(2025, 9, 8, 13),
+            duration: const Duration(minutes: 100),
+            cohortId: cohortsMock[0].id,
+            courseId: coursesMock[0].id,
+            programId: testProgramId,
+            lecturerId: lecturersMock[0].id,
+            roomId: roomsMock[0].id,
+          );
+          when(() => watchCourseSchedulesMock(testFilter)).thenAnswer(
+            (_) => Stream.value(AppResult.success([schedule1, schedule2])),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          CourseSchedulesSubscriptionRequested(
+            academicYearId: testYear.id,
+            termId: testTermId,
+            programId: testProgramId,
+          ),
+        ),
+        expect: () {
+          final scheduleUI1 = expectedScheduleUIs[0];
+          final scheduleUI2 = CourseScheduleUI(
+            id: 'same_day_same_sem',
+            academicYearId: testYear.id,
+            termId: testTermId,
+            name: 'Schedule Same Day Same Sem',
+            start: DateTime(2025, 9, 8, 13),
+            duration: const Duration(minutes: 100),
+            cohortId: cohortsMock[0].id,
+            courseId: coursesMock[0].id,
+            programId: testProgramId,
+            lecturerId: lecturersMock[0].id,
+            roomId: roomsMock[0].id,
+            cohort: cohortsMock[0],
+            course: coursesMock[0],
+            lecturer: lecturersMock[0],
+            room: roomsMock[0],
+          );
+          return <CourseSchedulesState>[
+            const CourseSchedulesLoadData(),
+            CourseSchedulesLoaded(
+              CourseScheduleCalendarUI(
+                academicCalendar: AcademicCalendar(year: testYear),
+                schedules: {
+                  DateTime.monday: {
+                    1: [scheduleUI1, scheduleUI2],
+                  },
+                },
+              ),
+            ),
+          ];
+        },
+      );
+
+      blocTest<CourseSchedulesBloc, CourseSchedulesState>(
+        'correctly groups schedules across different weekdays',
+        setUp: () {
+          final scheduleMon = testSchedules[0];
+          final scheduleTue = CourseSchedule(
+            id: 'tuesday_schedule',
+            academicYearId: testYear.id,
+            termId: testTermId,
+            name: 'Tuesday Schedule',
+            start: DateTime(2025, 9, 9, 8),
+            duration: const Duration(minutes: 100),
+            cohortId: cohortsMock[1].id,
+            courseId: coursesMock[1].id,
+            programId: testProgramId,
+            lecturerId: lecturersMock[1].id,
+            roomId: roomsMock[1].id,
+          );
+          when(() => watchCourseSchedulesMock(testFilter)).thenAnswer(
+            (_) => Stream.value(AppResult.success([scheduleMon, scheduleTue])),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          CourseSchedulesSubscriptionRequested(
+            academicYearId: testYear.id,
+            termId: testTermId,
+            programId: testProgramId,
+          ),
+        ),
+        expect: () {
+          final scheduleUIMon = expectedScheduleUIs[0];
+          final scheduleUITue = CourseScheduleUI(
+            id: 'tuesday_schedule',
+            academicYearId: testYear.id,
+            termId: testTermId,
+            name: 'Tuesday Schedule',
+            start: DateTime(2025, 9, 9, 8),
+            duration: const Duration(minutes: 100),
+            cohortId: cohortsMock[1].id,
+            courseId: coursesMock[1].id,
+            programId: testProgramId,
+            lecturerId: lecturersMock[1].id,
+            roomId: roomsMock[1].id,
+            cohort: cohortsMock[1],
+            course: coursesMock[1],
+            lecturer: lecturersMock[1],
+            room: roomsMock[1],
+          );
+          return <CourseSchedulesState>[
+            const CourseSchedulesLoadData(),
+            CourseSchedulesLoaded(
+              CourseScheduleCalendarUI(
+                academicCalendar: AcademicCalendar(year: testYear),
+                schedules: {
+                  DateTime.monday: {
+                    1: [scheduleUIMon],
+                  },
+                  DateTime.tuesday: {
+                    2: [scheduleUITue],
+                  },
+                },
+              ),
+            ),
+          ];
+        },
+      );
+
+      blocTest<CourseSchedulesBloc, CourseSchedulesState>(
+        'emits [CourseSchedulesLoadData, CourseSchedulesLoaded] with empty '
+        'schedules when use case emits empty schedules',
+        setUp: () {
+          when(() => watchCourseSchedulesMock(testFilter)).thenAnswer(
+            (_) => Stream.value(AppResult.success(const [])),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(
+          CourseSchedulesSubscriptionRequested(
+            academicYearId: testYear.id,
+            termId: testTermId,
+            programId: testProgramId,
+          ),
+        ),
+        expect: () => <CourseSchedulesState>[
+          const CourseSchedulesLoadData(),
+          CourseSchedulesLoaded(
+            CourseScheduleCalendarUI(
+              academicCalendar: AcademicCalendar(year: testYear),
+              schedules: const {},
+            ),
+          ),
         ],
       );
 

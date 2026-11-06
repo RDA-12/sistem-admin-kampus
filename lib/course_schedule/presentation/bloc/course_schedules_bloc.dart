@@ -128,7 +128,7 @@ class CourseSchedulesBloc
               rooms = data;
           }
 
-          final scheduleUIs = <CourseScheduleUI>[];
+          final scheduleUIs = <int, Map<int, List<CourseScheduleUI>>>{};
           for (final schedule in schedules) {
             if (schedule.academicYearId != event.academicYearId ||
                 schedule.termId != event.termId ||
@@ -156,25 +156,29 @@ class CourseSchedulesBloc
               continue;
             }
 
-            scheduleUIs.add(
-              CourseScheduleUI(
-                id: schedule.id,
-                academicYearId: schedule.academicYearId,
-                termId: schedule.termId,
-                name: schedule.name,
-                start: schedule.start,
-                duration: schedule.duration,
-                cohortId: schedule.cohortId,
-                courseId: schedule.courseId,
-                programId: schedule.programId,
-                lecturerId: schedule.lecturerId,
-                roomId: schedule.roomId,
-                cohort: cohort,
-                course: course,
-                lecturer: lecturer,
-                room: room,
-              ),
+            final scheduleUI = CourseScheduleUI(
+              id: schedule.id,
+              academicYearId: schedule.academicYearId,
+              termId: schedule.termId,
+              name: schedule.name,
+              start: schedule.start,
+              duration: schedule.duration,
+              cohortId: schedule.cohortId,
+              courseId: schedule.courseId,
+              programId: schedule.programId,
+              lecturerId: schedule.lecturerId,
+              roomId: schedule.roomId,
+              cohort: cohort,
+              course: course,
+              lecturer: lecturer,
+              room: room,
             );
+            final day = scheduleUI.start.weekday;
+            final semester = scheduleUI.course.semester;
+            scheduleUIs
+                .putIfAbsent(day, () => <int, List<CourseScheduleUI>>{})
+                .putIfAbsent(semester, () => <CourseScheduleUI>[])
+                .add(scheduleUI);
           }
 
           return AppResult.success(
