@@ -5,6 +5,9 @@ import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 @LazySingleton(as: AcademicYearsBloc, env: [Environment.test])
 class MockAcademicYearsBloc extends Mock implements AcademicYearsBloc;
 
+@LazySingleton(as: AcademicTermsBloc, env: [Environment.test])
+class MockAcademicTermsBloc extends Mock implements AcademicTermsBloc;
+
 @LazySingleton(as: AcademicYearDetailBloc, env: [Environment.test])
 class MockAcademicYearDetailBloc extends Mock implements AcademicYearDetailBloc;
 
