@@ -69,6 +69,7 @@ class MainShell extends StatelessWidget {
       builder: (context, breakpoint, _) {
         final navRailShouldExpanded = !breakpoint.inside([.medium, .expanded]);
         final navRail = NavigationRail(
+          scrollable: true,
           extended: navRailShouldExpanded,
           labelType: navRailShouldExpanded ? null : NavigationRailLabelType.all,
           selectedIndex: currentIndex,
