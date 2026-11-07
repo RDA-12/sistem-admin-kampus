@@ -2,6 +2,11 @@ import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sistem_admin/course_schedule/course_schedule.dart';
 
+import '../../cohort/domain/mocks.dart';
+import '../../course/domain/mocks.dart';
+import '../../lecturer/domain/mocks.dart';
+import '../../room/domain/mocks.dart';
+
 @LazySingleton(as: ICourseScheduleRepository, env: [Environment.test])
 class MockCourseScheduleRepository extends Mock
     implements ICourseScheduleRepository;
@@ -40,3 +45,26 @@ final courseSchedulesMock = List<CourseSchedule>.generate(
 );
 
 final CourseSchedule courseScheduleMock = courseSchedulesMock.first;
+
+final courseSchedulesUIMock = List<CourseScheduleUI>.generate(
+  3,
+  (index) => CourseScheduleUI(
+    id: 'schedule_$index',
+    academicYearId: 'year_1',
+    termId: 'term_1',
+    name: 'Schedule $index',
+    start: DateTime(2025, 9, 8 + index, 8 + index),
+    duration: const Duration(minutes: 100),
+    cohortId: cohortsMock[index].id,
+    courseId: coursesMock[index].id,
+    programId: 'program_1',
+    lecturerId: lecturersMock[index].id,
+    roomId: roomsMock[index].id,
+    cohort: cohortsMock[index],
+    course: coursesMock[index],
+    lecturer: lecturersMock[index],
+    room: roomsMock[index],
+  ),
+);
+
+final CourseScheduleUI courseScheduleUIMock = courseSchedulesUIMock.first;
