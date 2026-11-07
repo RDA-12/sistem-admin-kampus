@@ -37,6 +37,10 @@ const _destinations = <_MainDestination>[
     icon: Icons.groups_rounded,
     label: 'Angkatan',
   ),
+  _MainDestination(
+    icon: Icons.calendar_view_week_rounded,
+    label: 'Jadwal Kuliah',
+  ),
 ];
 
 /// Main shell which contains nav rail for large screen and

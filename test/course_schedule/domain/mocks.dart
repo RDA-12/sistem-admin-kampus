@@ -1,7 +1,9 @@
 import 'package:injectable/injectable.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/course_schedule/course_schedule.dart';
 
+import '../../academic_calendar/domain/mocks.dart';
 import '../../cohort/domain/mocks.dart';
 import '../../course/domain/mocks.dart';
 import '../../lecturer/domain/mocks.dart';
@@ -68,3 +70,8 @@ final courseSchedulesUIMock = List<CourseScheduleUI>.generate(
 );
 
 final CourseScheduleUI courseScheduleUIMock = courseSchedulesUIMock.first;
+
+final courseScheduleCalendarUIMock = CourseScheduleCalendarUI(
+  academicCalendar: AcademicCalendar(year: academicYearMock),
+  schedules: courseSchedulesUIMock,
+);

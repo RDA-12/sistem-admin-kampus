@@ -62,13 +62,7 @@ void main() {
 
   final expectedCalendarUI = CourseScheduleCalendarUI(
     academicCalendar: AcademicCalendar(year: testYear),
-    schedules: {
-      DateTime.monday: {
-        1: [expectedScheduleUIs[0]],
-        2: [expectedScheduleUIs[1]],
-        3: [expectedScheduleUIs[2]],
-      },
-    },
+    schedules: expectedScheduleUIs,
   );
 
   final testFilter = CourseScheduleFilter(
@@ -363,11 +357,7 @@ void main() {
             CourseSchedulesLoaded(
               CourseScheduleCalendarUI(
                 academicCalendar: AcademicCalendar(year: testYear),
-                schedules: {
-                  DateTime.monday: {
-                    1: [scheduleUI1, scheduleUI2],
-                  },
-                },
+                schedules: [scheduleUI1, scheduleUI2],
               ),
             ),
           ];
@@ -427,14 +417,7 @@ void main() {
             CourseSchedulesLoaded(
               CourseScheduleCalendarUI(
                 academicCalendar: AcademicCalendar(year: testYear),
-                schedules: {
-                  DateTime.monday: {
-                    1: [scheduleUIMon],
-                  },
-                  DateTime.tuesday: {
-                    2: [scheduleUITue],
-                  },
-                },
+                schedules: [scheduleUIMon, scheduleUITue],
               ),
             ),
           ];
@@ -462,7 +445,7 @@ void main() {
           CourseSchedulesLoaded(
             CourseScheduleCalendarUI(
               academicCalendar: AcademicCalendar(year: testYear),
-              schedules: const {},
+              schedules: const [],
             ),
           ),
         ],

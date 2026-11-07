@@ -4,6 +4,7 @@ import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/cohort/cohort.dart';
 import 'package:sistem_admin/common/shell/shell.dart';
 import 'package:sistem_admin/course/course.dart';
+import 'package:sistem_admin/course_schedule/course_schedule.dart';
 import 'package:sistem_admin/faculty/faculty.dart';
 import 'package:sistem_admin/lecturer/lecturer.dart';
 import 'package:sistem_admin/program/program.dart';

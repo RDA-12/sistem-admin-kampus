@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:sistem_admin/academic_calendar/academic_calendar.dart';
 import 'package:sistem_admin/cohort/cohort.dart';
@@ -52,15 +53,21 @@ class CourseScheduleUI extends CourseSchedule {
 /// UI model for [CourseCalendar]
 class CourseScheduleCalendarUI extends Equatable {
   /// Creates new [CourseScheduleCalendarUI]
-  const new({required this.academicCalendar, required this.schedules});
+  new({required this.academicCalendar, required this.schedules});
 
   /// AcademicCalendar this course calendar part of
   final AcademicCalendar academicCalendar;
 
-  /// Map of schedules
-  ///
-  /// day -> course semester -> schedules
-  final Map<int, Map<int, List<CourseScheduleUI>>> schedules;
+  /// List of schedules
+  final List<CourseScheduleUI> schedules;
+
+  /// List of possible semesters the schedules has
+  late final List<int> listOfSemester = schedules
+      .fold(
+        <int>{},
+        (p, e) => p..add(e.course.semester),
+      )
+      .sorted((a, b) => a.compareTo(b));
 
   @override
   List<Object?> get props => [academicCalendar, schedules];

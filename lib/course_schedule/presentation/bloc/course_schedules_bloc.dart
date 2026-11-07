@@ -128,7 +128,7 @@ class CourseSchedulesBloc
               rooms = data;
           }
 
-          final scheduleUIs = <int, Map<int, List<CourseScheduleUI>>>{};
+          final scheduleUIs = <CourseScheduleUI>[];
           for (final schedule in schedules) {
             if (schedule.academicYearId != event.academicYearId ||
                 schedule.termId != event.termId ||
@@ -173,12 +173,7 @@ class CourseSchedulesBloc
               lecturer: lecturer,
               room: room,
             );
-            final day = scheduleUI.start.weekday;
-            final semester = scheduleUI.course.semester;
-            scheduleUIs
-                .putIfAbsent(day, () => <int, List<CourseScheduleUI>>{})
-                .putIfAbsent(semester, () => <CourseScheduleUI>[])
-                .add(scheduleUI);
+            scheduleUIs.add(scheduleUI);
           }
 
           return AppResult.success(

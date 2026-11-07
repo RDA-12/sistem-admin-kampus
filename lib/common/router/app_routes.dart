@@ -485,6 +485,16 @@ class CohortDetailRoute extends GoRouteData with $CohortDetailRoute {
   );
 }
 
+/// Route for [CourseSchedulePage]
+class CourseScheduleRoute extends GoRouteData with $CourseScheduleRoute {
+  /// Creates new [CourseScheduleRoute]
+  const new();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CourseSchedulePage();
+}
+
 /// Route for [CohortDetailPage] in compact screen
 class CohortDetailCompactRoute extends GoRouteData
     with $CohortDetailCompactRoute {
@@ -526,6 +536,9 @@ class AcademicCalendarMainShellData extends StatefulShellBranchData;
 
 /// Branch for [Cohort] in [MainShell]
 class CohortMainShellData extends StatefulShellBranchData;
+
+/// Branch for [CourseSchedule] in [MainShell]
+class CourseScheduleMainShellData extends StatefulShellBranchData;
 
 /// Route for [MainShell]
 @TypedStatefulShellRoute<MainShellRoute>(
@@ -622,6 +635,13 @@ class CohortMainShellData extends StatefulShellBranchData;
             TypedGoRoute<CohortDetailRoute>(path: ':id'),
             TypedGoRoute<CohortDetailCompactRoute>(path: 'compact/:id'),
           ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<CourseScheduleMainShellData>(
+      routes: [
+        TypedGoRoute<CourseScheduleRoute>(
+          path: '/course-schedules',
         ),
       ],
     ),
